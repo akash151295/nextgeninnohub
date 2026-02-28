@@ -193,26 +193,26 @@
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData);
             
-            // Create email body
-            const emailBody = `New Registration from NextGen InnoHub
-
-Name: ${data.name}
-Email: ${data.email}
-Phone: ${data.phone}
-Domain: ${data.domain}
-Plan: ${data.plan}
-Status: ${data.status}
-Reason: ${data.reason}`;
+            // Format message for WhatsApp
+            const whatsappMessage = `*New Registration - NextGen InnoHub*%0A%0A*Name:* ${data.name}%0A*Email:* ${data.email}%0A*Phone:* ${data.phone}%0A*Domain:* ${data.domain}%0A*Plan:* ${data.plan}%0A*Status:* ${data.status}%0A*Reason:* ${data.reason}`;
             
-            // Send email using mailto
+            // Send to WhatsApp
+            window.open(`https://wa.me/919760327132?text=${whatsappMessage}`, '_blank');
+            
+            // Also send email (opens in new tab to avoid blocking)
+            const emailBody = `New Registration from NextGen InnoHub\n\nName: ${data.name}\nEmail: ${data.email}\nPhone: ${data.phone}\nDomain: ${data.domain}\nPlan: ${data.plan}\nStatus: ${data.status}\nReason: ${data.reason}`;
             const mailtoLink = `mailto:contact@nextgeninnohub.in?subject=New Registration - ${data.name}&body=${encodeURIComponent(emailBody)}`;
-            window.location.href = mailtoLink;
+            
+            // Open email in new window
+            setTimeout(() => {
+                window.open(mailtoLink, '_blank');
+            }, 1000);
             
             // Show success message
-            setTimeout(() => {
-                alert('✅ Registration Successful!\n\nThank you for joining NextGen InnoHub!\n\nWe will contact you at: ' + data.email);
-                e.target.reset();
-            }, 500);
+            alert('✅ Registration Successful!\n\nYour details have been sent via WhatsApp and Email.\n\nWe will contact you soon at: ' + data.email);
+            
+            // Reset form
+            e.target.reset();
         });
     </script>
 </body>
