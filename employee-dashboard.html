@@ -47,7 +47,7 @@
             <div class="card">
                 <h3>📝 Assign Tasks</h3>
                 <p style="color: #64748b; margin-bottom: 15px;">Create and assign tasks to interns</p>
-                <button class="btn" onclick="alert('Task assignment feature coming soon!')">➕ Assign New Task</button>
+                <button class="btn" onclick="openAssignTaskModal()">➕ Assign New Task</button>
                 <button class="btn btn-secondary" onclick="viewMyTasks()">📋 View All Tasks</button>
             </div>
 
@@ -55,7 +55,7 @@
             <div class="card">
                 <h3>✅ Review Submissions</h3>
                 <p style="color: #64748b; margin-bottom: 15px;">Review and provide feedback on intern work</p>
-                <button class="btn" onclick="alert('Review feature coming soon!')">📝 Review Submission</button>
+                <button class="btn" onclick="viewSubmissions()">📝 Review Submissions</button>
                 <button class="btn btn-secondary" onclick="viewPendingReviews()">📊 Pending Reviews</button>
             </div>
 
@@ -119,28 +119,192 @@
 
         loadMyInterns();
 
+        function openAssignTaskModal() {
+            const interns = DB.getAll('interns');
+            const myInterns = interns.filter(i => i.assignedTo === user.name);
+            
+            if (myInterns.length === 0) {
+                alert('❌ You have no interns assigned yet!');
+                return;
+            }
+            
+            const modal = document.createElement('div');
+            modal.id = 'assignTaskModal';
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; overflow-y: auto;';
+            
+            let internOptions = '';
+            myInterns.forEach(intern => {
+                internOptions += `<option value="${intern.name}">${intern.name} - ${intern.domain}</option>`;
+            });
+            
+            modal.innerHTML = `
+                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px; width: 90%;">
+                    <h3 style="margin-bottom: 20px;">Assign Task to Intern</h3>
+                    <form id="assignTaskForm">
+                        <select id="internSelect" required style="width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px;">
+                            <option value="">Select Intern</option>
+                            ${internOptions}
+                        </select>
+                        <input type="text" id="taskTitle" placeholder="Task Title" required style="width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px;">
+                        <textarea id="taskDesc" placeholder="Task Description" required rows="4" style="width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px;"></textarea>
+                        <input type="date" id="taskDue" required style="width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px;">
+                        <div style="margin-top: 20px;">
+                            <button type="submit" class="btn">Assign Task</button>
+                            <button type="button" class="btn" style="background: #6b7280;" onclick="document.getElementById('assignTaskModal').remove()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            document.getElementById('assignTaskForm').onsubmit = function(e) {
+                e.preventDefault();
+                const task = {
+                    id: 'TASK' + Date.now(),
+                    internName: document.getElementById('internSelect').value,
+                    title: document.getElementById('taskTitle').value,
+                    description: document.getElementById('taskDesc').value,
+                    dueDate: document.getElementById('taskDue').value,
+                    assignedBy: user.name,
+                    domain: user.domain,
+                    status: 'Assigned',
+                    createdAt: new Date().toISOString()
+                };
+                DB.addTask(task);
+                alert('✅ Task assigned successfully!');
+                modal.remove();
+            };
+        }
+
         function viewMyTasks() {
             const tasks = DB.getAll('tasks');
-            const myTasks = tasks.filter(t => t.domain === user.domain || t.status === 'Template');
+            const myTasks = tasks.filter(t => t.domain === user.domain || t.assignedBy === user.name);
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;';
+            
+            let html = '<div style="background: white; padding: 30px; border-radius: 15px; max-width: 900px; max-height: 80vh; overflow-y: auto; width: 90%;">';
+            html += '<button onclick="this.parentElement.parentElement.remove()" style="float: right; background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 20px;">×</button>';
+            html += '<h3>All Tasks</h3>';
+            html += '<button onclick="openCreateTaskModal()" class="btn" style="margin: 15px 0;">➕ Create New Task</button>';
             
             if (myTasks.length === 0) {
-                alert('📊 No tasks available for your domain yet.');
+                html += '<p style="color: #64748b; margin-top: 20px;">No tasks available yet.</p>';
             } else {
-                let html = '<h3>Available Tasks</h3><table style="width: 100%; border-collapse: collapse; margin-top: 15px;"><tr style="background: #f0f9ff;"><th style="padding: 10px; text-align: left;">Title</th><th style="padding: 10px; text-align: left;">Domain</th><th style="padding: 10px; text-align: left;">Description</th></tr>';
+                html += '<table style="width: 100%; border-collapse: collapse; margin-top: 15px;"><tr style="background: #f0f9ff;"><th style="padding: 10px; text-align: left;">Title</th><th style="padding: 10px; text-align: left;">Assigned To</th><th style="padding: 10px; text-align: left;">Status</th><th style="padding: 10px; text-align: left;">Due Date</th></tr>';
                 myTasks.forEach(task => {
-                    html += `<tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 10px;">${task.title}</td><td style="padding: 10px;">${task.domain}</td><td style="padding: 10px;">${task.description}</td></tr>`;
+                    html += `<tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 10px;">${task.title}</td><td style="padding: 10px;">${task.internName || 'Template'}</td><td style="padding: 10px;">${task.status}</td><td style="padding: 10px;">${task.dueDate || '-'}</td></tr>`;
                 });
                 html += '</table>';
-                
-                const modal = document.createElement('div');
-                modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;';
-                modal.innerHTML = `<div style="background: white; padding: 30px; border-radius: 15px; max-width: 800px; max-height: 80vh; overflow-y: auto;"><button onclick="this.parentElement.parentElement.remove()" style="float: right; background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">×</button>${html}</div>`;
-                document.body.appendChild(modal);
+            }
+            html += '</div>';
+            modal.innerHTML = html;
+            document.body.appendChild(modal);
+        }
+
+        function openCreateTaskModal() {
+            const modal = document.createElement('div');
+            modal.id = 'createTaskModal';
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001; display: flex; align-items: center; justify-content: center;';
+            
+            modal.innerHTML = `
+                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px; width: 90%;">
+                    <h3 style="margin-bottom: 20px;">Create New Task Template</h3>
+                    <form id="createTaskForm">
+                        <input type="text" id="newTaskTitle" placeholder="Task Title" required style="width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px;">
+                        <textarea id="newTaskDesc" placeholder="Task Description" required rows="4" style="width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px;"></textarea>
+                        <input type="text" id="newTaskDuration" placeholder="Estimated Duration (e.g., 2 days)" style="width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px;">
+                        <div style="margin-top: 20px;">
+                            <button type="submit" class="btn">Create Task</button>
+                            <button type="button" class="btn" style="background: #6b7280;" onclick="document.getElementById('createTaskModal').remove()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            document.getElementById('createTaskForm').onsubmit = function(e) {
+                e.preventDefault();
+                const task = {
+                    id: 'TASK' + Date.now(),
+                    title: document.getElementById('newTaskTitle').value,
+                    description: document.getElementById('newTaskDesc').value,
+                    duration: document.getElementById('newTaskDuration').value,
+                    domain: user.domain,
+                    status: 'Template',
+                    createdBy: user.name,
+                    createdAt: new Date().toISOString()
+                };
+                DB.addTask(task);
+                alert('✅ Task template created successfully!');
+                modal.remove();
+                document.querySelector('[onclick="this.parentElement.parentElement.remove()"]').click();
+                viewMyTasks();
+            };
+        }
+
+        function viewSubmissions() {
+            const tasks = DB.getAll('tasks');
+            const submissions = tasks.filter(t => t.assignedBy === user.name && t.status === 'Submitted');
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;';
+            
+            let html = '<div style="background: white; padding: 30px; border-radius: 15px; max-width: 900px; max-height: 80vh; overflow-y: auto; width: 90%;">';
+            html += '<button onclick="this.parentElement.parentElement.remove()" style="float: right; background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 20px;">×</button>';
+            html += '<h3>Submitted Tasks</h3>';
+            
+            if (submissions.length === 0) {
+                html += '<p style="color: #64748b; margin-top: 20px;">No submissions yet.</p>';
+            } else {
+                html += '<table style="width: 100%; border-collapse: collapse; margin-top: 15px;"><tr style="background: #f0f9ff;"><th style="padding: 10px; text-align: left;">Task</th><th style="padding: 10px; text-align: left;">Intern</th><th style="padding: 10px; text-align: left;">Submission</th><th style="padding: 10px; text-align: left;">Actions</th></tr>';
+                submissions.forEach(task => {
+                    html += `<tr style="border-bottom: 1px solid #e0e0e0;">
+                        <td style="padding: 10px;">${task.title}</td>
+                        <td style="padding: 10px;">${task.internName}</td>
+                        <td style="padding: 10px;"><a href="${task.submissionLink}" target="_blank" style="color: #10b981;">🔗 View</a></td>
+                        <td style="padding: 10px;">
+                            <button onclick="reviewTask('${task.id}', 'Approved')" class="btn" style="padding: 6px 12px; margin: 2px; background: #10b981;">✅ Approve</button>
+                            <button onclick="reviewTask('${task.id}', 'Rejected')" class="btn" style="padding: 6px 12px; margin: 2px; background: #ef4444;">❌ Reject</button>
+                        </td>
+                    </tr>`;
+                });
+                html += '</table>';
+            }
+            html += '</div>';
+            modal.innerHTML = html;
+            document.body.appendChild(modal);
+        }
+
+        function reviewTask(taskId, status) {
+            const comment = prompt(`Enter your ${status.toLowerCase()} comments:`);
+            if (comment === null) return;
+            
+            const tasks = DB.getAll('tasks');
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.status = status;
+                task.reviewComment = comment;
+                task.reviewedAt = new Date().toISOString();
+                task.reviewedBy = user.name;
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+                alert(`✅ Task ${status.toLowerCase()} successfully!`);
+                document.querySelector('[onclick="this.parentElement.parentElement.remove()"]').click();
+                viewSubmissions();
             }
         }
 
         function viewPendingReviews() {
-            alert('📊 Pending reviews feature coming soon! You will be able to review intern submissions here.');
+            const tasks = DB.getAll('tasks');
+            const pending = tasks.filter(t => t.assignedBy === user.name && t.status === 'Submitted');
+            
+            if (pending.length === 0) {
+                alert('✅ No pending reviews!');
+            } else {
+                alert(`📊 You have ${pending.length} pending review(s). Click "Review Submissions" to review them.`);
+            }
         }
 
         function logout() {
