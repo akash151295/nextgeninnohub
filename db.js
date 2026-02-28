@@ -3,12 +3,13 @@
 
 const DB = {
     // Initialize default data
+    // ⚠️ SECURITY: Change these default passwords before production!
     init() {
         if (!localStorage.getItem('users')) {
             localStorage.setItem('users', JSON.stringify([
-                {username: 'admin', password: 'admin123', role: 'admin', name: 'Admin User', email: 'admin@nextgeninnohub.in'},
-                {username: 'employee', password: 'emp123', role: 'employee', name: 'Lead Intern', email: 'lead@nextgeninnohub.in'},
-                {username: 'intern', password: 'int123', role: 'intern', name: 'Intern User', email: 'intern@nextgeninnohub.in', domain: 'HR'}
+                {username: 'admin', password: 'admin123', role: 'admin', name: 'Admin User'},
+                {username: 'employee', password: 'emp123', role: 'employee', name: 'Lead Intern'},
+                {username: 'intern', password: 'int123', role: 'intern', name: 'Intern User', domain: 'HR'}
             ]));
         }
         if (!localStorage.getItem('interns')) localStorage.setItem('interns', JSON.stringify([]));
