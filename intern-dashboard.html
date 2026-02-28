@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intern Dashboard - NextGen InnoHub</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f5f7fa; }
+        .header { background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 1.8em; }
+        .logout-btn { background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border: none; border-radius: 20px; cursor: pointer; }
+        .container { max-width: 1400px; margin: 30px auto; padding: 0 20px; }
+        .welcome { background: white; padding: 30px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .info-box { background: #fef3c7; padding: 15px; border-radius: 10px; margin: 15px 0; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .card h3 { color: #f59e0b; margin-bottom: 15px; font-size: 1.3em; }
+        .btn { display: inline-block; background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; margin: 5px; font-weight: 600; }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-secondary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎓 Intern Dashboard</h1>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="container">
+        <div class="welcome">
+            <h2>Welcome, <span id="internName">Intern</span>! 👋</h2>
+            <p style="color: #64748b; margin-top: 10px;">View your tasks, submit work, and track your progress.</p>
+            
+            <div class="info-box">
+                <strong>📚 Course Enrolled:</strong> <span id="internDomain">HR using Generative AI</span><br>
+                <strong>👨💼 Team Lead:</strong> <span id="teamLead">Lead Intern Name</span>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- My Tasks -->
+            <div class="card">
+                <h3>📋 My Assigned Tasks</h3>
+                <p style="color: #64748b; margin-bottom: 15px;">View all tasks assigned to you</p>
+                <a href="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit" target="_blank" class="btn">📊 View My Tasks</a>
+            </div>
+
+            <!-- Submit Task -->
+            <div class="card">
+                <h3>📤 Submit Task</h3>
+                <p style="color: #64748b; margin-bottom: 15px;">Upload your completed work</p>
+                <a href="https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform" target="_blank" class="btn">📁 Submit Work</a>
+                <p style="margin-top: 15px; font-size: 0.9em; color: #64748b;">
+                    <strong>Accepted formats:</strong> Video links, ZIP files, Google Drive links, GitHub repos
+                </p>
+            </div>
+
+            <!-- Feedback & Performance -->
+            <div class="card">
+                <h3>⭐ Feedback & Performance</h3>
+                <p style="color: #64748b; margin-bottom: 15px;">View feedback from your team lead</p>
+                <a href="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit" target="_blank" class="btn">📊 View Feedback</a>
+                <a href="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit" target="_blank" class="btn btn-secondary">📈 Performance Report</a>
+            </div>
+
+            <!-- Learning Resources -->
+            <div class="card">
+                <h3>📚 Learning Resources</h3>
+                <p style="color: #64748b; margin-bottom: 15px;">AI tools to help you complete tasks</p>
+                <a href="https://chat.openai.com" target="_blank" class="btn btn-secondary">🤖 ChatGPT</a>
+                <a href="https://gemini.google.com" target="_blank" class="btn btn-secondary">✨ Gemini</a>
+                <a href="https://claude.ai" target="_blank" class="btn btn-secondary">🧠 Claude</a>
+                <a href="https://www.canva.com" target="_blank" class="btn btn-secondary">🎨 Canva</a>
+            </div>
+
+            <!-- Progress Tracker -->
+            <div class="card">
+                <h3>📊 My Progress</h3>
+                <p style="color: #64748b; margin-bottom: 15px;">Track your internship journey</p>
+                <div style="margin-top: 20px;">
+                    <div style="padding: 15px; background: #f0f9ff; border-radius: 8px; margin-bottom: 10px;">
+                        <strong>Tasks Completed:</strong> <span style="color: #667eea; font-size: 1.5em;">0</span>
+                    </div>
+                    <div style="padding: 15px; background: #f0fdf4; border-radius: 8px; margin-bottom: 10px;">
+                        <strong>Pending Tasks:</strong> <span style="color: #10b981; font-size: 1.5em;">0</span>
+                    </div>
+                    <div style="padding: 15px; background: #fef3c7; border-radius: 8px;">
+                        <strong>Average Rating:</strong> <span style="color: #f59e0b; font-size: 1.5em;">0.0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help & Support -->
+            <div class="card">
+                <h3>💬 Help & Support</h3>
+                <p style="color: #64748b; margin-bottom: 15px;">Need help? Contact your team lead</p>
+                <a href="mailto:contact@nextgeninnohub.in" class="btn">📧 Email Support</a>
+                <a href="https://wa.me/919760327132" target="_blank" class="btn btn-secondary">💬 WhatsApp</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        if (!user || user.role !== 'intern') {
+            window.location.href = 'portal-login.html';
+        }
+        document.getElementById('internName').textContent = user.name;
+        document.getElementById('internDomain').textContent = user.domain || 'Not assigned';
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'portal-login.html';
+        }
+    </script>
+</body>
+</html>
