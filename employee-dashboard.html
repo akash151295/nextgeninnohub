@@ -48,7 +48,7 @@
                 <h3>📝 Assign Tasks</h3>
                 <p style="color: #64748b; margin-bottom: 15px;">Create and assign tasks to interns</p>
                 <button class="btn" onclick="openAssignTaskModal()">➕ Assign New Task</button>
-                <button class="btn btn-secondary" onclick="viewMyTasks()">📋 View All Tasks</button>
+                <button class="btn btn-secondary" onclick="viewMyTasks()">📋 View All Tasks <span id="allTasksBadge" style="background: #667eea; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.85em; margin-left: 5px;"></span></button>
             </div>
 
             <!-- Review Submissions -->
@@ -93,7 +93,7 @@
             <div class="card">
                 <h3>🚀 Promotion Requests</h3>
                 <p style="color: #64748b; margin-bottom: 15px;">Review intern promotion requests</p>
-                <button class="btn" onclick="viewPromotionRequests()">📊 View Requests</button>
+                <button class="btn" onclick="viewPromotionRequests()">📊 View Requests <span id="promotionBadge" style="background: #f59e0b; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.85em; margin-left: 5px;"></span></button>
             </div>
         </div>
     </div>
@@ -140,7 +140,35 @@
             }
         }
 
-        updateReviewBadge();
+        function updateAllBadges() {
+            const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+            const myTasks = tasks.filter(t => t.domain === user.domain || t.assignedBy === user.name);
+            const requests = JSON.parse(localStorage.getItem('promotionRequests') || '[]');
+            const pendingRequests = requests.filter(r => r.status === 'Pending');
+            
+            // Update review badge
+            updateReviewBadge();
+            
+            // Update all tasks badge
+            const allTasksBadge = document.getElementById('allTasksBadge');
+            if (myTasks.length > 0) {
+                allTasksBadge.textContent = myTasks.length;
+                allTasksBadge.style.display = 'inline';
+            } else {
+                allTasksBadge.style.display = 'none';
+            }
+            
+            // Update promotion badge
+            const promotionBadge = document.getElementById('promotionBadge');
+            if (pendingRequests.length > 0) {
+                promotionBadge.textContent = pendingRequests.length;
+                promotionBadge.style.display = 'inline';
+            } else {
+                promotionBadge.style.display = 'none';
+            }
+        }
+
+        updateAllBadges();
 
         function openAssignTaskModal() {
             const interns = DB.getAll('interns');
@@ -432,6 +460,7 @@
                 localStorage.setItem('promotionRequests', JSON.stringify(requests));
                 alert(`✅ Promotion request ${status.toLowerCase()}!`);
                 document.querySelector('[onclick="this.parentElement.parentElement.remove()"]').click();
+                updateAllBadges();
                 viewPromotionRequests();
             }
         }
