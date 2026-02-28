@@ -138,6 +138,105 @@
             margin-bottom: 20px;
         }
         
+        /* Courses Section */
+        .course-card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 2px solid #f3f4f6;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        
+        .course-card:hover {
+            border-color: #6366f1;
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.15);
+        }
+        
+        .course-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .course-header h3 {
+            font-size: 1.4em;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .course-toggle {
+            font-size: 1.5em;
+            color: #6366f1;
+            transition: transform 0.3s;
+        }
+        
+        .course-card.active .course-toggle {
+            transform: rotate(180deg);
+        }
+        
+        .course-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+        
+        .course-card.active .course-details {
+            max-height: 800px;
+        }
+        
+        .course-content {
+            padding-top: 25px;
+            border-top: 2px solid #f3f4f6;
+            margin-top: 20px;
+        }
+        
+        .course-content p {
+            color: #64748b;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            font-size: 1.05em;
+        }
+        
+        .course-highlights {
+            background: linear-gradient(135deg, #f0f9ff 0%, #f5f3ff 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        
+        .course-highlights h4 {
+            color: #6366f1;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .course-highlights ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .course-highlights li {
+            padding: 8px 0;
+            color: #475569;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .course-highlights li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #6366f1;
+            font-weight: bold;
+        }
+        
         /* Domains Grid */
         .domains-grid {
             display: grid;
@@ -529,6 +628,177 @@
         </div>
     </section>
 
+    <!-- Our Courses Section -->
+    <section id="courses">
+        <div class="container">
+            <h2>📚 Our Courses</h2>
+            <p style="text-align: center; font-size: 1.2em; color: #64748b; margin-bottom: 50px; max-width: 800px; margin-left: auto; margin-right: auto;">Click on any course to learn how we teach you to master your domain using cutting-edge Generative AI tools</p>
+            
+            <div class="courses-list">
+                <div class="course-card" onclick="toggleCourse(this)">
+                    <div class="course-header">
+                        <h3>👥 HR using Generative AI</h3>
+                        <span class="course-toggle">▼</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="course-content">
+                            <p>Learn how to revolutionize HR operations using Generative AI tools. Master recruitment, employee engagement, and HR analytics with AI-powered solutions.</p>
+                            <div class="course-highlights">
+                                <h4>What You'll Learn:</h4>
+                                <ul>
+                                    <li>AI-powered resume screening and candidate matching</li>
+                                    <li>Automated interview scheduling and communication</li>
+                                    <li>Employee onboarding with AI chatbots</li>
+                                    <li>Performance review automation using GenAI</li>
+                                    <li>HR analytics and predictive workforce planning</li>
+                                </ul>
+                            </div>
+                            <p><strong>Tools:</strong> ChatGPT, Claude, Gemini, HR-specific AI platforms</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" onclick="toggleCourse(this)">
+                    <div class="course-header">
+                        <h3>🧪 Software Testing using Generative AI</h3>
+                        <span class="course-toggle">▼</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="course-content">
+                            <p>Transform your testing approach with AI. Learn to generate test cases, automate testing workflows, and identify bugs faster using Generative AI.</p>
+                            <div class="course-highlights">
+                                <h4>What You'll Learn:</h4>
+                                <ul>
+                                    <li>AI-generated test case creation</li>
+                                    <li>Automated bug detection and reporting</li>
+                                    <li>Test script generation using GenAI</li>
+                                    <li>API testing automation with AI</li>
+                                    <li>Performance testing optimization</li>
+                                </ul>
+                            </div>
+                            <p><strong>Tools:</strong> GitHub Copilot, ChatGPT, AI testing frameworks</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" onclick="toggleCourse(this)">
+                    <div class="course-header">
+                        <h3>🐍 Python Development using Generative AI</h3>
+                        <span class="course-toggle">▼</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="course-content">
+                            <p>Accelerate your Python development with AI assistance. Build applications faster, debug smarter, and write cleaner code using Generative AI tools.</p>
+                            <div class="course-highlights">
+                                <h4>What You'll Learn:</h4>
+                                <ul>
+                                    <li>AI-assisted code generation and completion</li>
+                                    <li>Automated debugging and error fixing</li>
+                                    <li>Code optimization using GenAI</li>
+                                    <li>Building AI-powered Python applications</li>
+                                    <li>API integration with AI assistance</li>
+                                </ul>
+                            </div>
+                            <p><strong>Tools:</strong> GitHub Copilot, Amazon Q Developer, ChatGPT, Cursor IDE</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" onclick="toggleCourse(this)">
+                    <div class="course-header">
+                        <h3>⚛️ React Development using Generative AI</h3>
+                        <span class="course-toggle">▼</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="course-content">
+                            <p>Build modern web applications with React and AI. Learn to create components, manage state, and design UIs with the help of Generative AI.</p>
+                            <div class="course-highlights">
+                                <h4>What You'll Learn:</h4>
+                                <ul>
+                                    <li>AI-powered component generation</li>
+                                    <li>Automated UI/UX design with GenAI</li>
+                                    <li>State management optimization</li>
+                                    <li>Responsive design with AI assistance</li>
+                                    <li>Performance optimization using AI tools</li>
+                                </ul>
+                            </div>
+                            <p><strong>Tools:</strong> GitHub Copilot, v0.dev, ChatGPT, Cursor IDE</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" onclick="toggleCourse(this)">
+                    <div class="course-header">
+                        <h3>💼 Sales using Generative AI</h3>
+                        <span class="course-toggle">▼</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="course-content">
+                            <p>Supercharge your sales process with AI. Learn to generate leads, personalize outreach, and close deals faster using Generative AI tools.</p>
+                            <div class="course-highlights">
+                                <h4>What You'll Learn:</h4>
+                                <ul>
+                                    <li>AI-powered lead generation and qualification</li>
+                                    <li>Personalized email campaigns with GenAI</li>
+                                    <li>Sales script generation and optimization</li>
+                                    <li>CRM automation using AI</li>
+                                    <li>Sales forecasting and analytics</li>
+                                </ul>
+                            </div>
+                            <p><strong>Tools:</strong> ChatGPT, Claude, Sales AI platforms, CRM integrations</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" onclick="toggleCourse(this)">
+                    <div class="course-header">
+                        <h3>📢 Marketing using Generative AI</h3>
+                        <span class="course-toggle">▼</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="course-content">
+                            <p>Master digital marketing with AI. Create compelling content, design campaigns, and analyze performance using Generative AI tools.</p>
+                            <div class="course-highlights">
+                                <h4>What You'll Learn:</h4>
+                                <ul>
+                                    <li>AI-generated content creation (blogs, social media, ads)</li>
+                                    <li>SEO optimization using GenAI</li>
+                                    <li>Social media campaign automation</li>
+                                    <li>Email marketing with AI personalization</li>
+                                    <li>Marketing analytics and insights</li>
+                                </ul>
+                            </div>
+                            <p><strong>Tools:</strong> ChatGPT, Jasper, Canva AI, Marketing automation platforms</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" onclick="toggleCourse(this)">
+                    <div class="course-header">
+                        <h3>💰 Finance using Generative AI</h3>
+                        <span class="course-toggle">▼</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="course-content">
+                            <p>Transform financial operations with AI. Learn financial analysis, reporting, and forecasting using Generative AI tools.</p>
+                            <div class="course-highlights">
+                                <h4>What You'll Learn:</h4>
+                                <ul>
+                                    <li>AI-powered financial analysis and reporting</li>
+                                    <li>Automated invoice processing and reconciliation</li>
+                                    <li>Financial forecasting with GenAI</li>
+                                    <li>Risk assessment using AI models</li>
+                                    <li>Budget planning and optimization</li>
+                                </ul>
+                            </div>
+                            <p><strong>Tools:</strong> ChatGPT, Excel with AI, Financial AI platforms</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Domains Section -->
     <section id="domains">
         <div class="container">
@@ -778,5 +1048,20 @@
         <p>&copy; 2024 NextGen InnoHub. All rights reserved.</p>
         <p style="margin-top: 10px; font-style: italic;">"Internships for the AI Era - Learn Work, Not Just Skills"</p>
     </footer>
+    
+    <script>
+        function toggleCourse(element) {
+            // Close all other courses
+            const allCourses = document.querySelectorAll('.course-card');
+            allCourses.forEach(course => {
+                if (course !== element && course.classList.contains('active')) {
+                    course.classList.remove('active');
+                }
+            });
+            
+            // Toggle clicked course
+            element.classList.toggle('active');
+        }
+    </script>
 </body>
 </html>
