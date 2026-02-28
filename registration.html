@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - NextGen InnoHub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+        }
+        
+        .radio-group input {
+            width: auto;
+            margin-right: 8px;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-3px);
+        }
+        
+        .required {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>🚀 Join NextGen InnoHub</h1>
+        <p class="subtitle">Register for AI-Powered Internship</p>
+        
+        <form id="registrationForm">
+            <div class="form-group">
+                <label>Full Name <span class="required">*</span></label>
+                <input type="text" name="name" required placeholder="Enter your full name">
+            </div>
+            
+            <div class="form-group">
+                <label>Email <span class="required">*</span></label>
+                <input type="email" name="email" required placeholder="your.email@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label>Phone Number <span class="required">*</span></label>
+                <input type="tel" name="phone" required placeholder="+91 XXXXXXXXXX">
+            </div>
+            
+            <div class="form-group">
+                <label>Select Domain <span class="required">*</span></label>
+                <select name="domain" required>
+                    <option value="">Choose a domain...</option>
+                    <option value="hr">HR using Generative AI</option>
+                    <option value="testing">Software Testing using Generative AI</option>
+                    <option value="python">Python Development using Generative AI</option>
+                    <option value="react">React Development using Generative AI</option>
+                    <option value="sales">Sales using Generative AI</option>
+                    <option value="marketing">Marketing using Generative AI</option>
+                    <option value="finance">Finance using Generative AI</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Select Plan <span class="required">*</span></label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="plan" value="explorer" required>
+                        Explorer (FREE)
+                    </label>
+                    <label>
+                        <input type="radio" name="plan" value="builder">
+                        Builder (₹99)
+                    </label>
+                    <label>
+                        <input type="radio" name="plan" value="professional">
+                        Professional (₹199)
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Current Status <span class="required">*</span></label>
+                <select name="status" required>
+                    <option value="">Select your status...</option>
+                    <option value="school">School Student</option>
+                    <option value="college">College Student</option>
+                    <option value="fresher">Fresher</option>
+                    <option value="working">Working Professional</option>
+                    <option value="career-switch">Career Switcher</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Why do you want to join? <span class="required">*</span></label>
+                <textarea name="reason" required placeholder="Tell us your motivation..."></textarea>
+            </div>
+            
+            <button type="submit" class="submit-btn">Submit Registration 🚀</button>
+        </form>
+    </div>
+    
+    <script>
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            
+            // Show success message
+            alert('✅ Registration Successful!\n\nThank you for joining NextGen InnoHub!\n\nWe will contact you at: ' + data.email);
+            
+            // Log data (in production, send to backend)
+            console.log('Registration Data:', data);
+            
+            // Reset form
+            e.target.reset();
+        });
+    </script>
+</body>
+</html>
