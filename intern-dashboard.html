@@ -16,9 +16,10 @@
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }
         .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .card h3 { color: #f59e0b; margin-bottom: 15px; font-size: 1.3em; }
-        .btn { display: inline-block; background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; margin: 5px; font-weight: 600; }
+        .btn { display: inline-block; background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); color: white; padding: 12px 25px; border: none; border-radius: 8px; margin: 5px; font-weight: 600; cursor: pointer; text-decoration: none; }
         .btn:hover { transform: translateY(-2px); }
         .btn-secondary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .btn-success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
     </style>
 </head>
 <body>
@@ -37,7 +38,7 @@
             
             <div class="info-box">
                 <strong>📚 Course Enrolled:</strong> <span id="internDomain">HR using Generative AI</span><br>
-                <strong>👨💼 Team Lead:</strong> <span id="teamLead">Lead Intern Name</span>
+                <strong>👨💼 Team Lead:</strong> <span id="teamLead">Loading...</span>
             </div>
         </div>
 
@@ -46,35 +47,28 @@
             <div class="card">
                 <h3>📋 My Assigned Tasks</h3>
                 <p style="color: #64748b; margin-bottom: 15px;">View all tasks assigned to you</p>
-                <a href="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit" target="_blank" class="btn">📊 View My Tasks</a>
+                <button class="btn" onclick="viewMyTasks()">📊 View My Tasks</button>
             </div>
 
             <!-- Submit Task -->
             <div class="card">
                 <h3>📤 Submit Task</h3>
                 <p style="color: #64748b; margin-bottom: 15px;">Upload your completed work</p>
-                <a href="https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform" target="_blank" class="btn">📁 Submit Work</a>
-                <p style="margin-top: 15px; font-size: 0.9em; color: #64748b;">
-                    <strong>Accepted formats:</strong> Video links, ZIP files, Google Drive links, GitHub repos
-                </p>
+                <button class="btn" onclick="submitTask()">📁 Submit Work</button>
             </div>
 
-            <!-- Feedback & Performance -->
+            <!-- Feedback -->
             <div class="card">
-                <h3>⭐ Feedback & Performance</h3>
+                <h3>⭐ View Feedback</h3>
                 <p style="color: #64748b; margin-bottom: 15px;">View feedback from your team lead</p>
-                <a href="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit" target="_blank" class="btn">📊 View Feedback</a>
-                <a href="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit" target="_blank" class="btn btn-secondary">📈 Performance Report</a>
+                <button class="btn" onclick="viewFeedback()">📊 View Feedback</button>
             </div>
 
-            <!-- Learning Resources -->
+            <!-- Performance Report -->
             <div class="card">
-                <h3>📚 Learning Resources</h3>
-                <p style="color: #64748b; margin-bottom: 15px;">AI tools to help you complete tasks</p>
-                <a href="https://chat.openai.com" target="_blank" class="btn btn-secondary">🤖 ChatGPT</a>
-                <a href="https://gemini.google.com" target="_blank" class="btn btn-secondary">✨ Gemini</a>
-                <a href="https://claude.ai" target="_blank" class="btn btn-secondary">🧠 Claude</a>
-                <a href="https://www.canva.com" target="_blank" class="btn btn-secondary">🎨 Canva</a>
+                <h3>📈 Performance Report</h3>
+                <p style="color: #64748b; margin-bottom: 15px;">View your ratings and history</p>
+                <button class="btn btn-secondary" onclick="viewPerformance()">📈 View Report</button>
             </div>
 
             <!-- Progress Tracker -->
@@ -83,39 +77,293 @@
                 <p style="color: #64748b; margin-bottom: 15px;">Track your internship journey</p>
                 <div style="margin-top: 20px;">
                     <div style="padding: 15px; background: #f0f9ff; border-radius: 8px; margin-bottom: 10px;">
-                        <strong>Tasks Completed:</strong> <span style="color: #667eea; font-size: 1.5em;">0</span>
+                        <strong>Tasks Completed:</strong> <span id="completedCount" style="color: #667eea; font-size: 1.5em;">0</span>
                     </div>
                     <div style="padding: 15px; background: #f0fdf4; border-radius: 8px; margin-bottom: 10px;">
-                        <strong>Pending Tasks:</strong> <span style="color: #10b981; font-size: 1.5em;">0</span>
+                        <strong>Pending Tasks:</strong> <span id="pendingCount" style="color: #10b981; font-size: 1.5em;">0</span>
                     </div>
                     <div style="padding: 15px; background: #fef3c7; border-radius: 8px;">
-                        <strong>Average Rating:</strong> <span style="color: #f59e0b; font-size: 1.5em;">0.0</span>
+                        <strong>Average Rating:</strong> <span id="avgRating" style="color: #f59e0b; font-size: 1.5em;">0.0</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Help & Support -->
+            <!-- Promotion Request -->
             <div class="card">
-                <h3>💬 Help & Support</h3>
-                <p style="color: #64748b; margin-bottom: 15px;">Need help? Contact your team lead</p>
-                <a href="mailto:contact@nextgeninnohub.in" class="btn">📧 Email Support</a>
-                <a href="https://wa.me/919760327132" target="_blank" class="btn btn-secondary">💬 WhatsApp</a>
+                <h3>🚀 Career Growth</h3>
+                <p style="color: #64748b; margin-bottom: 15px;">Request promotion to Lead Intern</p>
+                <button class="btn btn-success" onclick="requestPromotion()">⬆️ Request Promotion</button>
+                <div id="promotionStatus" style="margin-top: 15px;"></div>
             </div>
         </div>
     </div>
 
+    <script src="db.js"></script>
     <script>
         const user = JSON.parse(localStorage.getItem('currentUser'));
         if (!user || user.role !== 'intern') {
             window.location.href = 'portal-login.html';
         }
+        
         document.getElementById('internName').textContent = user.name || user.username;
         document.getElementById('internDomain').textContent = user.domain || 'Not assigned';
+
+        // Load team lead name
+        function loadTeamLead() {
+            const interns = DB.getAll('interns');
+            const myData = interns.find(i => i.name === user.name || i.email === user.email);
+            if (myData && myData.assignedTo) {
+                document.getElementById('teamLead').textContent = myData.assignedTo;
+            } else {
+                document.getElementById('teamLead').textContent = 'Not assigned';
+            }
+        }
+
+        // Load progress stats
+        function loadProgress() {
+            const tasks = DB.getAll('tasks');
+            const myTasks = tasks.filter(t => t.internName === user.name);
+            
+            const completed = myTasks.filter(t => t.status === 'Approved').length;
+            const pending = myTasks.filter(t => t.status === 'Assigned' || t.status === 'Submitted').length;
+            
+            const ratings = myTasks.filter(t => t.rating).map(t => parseFloat(t.rating));
+            const avgRating = ratings.length > 0 ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1) : '0.0';
+            
+            document.getElementById('completedCount').textContent = completed;
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('avgRating').textContent = avgRating;
+        }
+
+        function viewMyTasks() {
+            const tasks = DB.getAll('tasks');
+            const myTasks = tasks.filter(t => t.internName === user.name);
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;';
+            
+            let html = '<div style="background: white; padding: 30px; border-radius: 15px; max-width: 900px; max-height: 80vh; overflow-y: auto; width: 90%;">';
+            html += '<button onclick="this.parentElement.parentElement.remove()" style="float: right; background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 20px;">×</button>';
+            html += '<h3>My Tasks</h3>';
+            
+            if (myTasks.length === 0) {
+                html += '<p style="color: #64748b; margin-top: 20px;">No tasks assigned yet.</p>';
+            } else {
+                html += '<table style="width: 100%; border-collapse: collapse; margin-top: 15px;"><tr style="background: #f0f9ff;"><th style="padding: 10px; text-align: left;">Title</th><th style="padding: 10px; text-align: left;">Description</th><th style="padding: 10px; text-align: left;">Due Date</th><th style="padding: 10px; text-align: left;">Status</th></tr>';
+                myTasks.forEach(task => {
+                    const statusColor = task.status === 'Approved' ? '#10b981' : task.status === 'Rejected' ? '#ef4444' : '#f59e0b';
+                    html += `<tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 10px;">${task.title}</td><td style="padding: 10px;">${task.description}</td><td style="padding: 10px;">${task.dueDate || '-'}</td><td style="padding: 10px; color: ${statusColor}; font-weight: 600;">${task.status}</td></tr>`;
+                });
+                html += '</table>';
+            }
+            html += '</div>';
+            modal.innerHTML = html;
+            document.body.appendChild(modal);
+        }
+
+        function submitTask() {
+            const tasks = DB.getAll('tasks');
+            const myTasks = tasks.filter(t => t.internName === user.name && t.status === 'Assigned');
+            
+            if (myTasks.length === 0) {
+                alert('❌ No pending tasks to submit!');
+                return;
+            }
+            
+            const modal = document.createElement('div');
+            modal.id = 'submitModal';
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;';
+            
+            let taskOptions = '';
+            myTasks.forEach(task => {
+                taskOptions += `<option value="${task.id}">${task.title}</option>`;
+            });
+            
+            modal.innerHTML = `
+                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px; width: 90%;">
+                    <h3 style="margin-bottom: 20px;">Submit Task</h3>
+                    <form id="submitForm">
+                        <select id="taskSelect" required style="width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px;">
+                            <option value="">Select Task</option>
+                            ${taskOptions}
+                        </select>
+                        <input type="url" id="submissionLink" placeholder="Submission Link (Google Drive, GitHub, etc.)" required style="width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px;">
+                        <textarea id="submissionNotes" placeholder="Additional Notes (optional)" rows="3" style="width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px;"></textarea>
+                        <div style="margin-top: 20px;">
+                            <button type="submit" class="btn">Submit Task</button>
+                            <button type="button" class="btn" style="background: #6b7280;" onclick="document.getElementById('submitModal').remove()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            document.getElementById('submitForm').onsubmit = function(e) {
+                e.preventDefault();
+                const taskId = document.getElementById('taskSelect').value;
+                const link = document.getElementById('submissionLink').value;
+                const notes = document.getElementById('submissionNotes').value;
+                
+                const tasks = DB.getAll('tasks');
+                const task = tasks.find(t => t.id === taskId);
+                if (task) {
+                    task.status = 'Submitted';
+                    task.submissionLink = link;
+                    task.submissionNotes = notes;
+                    task.submittedAt = new Date().toISOString();
+                    localStorage.setItem('tasks', JSON.stringify(tasks));
+                    alert('✅ Task submitted successfully!');
+                    modal.remove();
+                    loadProgress();
+                }
+            };
+        }
+
+        function viewFeedback() {
+            const tasks = DB.getAll('tasks');
+            const reviewedTasks = tasks.filter(t => t.internName === user.name && (t.status === 'Approved' || t.status === 'Rejected'));
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;';
+            
+            let html = '<div style="background: white; padding: 30px; border-radius: 15px; max-width: 900px; max-height: 80vh; overflow-y: auto; width: 90%;">';
+            html += '<button onclick="this.parentElement.parentElement.remove()" style="float: right; background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 20px;">×</button>';
+            html += '<h3>Feedback from Team Lead</h3>';
+            
+            if (reviewedTasks.length === 0) {
+                html += '<p style="color: #64748b; margin-top: 20px;">No feedback yet.</p>';
+            } else {
+                html += '<div style="margin-top: 20px;">';
+                reviewedTasks.forEach(task => {
+                    const statusColor = task.status === 'Approved' ? '#10b981' : '#ef4444';
+                    html += `<div style="border: 2px solid ${statusColor}; padding: 20px; border-radius: 10px; margin-bottom: 15px;">
+                        <h4 style="color: ${statusColor};">${task.status === 'Approved' ? '✅' : '❌'} ${task.title}</h4>
+                        <p style="margin: 10px 0;"><strong>Status:</strong> ${task.status}</p>
+                        <p style="margin: 10px 0;"><strong>Feedback:</strong> ${task.reviewComment || 'No comments'}</p>
+                        <p style="margin: 10px 0;"><strong>Rating:</strong> ${task.rating ? task.rating + '/5' : 'Not rated'}</p>
+                        <p style="margin: 10px 0; font-size: 0.9em; color: #64748b;">Reviewed by: ${task.reviewedBy || 'Team Lead'}</p>
+                    </div>`;
+                });
+                html += '</div>';
+            }
+            html += '</div>';
+            modal.innerHTML = html;
+            document.body.appendChild(modal);
+        }
+
+        function viewPerformance() {
+            const tasks = DB.getAll('tasks');
+            const myTasks = tasks.filter(t => t.internName === user.name);
+            const reviewedTasks = myTasks.filter(t => t.rating);
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;';
+            
+            let html = '<div style="background: white; padding: 30px; border-radius: 15px; max-width: 900px; max-height: 80vh; overflow-y: auto; width: 90%;">';
+            html += '<button onclick="this.parentElement.parentElement.remove()" style="float: right; background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 20px;">×</button>';
+            html += '<h3>Performance Report</h3>';
+            
+            const completed = myTasks.filter(t => t.status === 'Approved').length;
+            const rejected = myTasks.filter(t => t.status === 'Rejected').length;
+            const ratings = reviewedTasks.map(t => parseFloat(t.rating));
+            const avgRating = ratings.length > 0 ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1) : '0.0';
+            
+            html += `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0;">
+                <div style="background: #f0f9ff; padding: 20px; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 2em; color: #667eea;">${completed}</div>
+                    <div>Tasks Approved</div>
+                </div>
+                <div style="background: #fef3c7; padding: 20px; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 2em; color: #f59e0b;">${avgRating}</div>
+                    <div>Average Rating</div>
+                </div>
+                <div style="background: #fee2e2; padding: 20px; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 2em; color: #ef4444;">${rejected}</div>
+                    <div>Tasks Rejected</div>
+                </div>
+            </div>`;
+            
+            if (reviewedTasks.length > 0) {
+                html += '<h4 style="margin-top: 20px;">Rating History</h4>';
+                html += '<table style="width: 100%; border-collapse: collapse; margin-top: 15px;"><tr style="background: #f0f9ff;"><th style="padding: 10px; text-align: left;">Task</th><th style="padding: 10px; text-align: left;">Rating</th><th style="padding: 10px; text-align: left;">Feedback</th></tr>';
+                reviewedTasks.forEach(task => {
+                    html += `<tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 10px;">${task.title}</td><td style="padding: 10px;">${task.rating}/5 ⭐</td><td style="padding: 10px;">${task.performanceFeedback || task.reviewComment || '-'}</td></tr>`;
+                });
+                html += '</table>';
+            }
+            
+            html += '</div>';
+            modal.innerHTML = html;
+            document.body.appendChild(modal);
+        }
+
+        function requestPromotion() {
+            const tasks = DB.getAll('tasks');
+            const myTasks = tasks.filter(t => t.internName === user.name);
+            const completedTasks = myTasks.filter(t => t.status === 'Approved').length;
+            const pendingTasks = myTasks.filter(t => t.status === 'Assigned' || t.status === 'Submitted').length;
+            
+            if (pendingTasks > 0) {
+                alert('❌ You have pending tasks! Complete all assigned tasks before requesting promotion.');
+                return;
+            }
+            
+            if (completedTasks < 3) {
+                alert('❌ You need to complete at least 3 tasks before requesting promotion.');
+                return;
+            }
+            
+            if (confirm('🚀 Request promotion to Lead Intern? Your team lead will review your request.')) {
+                const requests = JSON.parse(localStorage.getItem('promotionRequests') || '[]');
+                const existing = requests.find(r => r.internName === user.name && r.status === 'Pending');
+                
+                if (existing) {
+                    alert('⏳ You already have a pending promotion request!');
+                    return;
+                }
+                
+                requests.push({
+                    id: 'PROMO' + Date.now(),
+                    internName: user.name,
+                    internEmail: user.email,
+                    domain: user.domain,
+                    completedTasks: completedTasks,
+                    requestedAt: new Date().toISOString(),
+                    status: 'Pending'
+                });
+                
+                localStorage.setItem('promotionRequests', JSON.stringify(requests));
+                alert('✅ Promotion request submitted! Your team lead will review it soon.');
+                document.getElementById('promotionStatus').innerHTML = '<p style="color: #f59e0b; font-weight: 600;">⏳ Promotion request pending...</p>';
+            }
+        }
+
+        // Check promotion status
+        function checkPromotionStatus() {
+            const requests = JSON.parse(localStorage.getItem('promotionRequests') || '[]');
+            const myRequest = requests.find(r => r.internName === user.name);
+            
+            if (myRequest) {
+                if (myRequest.status === 'Pending') {
+                    document.getElementById('promotionStatus').innerHTML = '<p style="color: #f59e0b; font-weight: 600;">⏳ Promotion request pending...</p>';
+                } else if (myRequest.status === 'Approved') {
+                    document.getElementById('promotionStatus').innerHTML = '<p style="color: #10b981; font-weight: 600;">✅ Promotion approved! Contact admin.</p>';
+                } else if (myRequest.status === 'Rejected') {
+                    document.getElementById('promotionStatus').innerHTML = '<p style="color: #ef4444; font-weight: 600;">❌ Promotion request rejected. Reason: ' + (myRequest.reason || 'Not specified') + '</p>';
+                }
+            }
+        }
 
         function logout() {
             localStorage.removeItem('currentUser');
             window.location.href = 'portal-login.html';
         }
+
+        // Initialize
+        loadTeamLead();
+        loadProgress();
+        checkPromotionStatus();
     </script>
 </body>
 </html>

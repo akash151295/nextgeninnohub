@@ -88,6 +88,13 @@
                     </ul>
                 </details>
             </div>
+            
+            <!-- Promotion Requests -->
+            <div class="card">
+                <h3>🚀 Promotion Requests</h3>
+                <p style="color: #64748b; margin-bottom: 15px;">Review intern promotion requests</p>
+                <button class="btn" onclick="viewPromotionRequests()">📊 View Requests</button>
+            </div>
         </div>
     </div>
 
@@ -279,21 +286,58 @@
         }
 
         function reviewTask(taskId, status) {
-            const comment = prompt(`Enter your ${status.toLowerCase()} comments:`);
-            if (comment === null) return;
+            const modal = document.createElement('div');
+            modal.id = 'reviewModal';
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001; display: flex; align-items: center; justify-content: center;';
             
-            const tasks = DB.getAll('tasks');
-            const task = tasks.find(t => t.id === taskId);
-            if (task) {
-                task.status = status;
-                task.reviewComment = comment;
-                task.reviewedAt = new Date().toISOString();
-                task.reviewedBy = user.name;
-                localStorage.setItem('tasks', JSON.stringify(tasks));
-                alert(`✅ Task ${status.toLowerCase()} successfully!`);
-                document.querySelector('[onclick="this.parentElement.parentElement.remove()"]').click();
-                viewSubmissions();
-            }
+            modal.innerHTML = `
+                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px; width: 90%;">
+                    <h3 style="margin-bottom: 20px;">${status === 'Approved' ? '✅ Approve' : '❌ Reject'} Task</h3>
+                    <form id="reviewForm">
+                        <textarea id="reviewComment" placeholder="Your feedback comments" required rows="3" style="width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px;"></textarea>
+                        ${status === 'Approved' ? `
+                        <select id="rating" required style="width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px;">
+                            <option value="">Select Rating</option>
+                            <option value="5">5 - Excellent</option>
+                            <option value="4">4 - Very Good</option>
+                            <option value="3">3 - Good</option>
+                            <option value="2">2 - Needs Improvement</option>
+                            <option value="1">1 - Poor</option>
+                        </select>
+                        <textarea id="performanceFeedback" placeholder="Performance feedback (punctuality, quality, etc.)" rows="2" style="width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px;"></textarea>
+                        ` : ''}
+                        <div style="margin-top: 20px;">
+                            <button type="submit" class="btn">Submit Review</button>
+                            <button type="button" class="btn" style="background: #6b7280;" onclick="document.getElementById('reviewModal').remove()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            document.getElementById('reviewForm').onsubmit = function(e) {
+                e.preventDefault();
+                const comment = document.getElementById('reviewComment').value;
+                const rating = status === 'Approved' ? document.getElementById('rating').value : null;
+                const perfFeedback = status === 'Approved' ? document.getElementById('performanceFeedback').value : null;
+                
+                const tasks = DB.getAll('tasks');
+                const task = tasks.find(t => t.id === taskId);
+                if (task) {
+                    task.status = status;
+                    task.reviewComment = comment;
+                    if (rating) task.rating = rating;
+                    if (perfFeedback) task.performanceFeedback = perfFeedback;
+                    task.reviewedAt = new Date().toISOString();
+                    task.reviewedBy = user.name;
+                    localStorage.setItem('tasks', JSON.stringify(tasks));
+                    alert(`✅ Task ${status.toLowerCase()} successfully!`);
+                    modal.remove();
+                    document.querySelector('[onclick="this.parentElement.parentElement.remove()"]').click();
+                    viewSubmissions();
+                }
+            };
         }
 
         function viewPendingReviews() {
@@ -304,6 +348,60 @@
                 alert('✅ No pending reviews!');
             } else {
                 alert(`📊 You have ${pending.length} pending review(s). Click "Review Submissions" to review them.`);
+            }
+        }
+
+        function viewPromotionRequests() {
+            const requests = JSON.parse(localStorage.getItem('promotionRequests') || '[]');
+            const myRequests = requests.filter(r => r.status === 'Pending');
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;';
+            
+            let html = '<div style="background: white; padding: 30px; border-radius: 15px; max-width: 900px; max-height: 80vh; overflow-y: auto; width: 90%;">';
+            html += '<button onclick="this.parentElement.parentElement.remove()" style="float: right; background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 20px;">×</button>';
+            html += '<h3>Promotion Requests</h3>';
+            
+            if (myRequests.length === 0) {
+                html += '<p style="color: #64748b; margin-top: 20px;">No pending promotion requests.</p>';
+            } else {
+                html += '<div style="margin-top: 20px;">';
+                myRequests.forEach(req => {
+                    html += `<div style="border: 2px solid #f59e0b; padding: 20px; border-radius: 10px; margin-bottom: 15px;">
+                        <h4>🚀 ${req.internName}</h4>
+                        <p style="margin: 10px 0;"><strong>Domain:</strong> ${req.domain}</p>
+                        <p style="margin: 10px 0;"><strong>Completed Tasks:</strong> ${req.completedTasks}</p>
+                        <p style="margin: 10px 0;"><strong>Requested:</strong> ${new Date(req.requestedAt).toLocaleDateString()}</p>
+                        <div style="margin-top: 15px;">
+                            <button onclick="handlePromotionRequest('${req.id}', 'Approved')" class="btn" style="background: #10b981; padding: 8px 16px;">✅ Approve</button>
+                            <button onclick="handlePromotionRequest('${req.id}', 'Rejected')" class="btn" style="background: #ef4444; padding: 8px 16px;">❌ Reject</button>
+                        </div>
+                    </div>`;
+                });
+                html += '</div>';
+            }
+            html += '</div>';
+            modal.innerHTML = html;
+            document.body.appendChild(modal);
+        }
+
+        function handlePromotionRequest(requestId, status) {
+            const reason = status === 'Rejected' ? prompt('Enter reason for rejection:') : '';
+            if (status === 'Rejected' && !reason) return;
+            
+            const requests = JSON.parse(localStorage.getItem('promotionRequests') || '[]');
+            const request = requests.find(r => r.id === requestId);
+            
+            if (request) {
+                request.status = status;
+                request.reviewedBy = user.name;
+                request.reviewedAt = new Date().toISOString();
+                if (reason) request.reason = reason;
+                
+                localStorage.setItem('promotionRequests', JSON.stringify(requests));
+                alert(`✅ Promotion request ${status.toLowerCase()}!`);
+                document.querySelector('[onclick="this.parentElement.parentElement.remove()"]').click();
+                viewPromotionRequests();
             }
         }
 
