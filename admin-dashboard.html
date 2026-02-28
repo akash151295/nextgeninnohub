@@ -51,6 +51,13 @@
             </div>
 
             <div class="card">
+                <h3>👨‍💼 Lead Intern Management</h3>
+                <button class="btn" onclick="openModal('addLeadIntern')">➕ Add Lead Intern</button>
+                <button class="btn btn-secondary" onclick="openModal('promoteIntern')">⬆️ Promote to Lead</button>
+                <button class="btn btn-secondary" onclick="viewLeadInterns()">📊 View Lead Interns</button>
+            </div>
+
+            <div class="card">
                 <h3>🎓 Intern Management</h3>
                 <button class="btn" onclick="openModal('addIntern')">➕ Add Intern</button>
                 <button class="btn btn-secondary" onclick="viewData('interns')">📊 View All Interns</button>
@@ -126,8 +133,47 @@
                     <option value="Python">Python</option>
                     <option value="React">React</option>
                 </select>
-                <input type="text" placeholder="Assign To (Employee Name)" name="assignedTo">
+                <select name="assignedTo" id="leadInternSelect" required>
+                    <option value="">Select Lead Intern</option>
+                </select>
                 <button type="submit" class="btn">Add Intern</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="addLeadInternModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addLeadIntern')">&times;</span>
+            <h3>Add Lead Intern</h3>
+            <form onsubmit="addLeadIntern(event)">
+                <input type="text" placeholder="Username" required name="username">
+                <input type="password" placeholder="Password" required name="password" minlength="6">
+                <input type="text" placeholder="Full Name" required name="name">
+                <input type="email" placeholder="Email" required name="email">
+                <select name="domain" required>
+                    <option value="">Select Domain</option>
+                    <option value="HR">HR</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Testing">Testing</option>
+                    <option value="Python">Python</option>
+                    <option value="React">React</option>
+                </select>
+                <button type="submit" class="btn">Add Lead Intern</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="promoteInternModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('promoteIntern')">&times;</span>
+            <h3>Promote Intern to Lead</h3>
+            <form onsubmit="promoteIntern(event)">
+                <select name="internId" id="internPromoteSelect" required>
+                    <option value="">Select Intern to Promote</option>
+                </select>
+                <input type="text" placeholder="Username for Login" required name="username">
+                <input type="password" placeholder="Password" required name="password" minlength="6">
+                <button type="submit" class="btn">Promote to Lead Intern</button>
             </form>
         </div>
     </div>
@@ -187,8 +233,131 @@
         if (!user || user.role !== 'admin') window.location.href = 'portal-login.html';
         document.getElementById('adminName').textContent = user.name;
 
-        function openModal(type) { document.getElementById(type + 'Modal').style.display = 'block'; }
+        function openModal(type) { 
+            document.getElementById(type + 'Modal').style.display = 'block';
+            if (type === 'addIntern') loadLeadInterns();
+            if (type === 'promoteIntern') loadInternsForPromotion();
+        }
         function closeModal(type) { document.getElementById(type + 'Modal').style.display = 'none'; }
+
+        function loadLeadInterns() {
+            const users = DB.getAll('users');
+            const leadInterns = users.filter(u => u.role === 'employee');
+            const select = document.getElementById('leadInternSelect');
+            select.innerHTML = '<option value="">Select Lead Intern</option>';
+            leadInterns.forEach(lead => {
+                select.innerHTML += `<option value="${lead.name}">${lead.name} (${lead.domain || 'All'})</option>`;
+            });
+        }
+
+        function loadInternsForPromotion() {
+            const interns = DB.getAll('interns');
+            const select = document.getElementById('internPromoteSelect');
+            select.innerHTML = '<option value="">Select Intern to Promote</option>';
+            interns.forEach(intern => {
+                select.innerHTML += `<option value="${intern.id}">${intern.name} - ${intern.domain}</option>`;
+            });
+        }
+
+        function addLeadIntern(e) {
+            e.preventDefault();
+            const data = new FormData(e.target);
+            const leadData = Object.fromEntries(data);
+            leadData.role = 'employee';
+            
+            const users = DB.getAll('users');
+            const exists = users.find(u => u.username === leadData.username);
+            if (exists) {
+                alert('❌ Username already exists!');
+                return;
+            }
+            
+            DB.addUser(leadData);
+            alert('✅ Lead Intern added successfully!');
+            e.target.reset();
+            closeModal('addLeadIntern');
+        }
+
+        function promoteIntern(e) {
+            e.preventDefault();
+            const data = new FormData(e.target);
+            const internId = data.get('internId');
+            const username = data.get('username');
+            const password = data.get('password');
+            
+            const interns = DB.getAll('interns');
+            const intern = interns.find(i => i.id == internId);
+            
+            if (!intern) {
+                alert('❌ Intern not found!');
+                return;
+            }
+            
+            const users = DB.getAll('users');
+            const exists = users.find(u => u.username === username);
+            if (exists) {
+                alert('❌ Username already exists!');
+                return;
+            }
+            
+            const leadData = {
+                username: username,
+                password: password,
+                role: 'employee',
+                name: intern.name,
+                email: intern.email,
+                domain: intern.domain
+            };
+            
+            DB.addUser(leadData);
+            alert(`✅ ${intern.name} promoted to Lead Intern successfully!`);
+            e.target.reset();
+            closeModal('promoteIntern');
+        }
+
+        function addIntern(e) {
+            e.preventDefault();
+            const data = new FormData(e.target);
+            const internData = Object.fromEntries(data);
+            
+            if (!internData.assignedTo) {
+                alert('❌ Please select a Lead Intern!');
+                return;
+            }
+            
+            const users = DB.getAll('users');
+            const leadExists = users.find(u => u.role === 'employee' && u.name === internData.assignedTo);
+            
+            if (!leadExists) {
+                alert(`❌ Lead Intern "${internData.assignedTo}" does not exist! Please add them first.`);
+                return;
+            }
+            
+            DB.addIntern(internData);
+            alert('✅ Intern added successfully!');
+            e.target.reset();
+            closeModal('addIntern');
+        }
+
+        function viewLeadInterns() {
+            const users = DB.getAll('users');
+            const leadInterns = users.filter(u => u.role === 'employee');
+            const view = document.getElementById('dataView');
+            const content = document.getElementById('dataContent');
+            document.getElementById('dataTitle').textContent = 'LEAD INTERNS';
+            
+            if (leadInterns.length === 0) {
+                content.innerHTML = '<p>No lead interns found</p>';
+            } else {
+                let html = '<table><tr><th>Name</th><th>Username</th><th>Email</th><th>Domain</th></tr>';
+                leadInterns.forEach(lead => {
+                    html += `<tr><td>${lead.name}</td><td>${lead.username}</td><td>${lead.email || '-'}</td><td>${lead.domain || 'All'}</td></tr>`;
+                });
+                html += '</table>';
+                content.innerHTML = html;
+            }
+            view.style.display = 'block';
+        }
 
         function addUser(e) {
             e.preventDefault();
@@ -197,15 +366,6 @@
             alert('✅ User added successfully!');
             e.target.reset();
             closeModal('addUser');
-        }
-
-        function addIntern(e) {
-            e.preventDefault();
-            const data = new FormData(e.target);
-            DB.addIntern(Object.fromEntries(data));
-            alert('✅ Intern added successfully!');
-            e.target.reset();
-            closeModal('addIntern');
         }
 
         function addTask(e) {
