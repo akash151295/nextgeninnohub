@@ -211,7 +211,7 @@
                 }
                 
                 const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-                const taskIndex = tasks.findIndex(t => t.id === taskId);
+                const taskIndex = tasks.findIndex(t => String(t.id) === String(taskId));
                 
                 if (taskIndex !== -1) {
                     tasks[taskIndex].status = 'Submitted';
@@ -223,8 +223,7 @@
                     modal.remove();
                     loadProgress();
                 } else {
-                    alert('❌ Task not found! Task ID: ' + taskId);
-                    console.log('Available tasks:', tasks);
+                    alert('❌ Task not found! Please contact your team lead.');
                 }
             };
         }
