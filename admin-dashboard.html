@@ -123,6 +123,8 @@
             <h3>Add Intern</h3>
             <form onsubmit="addIntern(event)">
                 <input type="text" placeholder="Intern Name" required name="name">
+                <input type="text" placeholder="Username for Login" required name="username">
+                <input type="password" placeholder="Password" required name="password" minlength="6">
                 <input type="email" placeholder="Email" required name="email">
                 <input type="tel" placeholder="Phone" required name="phone">
                 <select name="domain" required>
@@ -346,8 +348,27 @@
                 return;
             }
             
+            // Check if username already exists
+            if (users[internData.username]) {
+                alert('❌ Username already exists! Please choose a different username.');
+                return;
+            }
+            
+            // Create user account for intern
+            const userAccount = {
+                username: internData.username,
+                password: internData.password,
+                role: 'intern',
+                name: internData.name,
+                email: internData.email,
+                domain: internData.domain
+            };
+            users[internData.username] = userAccount;
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            // Add intern data
             DB.addIntern(internData);
-            alert('✅ Intern added successfully!');
+            alert('✅ Intern added successfully! They can now login with their credentials.');
             e.target.reset();
             closeModal('addIntern');
         }
