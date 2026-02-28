@@ -121,7 +121,7 @@
 
         // Load progress stats
         function loadProgress() {
-            const tasks = DB.getAll('tasks');
+            const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
             const myTasks = tasks.filter(t => t.internName === user.name);
             
             const completed = myTasks.filter(t => t.status === 'Approved').length;
@@ -136,7 +136,7 @@
         }
 
         function viewMyTasks() {
-            const tasks = DB.getAll('tasks');
+            const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
             const myTasks = tasks.filter(t => t.internName === user.name);
             
             const modal = document.createElement('div');
@@ -162,7 +162,7 @@
         }
 
         function submitTask() {
-            const tasks = DB.getAll('tasks');
+            const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
             const myTasks = tasks.filter(t => t.internName === user.name && t.status === 'Assigned');
             
             if (myTasks.length === 0) {
@@ -210,25 +210,27 @@
                     return;
                 }
                 
-                const tasks = DB.getAll('tasks');
-                const task = tasks.find(t => t.id === taskId);
-                if (task) {
-                    task.status = 'Submitted';
-                    task.submissionLink = link;
-                    task.submissionNotes = notes;
-                    task.submittedAt = new Date().toISOString();
+                const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+                const taskIndex = tasks.findIndex(t => t.id === taskId);
+                
+                if (taskIndex !== -1) {
+                    tasks[taskIndex].status = 'Submitted';
+                    tasks[taskIndex].submissionLink = link;
+                    tasks[taskIndex].submissionNotes = notes;
+                    tasks[taskIndex].submittedAt = new Date().toISOString();
                     localStorage.setItem('tasks', JSON.stringify(tasks));
                     alert('✅ Task submitted successfully!');
                     modal.remove();
                     loadProgress();
                 } else {
-                    alert('❌ Task not found!');
+                    alert('❌ Task not found! Task ID: ' + taskId);
+                    console.log('Available tasks:', tasks);
                 }
             };
         }
 
         function viewFeedback() {
-            const tasks = DB.getAll('tasks');
+            const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
             const reviewedTasks = tasks.filter(t => t.internName === user.name && (t.status === 'Approved' || t.status === 'Rejected'));
             
             const modal = document.createElement('div');
@@ -260,7 +262,7 @@
         }
 
         function viewPerformance() {
-            const tasks = DB.getAll('tasks');
+            const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
             const myTasks = tasks.filter(t => t.internName === user.name);
             const reviewedTasks = myTasks.filter(t => t.rating);
             
@@ -306,7 +308,7 @@
         }
 
         function requestPromotion() {
-            const tasks = DB.getAll('tasks');
+            const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
             const myTasks = tasks.filter(t => t.internName === user.name);
             const completedTasks = myTasks.filter(t => t.status === 'Approved').length;
             const pendingTasks = myTasks.filter(t => t.status === 'Assigned' || t.status === 'Submitted').length;
