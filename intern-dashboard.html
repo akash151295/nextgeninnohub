@@ -86,7 +86,10 @@
                         <strong>Pending Tasks:</strong> <span id="pendingCount" style="color: #10b981; font-size: 1.5em;">0</span>
                     </div>
                     <div style="padding: 15px; background: #fee2e2; border-radius: 8px;">
-                        <strong>Average Rating:</strong> <span id="avgRating" style="color: #ef4444; font-size: 1.5em;">0.0</span>
+                        <strong>Average Rating:</strong> <span id="avgRating" style="color: #ef4444; font-size: 1.5em;">0.0</span><span style="font-size: 0.9em; color: #64748b;"> / 10</span>
+                        <div style="margin-top: 8px; font-size: 0.85em; color: #64748b;">
+                            ⚠️ Maintain 5+ rating for promotion eligibility
+                        </div>
                     </div>
                 </div>
             </div>
@@ -317,6 +320,10 @@
             const completedTasks = myTasks.filter(t => t.status === 'Approved').length;
             const pendingTasks = myTasks.filter(t => t.status === 'Assigned' || t.status === 'Submitted').length;
             
+            // Calculate average rating
+            const ratings = myTasks.filter(t => t.rating).map(t => parseFloat(t.rating));
+            const avgRating = ratings.length > 0 ? (ratings.reduce((a, b) => a + b, 0) / ratings.length) : 0;
+            
             if (pendingTasks > 0) {
                 alert('❌ You have pending tasks! Complete all assigned tasks before requesting promotion.');
                 return;
@@ -324,6 +331,11 @@
             
             if (completedTasks < 3) {
                 alert('❌ You need to complete at least 3 tasks before requesting promotion.');
+                return;
+            }
+            
+            if (avgRating < 5) {
+                alert(`❌ Your average rating is ${avgRating.toFixed(1)}/10. You need a minimum rating of 5.0 to request promotion. Keep improving your work quality!`);
                 return;
             }
             
@@ -342,6 +354,7 @@
                     internEmail: user.email,
                     domain: user.domain,
                     completedTasks: completedTasks,
+                    avgRating: avgRating.toFixed(1),
                     requestedAt: new Date().toISOString(),
                     status: 'Pending'
                 });

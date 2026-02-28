@@ -294,21 +294,24 @@
                 <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px; width: 90%;">
                     <h3 style="margin-bottom: 20px;">${status === 'Approved' ? '✅ Approve' : '❌ Reject'} Task</h3>
                     <form id="reviewForm">
-                        <textarea id="reviewComment" placeholder="Your feedback comments" required rows="3" style="width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px;"></textarea>
-                        ${status === 'Approved' ? `
                         <select id="rating" required style="width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px;">
-                            <option value="">Select Rating</option>
-                            <option value="5">5 - Excellent</option>
-                            <option value="4">4 - Very Good</option>
-                            <option value="3">3 - Good</option>
-                            <option value="2">2 - Needs Improvement</option>
-                            <option value="1">1 - Poor</option>
+                            <option value="">Select Rating (Required)</option>
+                            <option value="10">10 - Outstanding</option>
+                            <option value="9">9 - Excellent</option>
+                            <option value="8">8 - Very Good</option>
+                            <option value="7">7 - Good</option>
+                            <option value="6">6 - Above Average</option>
+                            <option value="5">5 - Average</option>
+                            <option value="4">4 - Below Average</option>
+                            <option value="3">3 - Poor</option>
+                            <option value="2">2 - Very Poor</option>
+                            <option value="1">1 - Unacceptable</option>
                         </select>
-                        <textarea id="performanceFeedback" placeholder="Performance feedback (punctuality, quality, etc.)" rows="2" style="width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px;"></textarea>
-                        ` : ''}
+                        <textarea id="reviewComment" placeholder="Your feedback comments (Required)" required rows="3" style="width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px;"></textarea>
+                        <textarea id="performanceFeedback" placeholder="Performance feedback: punctuality, quality, effort, etc." rows="2" style="width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px;"></textarea>
                         <div style="margin-top: 20px;">
-                            <button type="submit" class="btn">Submit Review</button>
-                            <button type="button" class="btn" style="background: #6b7280;" onclick="document.getElementById('reviewModal').remove()">Cancel</button>
+                            <button type="submit" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 12px 25px; border: none; border-radius: 8px; margin: 5px; font-weight: 600; cursor: pointer;">Submit Review</button>
+                            <button type="button" style="display: inline-block; background: #6b7280; color: white; padding: 12px 25px; border: none; border-radius: 8px; margin: 5px; font-weight: 600; cursor: pointer;" onclick="document.getElementById('reviewModal').remove()">Cancel</button>
                         </div>
                     </form>
                 </div>
@@ -319,21 +322,32 @@
             document.getElementById('reviewForm').onsubmit = function(e) {
                 e.preventDefault();
                 const comment = document.getElementById('reviewComment').value;
-                const rating = status === 'Approved' && document.getElementById('rating') ? document.getElementById('rating').value : null;
-                const perfFeedback = status === 'Approved' && document.getElementById('performanceFeedback') ? document.getElementById('performanceFeedback').value : null;
+                const rating = document.getElementById('rating') ? document.getElementById('rating').value : null;
+                const perfFeedback = document.getElementById('performanceFeedback') ? document.getElementById('performanceFeedback').value : null;
+                
+                if (!rating) {
+                    alert('❌ Please select a rating!');
+                    return;
+                }
                 
                 const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
                 const taskIndex = tasks.findIndex(t => String(t.id) === String(taskId));
                 
                 if (taskIndex !== -1) {
-                    tasks[taskIndex].status = status;
+                    // If rejected, reset to Assigned so intern can resubmit
+                    tasks[taskIndex].status = status === 'Rejected' ? 'Assigned' : status;
                     tasks[taskIndex].reviewComment = comment;
-                    if (rating) tasks[taskIndex].rating = rating;
+                    tasks[taskIndex].rating = rating;
                     if (perfFeedback) tasks[taskIndex].performanceFeedback = perfFeedback;
                     tasks[taskIndex].reviewedAt = new Date().toISOString();
                     tasks[taskIndex].reviewedBy = user.name;
+                    // Clear submission data if rejected so intern can resubmit
+                    if (status === 'Rejected') {
+                        tasks[taskIndex].submissionLink = '';
+                        tasks[taskIndex].submissionNotes = '';
+                    }
                     localStorage.setItem('tasks', JSON.stringify(tasks));
-                    alert(`✅ Task ${status.toLowerCase()} successfully!`);
+                    alert(`✅ Task ${status.toLowerCase()} successfully! ${status === 'Rejected' ? 'Intern can now resubmit.' : ''}`);
                     modal.remove();
                     const closeBtn = document.querySelector('[onclick="this.parentElement.parentElement.remove()"]');
                     if (closeBtn) closeBtn.click();
@@ -375,6 +389,7 @@
                         <h4>🚀 ${req.internName}</h4>
                         <p style="margin: 10px 0;"><strong>Domain:</strong> ${req.domain}</p>
                         <p style="margin: 10px 0;"><strong>Completed Tasks:</strong> ${req.completedTasks}</p>
+                        <p style="margin: 10px 0;"><strong>Average Rating:</strong> ${req.avgRating || 'N/A'}/10</p>
                         <p style="margin: 10px 0;"><strong>Requested:</strong> ${new Date(req.requestedAt).toLocaleDateString()}</p>
                         <div style="margin-top: 15px;">
                             <button onclick="handlePromotionRequest('${req.id}', 'Approved')" class="btn" style="background: #10b981; padding: 8px 16px;">✅ Approve</button>
