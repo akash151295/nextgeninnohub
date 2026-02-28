@@ -193,14 +193,26 @@
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData);
             
+            // Create email body
+            const emailBody = `New Registration from NextGen InnoHub
+
+Name: ${data.name}
+Email: ${data.email}
+Phone: ${data.phone}
+Domain: ${data.domain}
+Plan: ${data.plan}
+Status: ${data.status}
+Reason: ${data.reason}`;
+            
+            // Send email using mailto
+            const mailtoLink = `mailto:contact@nextgeninnohub.in?subject=New Registration - ${data.name}&body=${encodeURIComponent(emailBody)}`;
+            window.location.href = mailtoLink;
+            
             // Show success message
-            alert('✅ Registration Successful!\n\nThank you for joining NextGen InnoHub!\n\nWe will contact you at: ' + data.email);
-            
-            // Log data (in production, send to backend)
-            console.log('Registration Data:', data);
-            
-            // Reset form
-            e.target.reset();
+            setTimeout(() => {
+                alert('✅ Registration Successful!\n\nThank you for joining NextGen InnoHub!\n\nWe will contact you at: ' + data.email);
+                e.target.reset();
+            }, 500);
         });
     </script>
 </body>
