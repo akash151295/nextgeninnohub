@@ -82,12 +82,10 @@
         
         /* Hero Section */
         .hero {
-            background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #2563EB 100%);
-            color: white;
-            padding: 100px 20px 80px;
+            background: linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 100%);
+            padding: 120px 20px 80px;
             text-align: center;
             position: relative;
-            overflow: hidden;
         }
         
         .hero::before {
@@ -97,72 +95,80 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>');
-            opacity: 0.2;
+            background: radial-gradient(circle at 20% 50%, rgba(37, 99, 235, 0.05) 0%, transparent 50%);
+            pointer-events: none;
         }
         
         .hero h1 {
-            font-size: 3em;
-            margin-bottom: 20px;
-            animation: fadeInDown 1s;
+            font-size: 3.5em;
+            margin-bottom: 24px;
             font-weight: 800;
             letter-spacing: -1px;
             position: relative;
             z-index: 1;
-            color: white;
+            color: #0F172A;
+            line-height: 1.2;
         }
         
         .hero p {
-            font-size: 1.3em;
-            margin-bottom: 30px;
-            opacity: 0.95;
+            font-size: 1.25em;
+            margin-bottom: 40px;
             position: relative;
             z-index: 1;
             max-width: 800px;
             margin-left: auto;
             margin-right: auto;
-            color: white;
+            color: #374151;
+            line-height: 1.6;
         }
         
         .hero-features {
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 16px;
             margin: 40px 0;
+            position: relative;
+            z-index: 1;
         }
         
         .hero-features div {
-            background: rgba(255,255,255,0.2);
-            padding: 15px 25px;
-            border-radius: 12px;
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.3);
-            position: relative;
-            z-index: 1;
-            color: white;
+            background: #FFFFFF;
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: 2px solid #E5E7EB;
+            color: #374151;
             font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.3s;
+        }
+        
+        .hero-features div:hover {
+            border-color: #2563EB;
+            color: #2563EB;
+            transform: translateY(-2px);
         }
         
         .cta-btn {
             display: inline-block;
-            background: linear-gradient(135deg, #2563EB 0%, #22D3EE 100%);
+            background: #2563EB;
             color: white;
-            padding: 20px 50px;
+            padding: 18px 40px;
             text-decoration: none;
-            border-radius: 50px;
-            font-size: 1.2em;
+            border-radius: 12px;
+            font-size: 1.1em;
             font-weight: 700;
             transition: all 0.3s ease;
-            margin-top: 20px;
-            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.4);
+            margin: 10px;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
             position: relative;
             z-index: 1;
         }
         
         .cta-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(37, 99, 235, 0.5);
+            background: #1D4ED8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
         }
         
         /* Section Styles */
@@ -691,11 +697,25 @@
         
         @media (max-width: 768px) {
             .hero h1 {
-                font-size: 2em;
+                font-size: 2.2em;
             }
             
             .hero p {
                 font-size: 1.1em;
+            }
+            
+            .hero-features {
+                gap: 10px;
+            }
+            
+            .hero-features div {
+                font-size: 0.85em;
+                padding: 10px 16px;
+            }
+            
+            .cta-btn {
+                width: 100%;
+                margin: 8px 0;
             }
             
             h2 {
@@ -728,19 +748,19 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
-            <h1 style="color: white !important;">🏢 Build Your Career with AI-Powered Internships</h1>
-            <p style="color: white !important;">Learn real job skills using Generative AI across multiple domains — HR, Testing, Python, React, Sales, Marketing, and Finance.</p>
+            <h1>🚀 Build Your Career with AI-Powered Internships</h1>
+            <p>Learn real job skills using Generative AI across multiple domains — HR, Testing, Python, React, Sales, Marketing, and Finance.</p>
             
             <div class="hero-features">
-                <div style="color: white !important;">✅ Work on real tasks</div>
-                <div style="color: white !important;">✅ Build your own AI agents</div>
-                <div style="color: white !important;">✅ Industry-style guidance</div>
-                <div style="color: white !important;">✅ Certificates & LOR</div>
-                <div style="color: white !important;">✅ Beginner to Advanced</div>
+                <div>✅ Work on real tasks</div>
+                <div>✅ Build your own AI agents</div>
+                <div>✅ Industry-style guidance</div>
+                <div>✅ Certificates & LOR</div>
+                <div>✅ Beginner to Advanced</div>
             </div>
             
-            <a href="registration.html" class="cta-btn">Start Your Internship Journey Today — From Just ₹0</a>
-            <a href="portal-login.html" class="cta-btn" style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); margin-left: 15px;">🔐 Portal Login</a>
+            <a href="registration.html" class="cta-btn">Start Your Internship Journey — From Just ₹0</a>
+            <a href="portal-login.html" class="cta-btn" style="background: #0F172A;">🔐 Portal Login</a>
         </div>
     </section>
 
