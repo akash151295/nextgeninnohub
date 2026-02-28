@@ -185,7 +185,7 @@
         }
 
         function viewMyTasks() {
-            const tasks = DB.getAll('tasks');
+            const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
             const myTasks = tasks.filter(t => t.domain === user.domain || t.assignedBy === user.name);
             
             const modal = document.createElement('div');
@@ -253,7 +253,7 @@
         }
 
         function viewSubmissions() {
-            const tasks = DB.getAll('tasks');
+            const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
             const submissions = tasks.filter(t => t.assignedBy === user.name && t.status === 'Submitted');
             
             const modal = document.createElement('div');
@@ -319,29 +319,33 @@
             document.getElementById('reviewForm').onsubmit = function(e) {
                 e.preventDefault();
                 const comment = document.getElementById('reviewComment').value;
-                const rating = status === 'Approved' ? document.getElementById('rating').value : null;
-                const perfFeedback = status === 'Approved' ? document.getElementById('performanceFeedback').value : null;
+                const rating = status === 'Approved' && document.getElementById('rating') ? document.getElementById('rating').value : null;
+                const perfFeedback = status === 'Approved' && document.getElementById('performanceFeedback') ? document.getElementById('performanceFeedback').value : null;
                 
-                const tasks = DB.getAll('tasks');
-                const task = tasks.find(t => t.id === taskId);
-                if (task) {
-                    task.status = status;
-                    task.reviewComment = comment;
-                    if (rating) task.rating = rating;
-                    if (perfFeedback) task.performanceFeedback = perfFeedback;
-                    task.reviewedAt = new Date().toISOString();
-                    task.reviewedBy = user.name;
+                const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+                const taskIndex = tasks.findIndex(t => String(t.id) === String(taskId));
+                
+                if (taskIndex !== -1) {
+                    tasks[taskIndex].status = status;
+                    tasks[taskIndex].reviewComment = comment;
+                    if (rating) tasks[taskIndex].rating = rating;
+                    if (perfFeedback) tasks[taskIndex].performanceFeedback = perfFeedback;
+                    tasks[taskIndex].reviewedAt = new Date().toISOString();
+                    tasks[taskIndex].reviewedBy = user.name;
                     localStorage.setItem('tasks', JSON.stringify(tasks));
                     alert(`✅ Task ${status.toLowerCase()} successfully!`);
                     modal.remove();
-                    document.querySelector('[onclick="this.parentElement.parentElement.remove()"]').click();
+                    const closeBtn = document.querySelector('[onclick="this.parentElement.parentElement.remove()"]');
+                    if (closeBtn) closeBtn.click();
                     viewSubmissions();
+                } else {
+                    alert('❌ Task not found!');
                 }
             };
         }
 
         function viewPendingReviews() {
-            const tasks = DB.getAll('tasks');
+            const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
             const pending = tasks.filter(t => t.assignedBy === user.name && t.status === 'Submitted');
             
             if (pending.length === 0) {
