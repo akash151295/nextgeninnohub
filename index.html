@@ -718,7 +718,23 @@
             }
             
             .nav-links {
-                display: none;
+                display: flex;
+                width: 100%;
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 15px;
+            }
+            
+            .nav-links a {
+                display: block;
+                text-align: center;
+                padding: 10px;
+                background: #F3F4F6;
+                border-radius: 8px;
+            }
+            
+            .nav-container {
+                flex-direction: column;
             }
         }
     </style>
