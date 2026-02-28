@@ -47,14 +47,14 @@
             <div class="card">
                 <h3>📋 My Assigned Tasks</h3>
                 <p style="color: #64748b; margin-bottom: 15px;">View all tasks assigned to you</p>
-                <button class="btn" onclick="viewMyTasks()">📊 View My Tasks</button>
+                <button class="btn" onclick="viewMyTasks()">📊 View My Tasks <span id="newTasksBadge" style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.85em; margin-left: 5px;"></span></button>
             </div>
 
             <!-- Submit Task -->
             <div class="card">
                 <h3>📤 Submit Task</h3>
                 <p style="color: #64748b; margin-bottom: 15px;">Upload your completed work</p>
-                <button class="btn" onclick="submitTask()">📁 Submit Work</button>
+                <button class="btn" onclick="submitTask()">📁 Submit Work <span id="pendingSubmitBadge" style="background: #f59e0b; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.85em; margin-left: 5px;"></span></button>
             </div>
 
             <!-- Feedback -->
@@ -141,6 +141,20 @@
             document.getElementById('pendingReviewCount').textContent = pendingReview;
             document.getElementById('pendingCount').textContent = pending;
             document.getElementById('avgRating').textContent = avgRating;
+            
+            // Update notification badges
+            const newTasksBadge = document.getElementById('newTasksBadge');
+            const pendingSubmitBadge = document.getElementById('pendingSubmitBadge');
+            
+            if (pending > 0) {
+                newTasksBadge.textContent = pending;
+                newTasksBadge.style.display = 'inline';
+                pendingSubmitBadge.textContent = pending;
+                pendingSubmitBadge.style.display = 'inline';
+            } else {
+                newTasksBadge.style.display = 'none';
+                pendingSubmitBadge.style.display = 'none';
+            }
         }
 
         function viewMyTasks() {

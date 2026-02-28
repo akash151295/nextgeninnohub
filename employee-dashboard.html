@@ -55,7 +55,7 @@
             <div class="card">
                 <h3>✅ Review Submissions</h3>
                 <p style="color: #64748b; margin-bottom: 15px;">Review and provide feedback on intern work</p>
-                <button class="btn" onclick="viewSubmissions()">📝 Review Submissions</button>
+                <button class="btn" onclick="viewSubmissions()">📝 Review Submissions <span id="reviewBadge" style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.85em; margin-left: 5px;"></span></button>
                 <button class="btn btn-secondary" onclick="viewPendingReviews()">📊 Pending Reviews</button>
             </div>
 
@@ -125,6 +125,22 @@
         }
 
         loadMyInterns();
+
+        // Load and update review badge
+        function updateReviewBadge() {
+            const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+            const submissions = tasks.filter(t => t.assignedBy === user.name && t.status === 'Submitted');
+            const badge = document.getElementById('reviewBadge');
+            
+            if (submissions.length > 0) {
+                badge.textContent = submissions.length;
+                badge.style.display = 'inline';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        updateReviewBadge();
 
         function openAssignTaskModal() {
             const interns = DB.getAll('interns');
@@ -346,6 +362,7 @@
                     modal.remove();
                     const closeBtn = document.querySelector('[onclick="this.parentElement.parentElement.remove()"]');
                     if (closeBtn) closeBtn.click();
+                    updateReviewBadge();
                     viewSubmissions();
                 } else {
                     alert('❌ Task not found!');
