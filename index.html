@@ -24,11 +24,65 @@
             padding: 0 20px;
         }
         
+        /* Navigation Bar */
+        .navbar {
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 15px 0;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .nav-logo {
+            font-size: 1.5em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-links a {
+            color: #1a202c;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+            padding: 5px 10px;
+        }
+        
+        .nav-links a:hover {
+            color: #6366f1;
+        }
+        
+        .nav-cta {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white !important;
+            padding: 10px 25px !important;
+            border-radius: 25px;
+        }
+        
         /* Hero Section */
         .hero {
             background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
             color: white;
-            padding: 120px 20px;
+            padding: 100px 20px 80px;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -46,7 +100,7 @@
         }
         
         .hero h1 {
-            font-size: 3.5em;
+            font-size: 3em;
             margin-bottom: 20px;
             animation: fadeInDown 1s;
             font-weight: 800;
@@ -107,7 +161,7 @@
         
         /* Section Styles */
         section {
-            padding: 80px 20px;
+            padding: 60px 20px;
         }
         
         section:nth-child(even) {
@@ -115,8 +169,8 @@
         }
         
         h2 {
-            font-size: 2.8em;
-            margin-bottom: 20px;
+            font-size: 2.5em;
+            margin-bottom: 15px;
             text-align: center;
             background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
             -webkit-background-clip: text;
@@ -124,6 +178,14 @@
             background-clip: text;
             font-weight: 800;
             letter-spacing: -1px;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.1em;
+            color: #64748b;
+            max-width: 800px;
+            margin: 0 auto 40px;
         }
         
         /* About Section */
@@ -633,10 +695,30 @@
             h2 {
                 font-size: 2em;
             }
+            
+            .nav-links {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">🚀 NextGen InnoHub</div>
+            <div class="nav-links">
+                <a href="#about">About</a>
+                <a href="#courses">Courses</a>
+                <a href="#plans">Plans</a>
+                <a href="#projects">Projects</a>
+                <a href="#careers">Careers</a>
+                <a href="#contact">Contact</a>
+                <a href="portal-login.html" class="nav-cta">🔐 Login</a>
+            </div>
+        </div>
+    </nav>
+
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
@@ -676,7 +758,7 @@
     <section id="courses">
         <div class="container">
             <h2>📚 Our Courses</h2>
-            <p style="text-align: center; font-size: 1.2em; color: #64748b; margin-bottom: 50px; max-width: 800px; margin-left: auto; margin-right: auto;">Click on any course to learn how we teach you to master your domain using cutting-edge Generative AI tools</p>
+            <p class="section-subtitle">Click on any course to learn how we teach you to master your domain using cutting-edge Generative AI tools</p>
             
             <div class="courses-list">
                 <div class="course-card" onclick="toggleCourse(this)">
@@ -847,7 +929,7 @@
     <section id="domains">
         <div class="container">
             <h2>🎯 Domains We Offer</h2>
-            <p style="text-align: center; font-size: 1.1em; margin-bottom: 20px;">Each domain focuses on practical work, automation skills, and AI productivity tools.</p>
+            <p class="section-subtitle">Each domain focuses on practical work, automation skills, and AI productivity tools.</p>
             
             <div class="domains-grid">
                 <div class="domain-card">
@@ -950,7 +1032,7 @@
     <section id="why-ai">
         <div class="container">
             <h2>🤖 Why Learn with Generative AI?</h2>
-            <p style="text-align: center; font-size: 1.2em; margin-bottom: 30px;">Modern companies are rapidly adopting AI tools.</p>
+            <p class="section-subtitle">Modern companies are rapidly adopting AI tools.</p>
             
             <div class="why-ai-grid">
                 <div class="why-card">
@@ -997,7 +1079,7 @@
     <section id="certification">
         <div class="container">
             <h2>📜 Certification & Recognition</h2>
-            <p style="text-align: center; font-size: 1.1em; margin-bottom: 30px;">Participants in the Professional Plan receive:</p>
+            <p class="section-subtitle">Participants in the Professional Plan receive:</p>
             
             <ul class="cert-list">
                 <li>✔ Internship Completion Certificate</li>
@@ -1065,8 +1147,8 @@
     <!-- Join Our Team Section -->
     <section id="careers" style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: white;">
         <div class="container">
-            <h2 style="color: white;">🚀 Join Our Team</h2>
-            <p style="text-align: center; font-size: 1.3em; margin-bottom: 30px; max-width: 800px; margin-left: auto; margin-right: auto;">Want to be part of our mission to revolutionize AI education? We're looking for passionate individuals to join NextGen InnoHub!</p>
+            <h2 style="color: white; -webkit-text-fill-color: white;">🚀 Join Our Team</h2>
+            <p class="section-subtitle" style="color: white;">Want to be part of our mission to revolutionize AI education? We're looking for passionate individuals to join NextGen InnoHub!</p>
             
             <div style="text-align: center; margin: 50px 0;">
                 <a href="careers.html" class="cta-btn" style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); font-size: 1.3em; padding: 20px 50px;">
@@ -1116,10 +1198,10 @@
     </section>
 
     <!-- Contact Section -->
-    <section class="contact">
+    <section class="contact" id="contact">
         <div class="container">
             <h2>📩 Contact Us</h2>
-            <p style="font-size: 1.2em; margin-bottom: 30px;">Have questions or want custom training for institutions?</p>
+            <p class="section-subtitle" style="color: white;">Have questions or want custom training for institutions?</p>
             
             <div class="contact-details">
                 <p>📧 Email: <a href="mailto:contact@nextgeninnohub.in">contact@nextgeninnohub.in</a></p>
