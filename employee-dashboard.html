@@ -334,18 +334,13 @@
                 const taskIndex = tasks.findIndex(t => String(t.id) === String(taskId));
                 
                 if (taskIndex !== -1) {
-                    // If rejected, reset to Assigned so intern can resubmit
-                    tasks[taskIndex].status = status === 'Rejected' ? 'Assigned' : status;
+                    // Set status to Rejected or Approved
+                    tasks[taskIndex].status = status;
                     tasks[taskIndex].reviewComment = comment;
                     tasks[taskIndex].rating = rating;
                     if (perfFeedback) tasks[taskIndex].performanceFeedback = perfFeedback;
                     tasks[taskIndex].reviewedAt = new Date().toISOString();
                     tasks[taskIndex].reviewedBy = user.name;
-                    // Clear submission data if rejected so intern can resubmit
-                    if (status === 'Rejected') {
-                        tasks[taskIndex].submissionLink = '';
-                        tasks[taskIndex].submissionNotes = '';
-                    }
                     localStorage.setItem('tasks', JSON.stringify(tasks));
                     alert(`✅ Task ${status.toLowerCase()} successfully! ${status === 'Rejected' ? 'Intern can now resubmit.' : ''}`);
                     modal.remove();

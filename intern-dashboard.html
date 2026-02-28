@@ -132,7 +132,7 @@
             
             const completed = myTasks.filter(t => t.status === 'Approved').length;
             const pendingReview = myTasks.filter(t => t.status === 'Submitted').length;
-            const pending = myTasks.filter(t => t.status === 'Assigned').length;
+            const pending = myTasks.filter(t => t.status === 'Assigned' || t.status === 'Rejected').length;
             
             const ratings = myTasks.filter(t => t.rating).map(t => parseFloat(t.rating));
             const avgRating = ratings.length > 0 ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1) : '0.0';
@@ -163,6 +163,9 @@
                     let statusText = task.status;
                     if (task.status === 'Approved') {
                         statusColor = '#10b981';
+                    } else if (task.status === 'Rejected') {
+                        statusColor = '#ef4444';
+                        statusText = 'Rejected - Resubmit';
                     } else if (task.status === 'Assigned' && task.reviewComment) {
                         statusColor = '#ef4444';
                         statusText = 'Rejected - Resubmit';
@@ -181,13 +184,11 @@
 
         function submitTask() {
             const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-            // Include tasks that are Assigned (including rejected ones that have reviewComment)
-            const myTasks = tasks.filter(t => t.internName === user.name && t.status === 'Assigned');
+            // Include tasks that are Assigned or Rejected (need resubmission)
+            const myTasks = tasks.filter(t => t.internName === user.name && (t.status === 'Assigned' || t.status === 'Rejected'));
             
             if (myTasks.length === 0) {
-                const allMyTasks = tasks.filter(t => t.internName === user.name);
-                console.log('All my tasks:', allMyTasks);
-                alert(`❌ No pending tasks to submit!\n\nYou have ${allMyTasks.length} total task(s).\nCheck "View My Tasks" to see their status.`);
+                alert('❌ No pending tasks to submit!');
                 return;
             }
             
@@ -197,7 +198,7 @@
             
             let taskOptions = '';
             myTasks.forEach(task => {
-                const label = task.reviewComment ? `${task.title} (Rejected - Resubmit)` : task.title;
+                const label = (task.status === 'Rejected' || task.reviewComment) ? `${task.title} (Rejected - Resubmit)` : task.title;
                 taskOptions += `<option value="${task.id}">${label}</option>`;
             });
             
@@ -350,7 +351,7 @@
             const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
             const myTasks = tasks.filter(t => t.internName === user.name);
             const completedTasks = myTasks.filter(t => t.status === 'Approved').length;
-            const pendingTasks = myTasks.filter(t => t.status === 'Assigned' || t.status === 'Submitted').length;
+            const pendingTasks = myTasks.filter(t => t.status === 'Assigned' || t.status === 'Submitted' || t.status === 'Rejected').length;
             
             // Calculate average rating
             const ratings = myTasks.filter(t => t.rating).map(t => parseFloat(t.rating));
