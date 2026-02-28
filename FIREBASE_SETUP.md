@@ -52,8 +52,8 @@ Firebase will auto-create these collections:
 **users collection:**
 ```json
 {
-  "username": "admin",
-  "password": "admin123",
+  "username": "your_username",
+  "password": "your_secure_password",
   "role": "admin",
   "name": "Admin User",
   "email": "admin@nextgeninnohub.in"

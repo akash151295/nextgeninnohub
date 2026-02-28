@@ -4,13 +4,16 @@
 const DB = {
     // Initialize default data
     // ⚠️ SECURITY: Change these default passwords before production!
+    // Default users will be loaded from credentials.js (local file only)
     init() {
         if (!localStorage.getItem('users')) {
-            localStorage.setItem('users', JSON.stringify([
-                {username: 'admin', password: 'admin123', role: 'admin', name: 'Admin User'},
-                {username: 'employee', password: 'emp123', role: 'employee', name: 'Lead Intern'},
-                {username: 'intern', password: 'int123', role: 'intern', name: 'Intern User', domain: 'HR'}
-            ]));
+            // Check if credentials.js is loaded
+            if (typeof DEFAULT_CREDENTIALS !== 'undefined') {
+                localStorage.setItem('users', JSON.stringify(DEFAULT_CREDENTIALS));
+            } else {
+                // Fallback - user must set up manually
+                localStorage.setItem('users', JSON.stringify({}));
+            }
         }
         if (!localStorage.getItem('interns')) localStorage.setItem('interns', JSON.stringify([]));
         if (!localStorage.getItem('tasks')) localStorage.setItem('tasks', JSON.stringify([]));

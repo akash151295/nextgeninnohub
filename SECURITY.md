@@ -11,15 +11,11 @@
 - Use `.gitignore` to exclude sensitive files
 - Store intern data in Google Sheets (not in repo)
 
-### 3. Default Credentials (CHANGE THESE!)
-Current demo credentials in `db.js`:
-```
-Admin: admin / admin123
-Employee: employee / emp123
-Intern: intern / int123
-```
-
-**⚠️ IMPORTANT: Change these passwords before going live!**
+### 3. Default Credentials
+**⚠️ IMPORTANT: Default credentials are stored in `credentials.js` (local file only)**
+- This file is NOT pushed to GitHub
+- Only exists on your local machine
+- Change passwords after first login
 
 ### 4. Data Storage
 - User credentials → localStorage (browser-based)
@@ -27,7 +23,7 @@ Intern: intern / int123
 - No sensitive data in GitHub repo
 
 ### 5. Recommended Next Steps
-1. Change all default passwords
+1. Change all default passwords after first login
 2. Set up Firebase Authentication (optional)
 3. Use environment variables for API keys
 4. Enable HTTPS on your domain
