@@ -93,7 +93,7 @@
         if (!user || user.role !== 'employee') {
             window.location.href = 'portal-login.html';
         }
-        document.getElementById('empName').textContent = user.name;
+        document.getElementById('empName').textContent = user.name || user.username;
 
         function logout() {
             localStorage.removeItem('currentUser');

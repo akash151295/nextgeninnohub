@@ -106,7 +106,7 @@
         if (!user || user.role !== 'intern') {
             window.location.href = 'portal-login.html';
         }
-        document.getElementById('internName').textContent = user.name;
+        document.getElementById('internName').textContent = user.name || user.username;
         document.getElementById('internDomain').textContent = user.domain || 'Not assigned';
 
         function logout() {

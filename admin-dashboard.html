@@ -15,10 +15,16 @@
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }
         .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .card h3 { color: #667eea; margin-bottom: 15px; font-size: 1.3em; }
-        .btn { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; margin: 5px; font-weight: 600; transition: transform 0.2s; }
+        .btn { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 25px; border: none; border-radius: 8px; margin: 5px; font-weight: 600; cursor: pointer; }
         .btn:hover { transform: translateY(-2px); }
         .btn-secondary { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
-        iframe { width: 100%; height: 600px; border: none; border-radius: 10px; margin-top: 15px; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+        th { background: #f0f9ff; color: #667eea; font-weight: 600; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { background: white; margin: 50px auto; padding: 30px; border-radius: 15px; max-width: 500px; max-height: 80vh; overflow-y: auto; }
+        .close { float: right; font-size: 28px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -30,87 +36,257 @@
     <div class="container">
         <div class="welcome">
             <h2>Welcome, <span id="adminName">Admin</span>! 👋</h2>
-            <p style="color: #64748b; margin-top: 10px;">Manage users, interns, tasks, and generate certificates from here.</p>
+            <p style="color: #64748b; margin-top: 10px;">All data is stored locally in your browser. Export regularly!</p>
         </div>
 
         <div class="grid">
-            <!-- User Management -->
             <div class="card">
                 <h3>👥 User Management</h3>
-                <p style="color: #64748b; margin-bottom: 15px;">Add employees, lead interns, and interns to the system</p>
-                <a href="https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform" target="_blank" class="btn">➕ Add New User</a>
-                <a href="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit" target="_blank" class="btn btn-secondary">📊 View All Users</a>
+                <button class="btn" onclick="openModal('addUser')">➕ Add New User</button>
+                <button class="btn btn-secondary" onclick="viewData('users')">📊 View All Users</button>
             </div>
 
-            <!-- Intern Management -->
             <div class="card">
                 <h3>🎓 Intern Management</h3>
-                <p style="color: #64748b; margin-bottom: 15px;">Assign interns to employees and track progress</p>
-                <a href="https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform" target="_blank" class="btn">🔗 Assign Intern to Employee</a>
-                <a href="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit" target="_blank" class="btn btn-secondary">📊 View All Interns</a>
+                <button class="btn" onclick="openModal('addIntern')">➕ Add Intern</button>
+                <button class="btn btn-secondary" onclick="viewData('interns')">📊 View All Interns</button>
             </div>
 
-            <!-- Certificate Generation -->
             <div class="card">
-                <h3>📜 Certificate Generation</h3>
-                <p style="color: #64748b; margin-bottom: 15px;">Generate completion certificates for interns</p>
-                <a href="https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform" target="_blank" class="btn">🎖️ Generate Certificate</a>
-                <a href="https://www.canva.com/templates/s/certificate/" target="_blank" class="btn btn-secondary">🎨 Certificate Template (Canva)</a>
+                <h3>📋 Task Management</h3>
+                <button class="btn" onclick="openModal('addTask')">➕ Assign Task</button>
+                <button class="btn btn-secondary" onclick="viewData('tasks')">📊 View All Tasks</button>
             </div>
 
-            <!-- Task Overview -->
             <div class="card">
-                <h3>📋 Task Overview</h3>
-                <p style="color: #64748b; margin-bottom: 15px;">View all tasks assigned and submitted</p>
-                <a href="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit" target="_blank" class="btn">📊 View All Tasks</a>
-                <a href="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit" target="_blank" class="btn btn-secondary">📈 Performance Reports</a>
+                <h3>📜 Certificates</h3>
+                <button class="btn" onclick="openModal('addCert')">🎖️ Generate Certificate</button>
+                <button class="btn btn-secondary" onclick="viewData('certificates')">📊 View Certificates</button>
             </div>
 
-            <!-- System Stats -->
             <div class="card">
-                <h3>📊 System Statistics</h3>
-                <p style="color: #64748b; margin-bottom: 15px;">Quick overview of your platform</p>
-                <div style="margin-top: 20px;">
-                    <div style="padding: 15px; background: #f0f9ff; border-radius: 8px; margin-bottom: 10px;">
-                        <strong>Total Interns:</strong> <span style="color: #667eea; font-size: 1.5em;">0</span>
-                    </div>
-                    <div style="padding: 15px; background: #f0fdf4; border-radius: 8px; margin-bottom: 10px;">
-                        <strong>Active Tasks:</strong> <span style="color: #10b981; font-size: 1.5em;">0</span>
-                    </div>
-                    <div style="padding: 15px; background: #fef3c7; border-radius: 8px;">
-                        <strong>Certificates Issued:</strong> <span style="color: #f59e0b; font-size: 1.5em;">0</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="card">
-                <h3>⚡ Quick Actions</h3>
-                <p style="color: #64748b; margin-bottom: 15px;">Frequently used actions</p>
-                <a href="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit" target="_blank" class="btn">📧 View Registrations</a>
-                <a href="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit" target="_blank" class="btn btn-secondary">💼 View Job Applications</a>
+                <h3>💾 Data Management</h3>
+                <button class="btn" onclick="exportData()">📥 Export All Data</button>
+                <button class="btn btn-secondary" onclick="importData()">📤 Import Data</button>
             </div>
         </div>
 
-        <!-- Setup Instructions -->
-        <div class="card" style="margin-top: 30px; background: #fef3c7;">
-            <h3>⚙️ Setup Instructions</h3>
-            <p><strong>Replace placeholder links with your Google Forms/Sheets:</strong></p>
-            <ol style="margin: 15px 0 0 20px; line-height: 2;">
-                <li>Create Google Forms for: Add User, Assign Intern, Generate Certificate</li>
-                <li>Create Google Sheets for: Users, Interns, Tasks, Certificates</li>
-                <li>Get shareable links (Anyone with link can edit/view)</li>
-                <li>Replace "YOUR_FORM_ID" and "YOUR_SHEET_ID" in this HTML file</li>
-            </ol>
+        <div id="dataView" class="card" style="margin-top: 30px; display: none;">
+            <h3 id="dataTitle">Data View</h3>
+            <div id="dataContent"></div>
         </div>
     </div>
 
+    <!-- Modals -->
+    <div id="addUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addUser')">&times;</span>
+            <h3>Add New User</h3>
+            <form onsubmit="addUser(event)">
+                <input type="text" placeholder="Username" required name="username">
+                <input type="password" placeholder="Password" required name="password">
+                <select name="role" required>
+                    <option value="">Select Role</option>
+                    <option value="admin">Admin</option>
+                    <option value="employee">Employee</option>
+                    <option value="intern">Intern</option>
+                </select>
+                <input type="text" placeholder="Full Name" required name="name">
+                <input type="email" placeholder="Email" required name="email">
+                <select name="domain">
+                    <option value="">Select Domain</option>
+                    <option value="HR">HR</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Testing">Testing</option>
+                    <option value="Python">Python</option>
+                    <option value="React">React</option>
+                </select>
+                <button type="submit" class="btn">Add User</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="addInternModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addIntern')">&times;</span>
+            <h3>Add Intern</h3>
+            <form onsubmit="addIntern(event)">
+                <input type="text" placeholder="Intern Name" required name="name">
+                <input type="email" placeholder="Email" required name="email">
+                <input type="tel" placeholder="Phone" required name="phone">
+                <select name="domain" required>
+                    <option value="">Select Domain</option>
+                    <option value="HR">HR</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Testing">Testing</option>
+                    <option value="Python">Python</option>
+                    <option value="React">React</option>
+                </select>
+                <input type="text" placeholder="Assign To (Employee Name)" name="assignedTo">
+                <button type="submit" class="btn">Add Intern</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="addTaskModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addTask')">&times;</span>
+            <h3>Assign Task</h3>
+            <form onsubmit="addTask(event)">
+                <input type="text" placeholder="Intern Name" required name="internName">
+                <input type="text" placeholder="Task Title" required name="title">
+                <textarea placeholder="Task Description" required name="description" rows="3"></textarea>
+                <input type="text" placeholder="Assigned By" required name="assignedBy">
+                <input type="date" placeholder="Due Date" name="dueDate">
+                <button type="submit" class="btn">Assign Task</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="addCertModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addCert')">&times;</span>
+            <h3>Generate Certificate</h3>
+            <form onsubmit="addCertificate(event)">
+                <input type="text" placeholder="Intern Name" required name="name">
+                <input type="date" placeholder="Date of Birth" name="dob">
+                <input type="text" placeholder="Place" name="place">
+                <select name="domain" required>
+                    <option value="">Select Domain</option>
+                    <option value="HR">HR</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Testing">Testing</option>
+                    <option value="Python">Python</option>
+                    <option value="React">React</option>
+                </select>
+                <select name="months" required>
+                    <option value="">Duration</option>
+                    <option value="1">1 Month</option>
+                    <option value="2">2 Months</option>
+                    <option value="3">3 Months</option>
+                    <option value="6">6 Months</option>
+                </select>
+                <select name="performance" required>
+                    <option value="">Performance</option>
+                    <option value="Excellent">Excellent</option>
+                    <option value="Very Good">Very Good</option>
+                    <option value="Good">Good</option>
+                </select>
+                <button type="submit" class="btn">Generate</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="db.js"></script>
     <script>
         const user = JSON.parse(localStorage.getItem('currentUser'));
-        if (!user || user.role !== 'admin') {
-            window.location.href = 'portal-login.html';
-        }
+        if (!user || user.role !== 'admin') window.location.href = 'portal-login.html';
         document.getElementById('adminName').textContent = user.name;
+
+        function openModal(type) { document.getElementById(type + 'Modal').style.display = 'block'; }
+        function closeModal(type) { document.getElementById(type + 'Modal').style.display = 'none'; }
+
+        function addUser(e) {
+            e.preventDefault();
+            const data = new FormData(e.target);
+            DB.addUser(Object.fromEntries(data));
+            alert('✅ User added successfully!');
+            e.target.reset();
+            closeModal('addUser');
+        }
+
+        function addIntern(e) {
+            e.preventDefault();
+            const data = new FormData(e.target);
+            DB.addIntern(Object.fromEntries(data));
+            alert('✅ Intern added successfully!');
+            e.target.reset();
+            closeModal('addIntern');
+        }
+
+        function addTask(e) {
+            e.preventDefault();
+            const data = new FormData(e.target);
+            const task = Object.fromEntries(data);
+            task.id = 'TASK' + Date.now();
+            task.status = 'Pending';
+            DB.addTask(task);
+            alert('✅ Task assigned successfully!');
+            e.target.reset();
+            closeModal('addTask');
+        }
+
+        function addCertificate(e) {
+            e.preventDefault();
+            const data = new FormData(e.target);
+            const cert = Object.fromEntries(data);
+            cert.dateIssued = new Date().toLocaleDateString();
+            DB.addCertificate(cert);
+            alert('✅ Certificate generated!');
+            e.target.reset();
+            closeModal('addCert');
+        }
+
+        function viewData(type) {
+            const data = DB.getAll(type);
+            const view = document.getElementById('dataView');
+            const content = document.getElementById('dataContent');
+            document.getElementById('dataTitle').textContent = type.toUpperCase();
+            
+            if (data.length === 0) {
+                content.innerHTML = '<p>No data found</p>';
+            } else {
+                const keys = Object.keys(data[0]);
+                let html = '<table><tr>';
+                keys.forEach(k => html += `<th>${k}</th>`);
+                html += '</tr>';
+                data.forEach(row => {
+                    html += '<tr>';
+                    keys.forEach(k => html += `<td>${row[k] || '-'}</td>`);
+                    html += '</tr>';
+                });
+                html += '</table>';
+                content.innerHTML = html;
+            }
+            view.style.display = 'block';
+        }
+
+        function exportData() {
+            const data = {
+                users: DB.getAll('users'),
+                interns: DB.getAll('interns'),
+                tasks: DB.getAll('tasks'),
+                certificates: DB.getAll('certificates')
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'nextgen-innohub-data-' + new Date().toISOString().split('T')[0] + '.json';
+            a.click();
+            alert('✅ Data exported successfully!');
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    const data = JSON.parse(event.target.result);
+                    localStorage.setItem('users', JSON.stringify(data.users || []));
+                    localStorage.setItem('interns', JSON.stringify(data.interns || []));
+                    localStorage.setItem('tasks', JSON.stringify(data.tasks || []));
+                    localStorage.setItem('certificates', JSON.stringify(data.certificates || []));
+                    alert('✅ Data imported successfully!');
+                    location.reload();
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
 
         function logout() {
             localStorage.removeItem('currentUser');
