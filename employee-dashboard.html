@@ -47,16 +47,16 @@
             <div class="card">
                 <h3>📝 Assign Tasks</h3>
                 <p style="color: #64748b; margin-bottom: 15px;">Create and assign tasks to interns</p>
-                <a href="https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform" target="_blank" class="btn">➕ Assign New Task</a>
-                <a href="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit" target="_blank" class="btn btn-secondary">📋 View All Tasks</a>
+                <button class="btn" onclick="alert('Task assignment feature coming soon!')">➕ Assign New Task</button>
+                <button class="btn btn-secondary" onclick="viewMyTasks()">📋 View All Tasks</button>
             </div>
 
             <!-- Review Submissions -->
             <div class="card">
                 <h3>✅ Review Submissions</h3>
                 <p style="color: #64748b; margin-bottom: 15px;">Review and provide feedback on intern work</p>
-                <a href="https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform" target="_blank" class="btn">📝 Review Submission</a>
-                <a href="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit" target="_blank" class="btn btn-secondary">📊 Pending Reviews</a>
+                <button class="btn" onclick="alert('Review feature coming soon!')">📝 Review Submission</button>
+                <button class="btn btn-secondary" onclick="viewPendingReviews()">📊 Pending Reviews</button>
             </div>
 
             <!-- Sample Tasks by Domain -->
@@ -118,6 +118,30 @@
         }
 
         loadMyInterns();
+
+        function viewMyTasks() {
+            const tasks = DB.getAll('tasks');
+            const myTasks = tasks.filter(t => t.domain === user.domain || t.status === 'Template');
+            
+            if (myTasks.length === 0) {
+                alert('📊 No tasks available for your domain yet.');
+            } else {
+                let html = '<h3>Available Tasks</h3><table style="width: 100%; border-collapse: collapse; margin-top: 15px;"><tr style="background: #f0f9ff;"><th style="padding: 10px; text-align: left;">Title</th><th style="padding: 10px; text-align: left;">Domain</th><th style="padding: 10px; text-align: left;">Description</th></tr>';
+                myTasks.forEach(task => {
+                    html += `<tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 10px;">${task.title}</td><td style="padding: 10px;">${task.domain}</td><td style="padding: 10px;">${task.description}</td></tr>`;
+                });
+                html += '</table>';
+                
+                const modal = document.createElement('div');
+                modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;';
+                modal.innerHTML = `<div style="background: white; padding: 30px; border-radius: 15px; max-width: 800px; max-height: 80vh; overflow-y: auto;"><button onclick="this.parentElement.parentElement.remove()" style="float: right; background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">×</button>${html}</div>`;
+                document.body.appendChild(modal);
+            }
+        }
+
+        function viewPendingReviews() {
+            alert('📊 Pending reviews feature coming soon! You will be able to review intern submissions here.');
+        }
 
         function logout() {
             localStorage.removeItem('currentUser');
