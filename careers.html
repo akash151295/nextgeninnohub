@@ -125,6 +125,10 @@
         <p class="subtitle">Be part of the AI education revolution</p>
         
         <form id="careerForm">
+            <input type="hidden" name="_subject" value="Job Application - Employee Interested - NextGen InnoHub">
+            <input type="hidden" name="_cc" value="contact@nextgeninnohub.in">
+            <input type="hidden" name="_template" value="box">
+            <input type="hidden" name="application_type" value="EMPLOYEE INTERESTED TO WORK WITH OUR COMPANY">
             <div class="form-group">
                 <label>Full Name <span class="required">*</span></label>
                 <input type="text" name="name" required placeholder="Enter your full name">
@@ -194,33 +198,44 @@
     </div>
     
     <script>
-        document.getElementById('careerForm').addEventListener('submit', function(e) {
+        document.getElementById('careerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             // Get form data
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData);
             
-            // Format message for WhatsApp
-            const whatsappMessage = `*Job Application - NextGen InnoHub*%0A%0A*EMPLOYEE INTERESTED TO WORK WITH OUR COMPANY*%0A%0A*Name:* ${data.name}%0A*Email:* ${data.email}%0A*Phone:* ${data.phone}%0A*Position:* ${data.position}%0A*Experience:* ${data.experience}%0A*LinkedIn:* ${data.linkedin || 'Not provided'}%0A*Resume:* ${data.resume || 'Not provided'}%0A*Why Join:* ${data.reason}%0A*Skills:* ${data.skills}`;
+            // Disable submit button
+            const submitBtn = e.target.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
             
-            // Send to WhatsApp
-            window.open(`https://wa.me/919760327132?text=${whatsappMessage}`, '_blank');
-            
-            // Also send email
-            const emailBody = `Job Application from NextGen InnoHub\n\nEMPLOYEE INTERESTED TO WORK WITH OUR COMPANY\n\nName: ${data.name}\nEmail: ${data.email}\nPhone: ${data.phone}\nPosition: ${data.position}\nExperience: ${data.experience}\nLinkedIn: ${data.linkedin || 'Not provided'}\nResume: ${data.resume || 'Not provided'}\nWhy Join: ${data.reason}\nSkills: ${data.skills}`;
-            const mailtoLink = `mailto:contact@nextgeninnohub.in?subject=Job Application - ${data.name} (${data.position})&body=${encodeURIComponent(emailBody)}`;
-            
-            // Open email in new window
-            setTimeout(() => {
-                window.open(mailtoLink, '_blank');
-            }, 1000);
-            
-            // Show success message
-            alert('✅ Application Submitted Successfully!\n\nYour application has been sent via WhatsApp and Email.\n\nWe will review your application and contact you soon at: ' + data.email);
-            
-            // Reset form
-            e.target.reset();
+            try {
+                // Send to Formspree (free email service)
+                const response = await fetch('https://formspree.io/f/xanyqbvg', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    // Show success message
+                    alert('✅ Application Submitted Successfully!\n\nThank you for your interest in joining NextGen InnoHub!\n\nSomeone from our team will review your application and connect with you soon at: ' + data.email);
+                    
+                    // Reset form
+                    e.target.reset();
+                } else {
+                    throw new Error('Submission failed');
+                }
+            } catch (error) {
+                alert('❌ Submission failed. Please try again or contact us directly at contact@nextgeninnohub.in');
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Application 🚀';
+            }
         });
     </script>
 </body>
