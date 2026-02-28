@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Careers - NextGen InnoHub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .form-container {
+            background: white;
+            padding: 50px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            max-width: 700px;
+            width: 100%;
+        }
+        
+        h1 {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            font-weight: 800;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1a202c;
+            font-weight: 600;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+        
+        .required {
+            color: #ef4444;
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-link a {
+            color: #6366f1;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>🚀 Join Our Team</h1>
+        <p class="subtitle">Be part of the AI education revolution</p>
+        
+        <form id="careerForm">
+            <div class="form-group">
+                <label>Full Name <span class="required">*</span></label>
+                <input type="text" name="name" required placeholder="Enter your full name">
+            </div>
+            
+            <div class="form-group">
+                <label>Email <span class="required">*</span></label>
+                <input type="email" name="email" required placeholder="your.email@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label>Phone Number <span class="required">*</span></label>
+                <input type="tel" name="phone" required placeholder="+91 XXXXXXXXXX">
+            </div>
+            
+            <div class="form-group">
+                <label>Position Applying For <span class="required">*</span></label>
+                <select name="position" required>
+                    <option value="">Choose a position...</option>
+                    <option value="content-creator">Content Creator</option>
+                    <option value="mentor">Mentor</option>
+                    <option value="developer">Developer</option>
+                    <option value="marketing">Marketing Team</option>
+                    <option value="hr">HR</option>
+                    <option value="sales">Sales</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Experience Level <span class="required">*</span></label>
+                <select name="experience" required>
+                    <option value="">Select experience...</option>
+                    <option value="fresher">Fresher (0-1 years)</option>
+                    <option value="junior">Junior (1-3 years)</option>
+                    <option value="mid">Mid-Level (3-5 years)</option>
+                    <option value="senior">Senior (5+ years)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>LinkedIn Profile</label>
+                <input type="url" name="linkedin" placeholder="https://linkedin.com/in/yourprofile">
+            </div>
+            
+            <div class="form-group">
+                <label>Resume/Portfolio Link</label>
+                <input type="url" name="resume" placeholder="Google Drive, Dropbox, or Portfolio URL">
+            </div>
+            
+            <div class="form-group">
+                <label>Why do you want to join NextGen InnoHub? <span class="required">*</span></label>
+                <textarea name="reason" required placeholder="Tell us your motivation and what you can bring to the team..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Skills & Expertise <span class="required">*</span></label>
+                <textarea name="skills" required placeholder="List your key skills, technologies, or areas of expertise..."></textarea>
+            </div>
+            
+            <button type="submit" class="submit-btn">Submit Application 🚀</button>
+        </form>
+        
+        <div class="back-link">
+            <a href="index.html">← Back to Home</a>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('careerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            
+            // Format message for WhatsApp
+            const whatsappMessage = `*Job Application - NextGen InnoHub*%0A%0A*EMPLOYEE INTERESTED TO WORK WITH OUR COMPANY*%0A%0A*Name:* ${data.name}%0A*Email:* ${data.email}%0A*Phone:* ${data.phone}%0A*Position:* ${data.position}%0A*Experience:* ${data.experience}%0A*LinkedIn:* ${data.linkedin || 'Not provided'}%0A*Resume:* ${data.resume || 'Not provided'}%0A*Why Join:* ${data.reason}%0A*Skills:* ${data.skills}`;
+            
+            // Send to WhatsApp
+            window.open(`https://wa.me/919760327132?text=${whatsappMessage}`, '_blank');
+            
+            // Also send email
+            const emailBody = `Job Application from NextGen InnoHub\n\nEMPLOYEE INTERESTED TO WORK WITH OUR COMPANY\n\nName: ${data.name}\nEmail: ${data.email}\nPhone: ${data.phone}\nPosition: ${data.position}\nExperience: ${data.experience}\nLinkedIn: ${data.linkedin || 'Not provided'}\nResume: ${data.resume || 'Not provided'}\nWhy Join: ${data.reason}\nSkills: ${data.skills}`;
+            const mailtoLink = `mailto:contact@nextgeninnohub.in?subject=Job Application - ${data.name} (${data.position})&body=${encodeURIComponent(emailBody)}`;
+            
+            // Open email in new window
+            setTimeout(() => {
+                window.open(mailtoLink, '_blank');
+            }, 1000);
+            
+            // Show success message
+            alert('✅ Application Submitted Successfully!\n\nYour application has been sent via WhatsApp and Email.\n\nWe will review your application and contact you soon at: ' + data.email);
+            
+            // Reset form
+            e.target.reset();
+        });
+    </script>
+</body>
+</html>
