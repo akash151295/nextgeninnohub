@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Certificate - NextGen InnoHub</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f5f7fa; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 15px; margin-bottom: 30px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .form-section { background: white; padding: 30px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+        input, select, textarea { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; }
+        .btn { padding: 15px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin: 5px; }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-secondary { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        
+        /* Certificate Design */
+        #certificate { width: 297mm; height: 210mm; background: white; padding: 40px; position: relative; border: 15px solid #667eea; box-shadow: 0 0 30px rgba(0,0,0,0.2); margin: 30px auto; display: none; }
+        .cert-border { border: 3px solid #764ba2; padding: 30px; height: 100%; position: relative; }
+        .cert-header { text-align: center; margin-bottom: 30px; }
+        .cert-logo { font-size: 48px; color: #667eea; margin-bottom: 10px; }
+        .cert-company { font-size: 32px; font-weight: bold; color: #667eea; margin-bottom: 5px; }
+        .cert-tagline { font-size: 16px; color: #666; font-style: italic; }
+        .cert-title { text-align: center; font-size: 48px; font-weight: bold; color: #764ba2; margin: 40px 0 30px; text-transform: uppercase; letter-spacing: 3px; }
+        .cert-body { text-align: center; font-size: 20px; line-height: 2; color: #333; margin: 30px 0; }
+        .cert-name { font-size: 36px; font-weight: bold; color: #667eea; border-bottom: 3px solid #667eea; display: inline-block; padding: 10px 40px; margin: 20px 0; }
+        .cert-course { font-size: 24px; font-weight: bold; color: #764ba2; margin: 20px 0; }
+        .cert-footer { display: flex; justify-content: space-between; margin-top: 60px; padding-top: 30px; }
+        .cert-signature { text-align: center; }
+        .cert-signature-line { border-top: 2px solid #333; width: 200px; margin: 0 auto 10px; }
+        .cert-signature-name { font-weight: bold; color: #333; }
+        .cert-signature-title { font-size: 14px; color: #666; }
+        .cert-date { position: absolute; bottom: 40px; left: 40px; font-size: 14px; color: #666; }
+        .cert-id { position: absolute; bottom: 40px; right: 40px; font-size: 14px; color: #666; }
+        .cert-seal { position: absolute; bottom: 100px; right: 80px; width: 100px; height: 100px; border: 5px solid #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #667eea; transform: rotate(-15deg); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📜 Generate Certificate</h1>
+            <p>Create professional certificates for interns</p>
+        </div>
+
+        <div class="form-section">
+            <h2 style="margin-bottom: 20px;">Certificate Details</h2>
+            <form id="certForm">
+                <div class="form-group">
+                    <label>Intern Name *</label>
+                    <input type="text" id="internName" required>
+                </div>
+                <div class="form-group">
+                    <label>Course/Domain *</label>
+                    <input type="text" id="course" required placeholder="e.g., HR using Generative AI">
+                </div>
+                <div class="form-group">
+                    <label>Duration *</label>
+                    <input type="text" id="duration" required placeholder="e.g., 4 Weeks">
+                </div>
+                <div class="form-group">
+                    <label>Completion Date *</label>
+                    <input type="date" id="completionDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Performance/Grade</label>
+                    <select id="performance">
+                        <option value="Excellent">Excellent</option>
+                        <option value="Outstanding">Outstanding</option>
+                        <option value="Very Good">Very Good</option>
+                        <option value="Good">Good</option>
+                        <option value="">Not Specified</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">🎨 Generate Certificate</button>
+                <button type="button" class="btn btn-secondary" onclick="window.history.back()">← Back</button>
+            </form>
+        </div>
+
+        <!-- Certificate Template -->
+        <div id="certificate">
+            <div class="cert-border">
+                <div class="cert-header">
+                    <div class="cert-logo">🚀</div>
+                    <div class="cert-company">NextGen InnoHub</div>
+                    <div class="cert-tagline">Empowering Future Innovators</div>
+                </div>
+                
+                <div class="cert-title">Certificate of Completion</div>
+                
+                <div class="cert-body">
+                    <p>This is to certify that</p>
+                    <div class="cert-name" id="certInternName">Intern Name</div>
+                    <p>has successfully completed the internship program in</p>
+                    <div class="cert-course" id="certCourse">Course Name</div>
+                    <p>Duration: <strong id="certDuration">4 Weeks</strong></p>
+                    <p id="certPerformance" style="margin-top: 20px;"></p>
+                    <p style="margin-top: 30px; font-size: 18px; color: #666;">
+                        We appreciate the dedication and hard work demonstrated<br>
+                        throughout this learning journey.
+                    </p>
+                </div>
+                
+                <div class="cert-footer">
+                    <div class="cert-signature">
+                        <div class="cert-signature-line"></div>
+                        <div class="cert-signature-name">Authorized Signatory</div>
+                        <div class="cert-signature-title">Program Director</div>
+                    </div>
+                    <div class="cert-signature">
+                        <div class="cert-signature-line"></div>
+                        <div class="cert-signature-name">NextGen InnoHub</div>
+                        <div class="cert-signature-title">CEO & Founder</div>
+                    </div>
+                </div>
+                
+                <div class="cert-seal">
+                    <div style="text-align: center; font-size: 12px;">VERIFIED<br>SEAL</div>
+                </div>
+                
+                <div class="cert-date">Issue Date: <span id="certDate"></span></div>
+                <div class="cert-id">Certificate ID: <span id="certId"></span></div>
+            </div>
+        </div>
+
+        <div id="actionButtons" style="text-align: center; margin: 30px 0; display: none;">
+            <button class="btn" onclick="downloadPDF()">📥 Download PDF</button>
+            <button class="btn btn-secondary" onclick="printCertificate()">🖨️ Print Certificate</button>
+            <button class="btn" onclick="resetForm()" style="background: #ef4444;">🔄 Create New</button>
+        </div>
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        if (!user || user.role === 'intern') window.location.href = 'portal-login.html';
+
+        document.getElementById('certForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            generateCertificate();
+        });
+
+        function generateCertificate() {
+            const internName = document.getElementById('internName').value;
+            const course = document.getElementById('course').value;
+            const duration = document.getElementById('duration').value;
+            const completionDate = document.getElementById('completionDate').value;
+            const performance = document.getElementById('performance').value;
+
+            document.getElementById('certInternName').textContent = internName;
+            document.getElementById('certCourse').textContent = course;
+            document.getElementById('certDuration').textContent = duration;
+            document.getElementById('certDate').textContent = new Date(completionDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('certId').textContent = 'NGI-' + Date.now();
+            
+            const perfText = performance ? `Performance: ${performance}` : '';
+            document.getElementById('certPerformance').innerHTML = perfText ? `<strong style="color: #10b981; font-size: 22px;">${perfText}</strong>` : '';
+
+            document.getElementById('certificate').style.display = 'block';
+            document.getElementById('actionButtons').style.display = 'block';
+            document.querySelector('.form-section').style.display = 'none';
+            
+            window.scrollTo({ top: document.getElementById('certificate').offsetTop - 100, behavior: 'smooth' });
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById('certificate');
+            const opt = {
+                margin: 0,
+                filename: 'Certificate_' + document.getElementById('certInternName').textContent.replace(/\s+/g, '_') + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function printCertificate() {
+            window.print();
+        }
+
+        function resetForm() {
+            document.getElementById('certForm').reset();
+            document.getElementById('certificate').style.display = 'none';
+            document.getElementById('actionButtons').style.display = 'none';
+            document.querySelector('.form-section').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+
+    <style media="print">
+        body * { visibility: hidden; }
+        #certificate, #certificate * { visibility: visible; }
+        #certificate { position: absolute; left: 0; top: 0; width: 100%; margin: 0; box-shadow: none; }
+        .header, .form-section, #actionButtons { display: none !important; }
+    </style>
+</body>
+</html>
