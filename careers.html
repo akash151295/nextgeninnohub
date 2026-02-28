@@ -124,25 +124,25 @@
         <h1>🚀 Join Our Team</h1>
         <p class="subtitle">Be part of the AI education revolution</p>
         
-        <form id="careerForm" action="submit-career.php" method="POST">
+        <form id="careerForm">
             <div class="form-group">
                 <label>Full Name <span class="required">*</span></label>
-                <input type="text" name="name" required placeholder="Enter your full name">
+                <input type="text" name="name" id="c_name" required placeholder="Enter your full name">
             </div>
             
             <div class="form-group">
                 <label>Email <span class="required">*</span></label>
-                <input type="email" name="email" required placeholder="your.email@example.com">
+                <input type="email" name="email" id="c_email" required placeholder="your.email@example.com">
             </div>
             
             <div class="form-group">
                 <label>Phone Number <span class="required">*</span></label>
-                <input type="tel" name="phone" required placeholder="+91 XXXXXXXXXX">
+                <input type="tel" name="phone" id="c_phone" required placeholder="+91 XXXXXXXXXX">
             </div>
             
             <div class="form-group">
                 <label>Position Applying For <span class="required">*</span></label>
-                <select name="position" required>
+                <select name="position" id="c_position" required>
                     <option value="">Choose a position...</option>
                     <option value="content-creator">Content Creator</option>
                     <option value="mentor">Mentor</option>
@@ -156,7 +156,7 @@
             
             <div class="form-group">
                 <label>Experience Level <span class="required">*</span></label>
-                <select name="experience" required>
+                <select name="experience" id="c_experience" required>
                     <option value="">Select experience...</option>
                     <option value="fresher">Fresher (0-1 years)</option>
                     <option value="junior">Junior (1-3 years)</option>
@@ -167,25 +167,28 @@
             
             <div class="form-group">
                 <label>LinkedIn Profile</label>
-                <input type="url" name="linkedin" placeholder="https://linkedin.com/in/yourprofile">
+                <input type="url" name="linkedin" id="c_linkedin" placeholder="https://linkedin.com/in/yourprofile">
             </div>
             
             <div class="form-group">
                 <label>Resume/Portfolio Link</label>
-                <input type="url" name="resume" placeholder="Google Drive, Dropbox, or Portfolio URL">
+                <input type="url" name="resume" id="c_resume" placeholder="Google Drive, Dropbox, or Portfolio URL">
             </div>
             
             <div class="form-group">
                 <label>Why do you want to join NextGen InnoHub? <span class="required">*</span></label>
-                <textarea name="reason" required placeholder="Tell us your motivation and what you can bring to the team..."></textarea>
+                <textarea name="reason" id="c_reason" required placeholder="Tell us your motivation and what you can bring to the team..."></textarea>
             </div>
             
             <div class="form-group">
                 <label>Skills & Expertise <span class="required">*</span></label>
-                <textarea name="skills" required placeholder="List your key skills, technologies, or areas of expertise..."></textarea>
+                <textarea name="skills" id="c_skills" required placeholder="List your key skills, technologies, or areas of expertise..."></textarea>
             </div>
             
-            <button type="submit" class="submit-btn">Submit Application 🚀</button>
+            <div style="display: flex; gap: 15px; margin-top: 10px;">
+                <button type="button" onclick="submitCareerViaEmail()" class="submit-btn" style="flex: 1; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">📧 Submit via Email</button>
+                <button type="button" onclick="submitCareerViaWhatsApp()" class="submit-btn" style="flex: 1; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);">💬 Submit via WhatsApp</button>
+            </div>
         </form>
         
         <div class="back-link">
@@ -194,37 +197,52 @@
     </div>
     
     <script>
-        document.getElementById('careerForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData);
-            
-            const submitBtn = e.target.querySelector('.submit-btn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
-            
-            try {
-                const response = await fetch('submit-career.php', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert('✅ Application Submitted Successfully!\n\nThank you for your interest in joining NextGen InnoHub!\n\nSomeone from our team will review your application and connect with you soon at: ' + data.email);
-                    e.target.reset();
-                } else {
-                    throw new Error(result.message || 'Submission failed');
-                }
-            } catch (error) {
-                alert('❌ Submission failed. Please try again or contact us directly at contact@nextgeninnohub.in');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit Application 🚀';
+        function getCareerFormData() {
+            return {
+                name: document.getElementById('c_name').value,
+                email: document.getElementById('c_email').value,
+                phone: document.getElementById('c_phone').value,
+                position: document.getElementById('c_position').value,
+                experience: document.getElementById('c_experience').value,
+                linkedin: document.getElementById('c_linkedin').value || 'Not provided',
+                resume: document.getElementById('c_resume').value || 'Not provided',
+                reason: document.getElementById('c_reason').value,
+                skills: document.getElementById('c_skills').value
+            };
+        }
+        
+        function submitCareerViaEmail() {
+            const data = getCareerFormData();
+            if (!data.name || !data.email || !data.phone || !data.position || !data.experience || !data.reason || !data.skills) {
+                alert('Please fill all required fields');
+                return;
             }
-        });
+            
+            const subject = 'Job Application - EMPLOYEE INTERESTED - ' + data.name;
+            const body = `EMPLOYEE INTERESTED TO WORK WITH OUR COMPANY\n\nJob Application\n\nName: ${data.name}\nEmail: ${data.email}\nPhone: ${data.phone}\nPosition: ${data.position}\nExperience: ${data.experience}\nLinkedIn: ${data.linkedin}\nResume: ${data.resume}\nWhy Join: ${data.reason}\nSkills: ${data.skills}`;
+            
+            window.location.href = `mailto:contact@nextgeninnohub.in?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            setTimeout(() => {
+                alert('✅ Email client opened!\n\nPlease send the email to complete your application.\n\nWe will review and connect with you soon!');
+            }, 500);
+        }
+        
+        function submitCareerViaWhatsApp() {
+            const data = getCareerFormData();
+            if (!data.name || !data.email || !data.phone || !data.position || !data.experience || !data.reason || !data.skills) {
+                alert('Please fill all required fields');
+                return;
+            }
+            
+            const message = `*EMPLOYEE INTERESTED TO WORK WITH OUR COMPANY*%0A%0A*Job Application*%0A%0AName: ${data.name}%0AEmail: ${data.email}%0APhone: ${data.phone}%0APosition: ${data.position}%0AExperience: ${data.experience}%0ALinkedIn: ${data.linkedin}%0AResume: ${data.resume}%0AWhy Join: ${data.reason}%0ASkills: ${data.skills}`;
+            
+            window.open(`https://wa.me/919760327132?text=${message}`, '_blank');
+            
+            setTimeout(() => {
+                alert('✅ WhatsApp opened!\n\nPlease send the message to complete your application.\n\nWe will review and connect with you soon!');
+            }, 500);
+        }
     </script>
 </body>
 </html>

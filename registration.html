@@ -116,25 +116,25 @@
         <h1>🚀 Join NextGen InnoHub</h1>
         <p class="subtitle">Register for AI-Powered Internship</p>
         
-        <form id="registrationForm" action="submit-registration.php" method="POST">
+        <form id="registrationForm">
             <div class="form-group">
                 <label>Full Name <span class="required">*</span></label>
-                <input type="text" name="name" required placeholder="Enter your full name">
+                <input type="text" name="name" id="name" required placeholder="Enter your full name">
             </div>
             
             <div class="form-group">
                 <label>Email <span class="required">*</span></label>
-                <input type="email" name="email" required placeholder="your.email@example.com">
+                <input type="email" name="email" id="email" required placeholder="your.email@example.com">
             </div>
             
             <div class="form-group">
                 <label>Phone Number <span class="required">*</span></label>
-                <input type="tel" name="phone" required placeholder="+91 XXXXXXXXXX">
+                <input type="tel" name="phone" id="phone" required placeholder="+91 XXXXXXXXXX">
             </div>
             
             <div class="form-group">
                 <label>Select Domain <span class="required">*</span></label>
-                <select name="domain" required>
+                <select name="domain" id="domain" required>
                     <option value="">Choose a domain...</option>
                     <option value="hr">HR using Generative AI</option>
                     <option value="testing">Software Testing using Generative AI</option>
@@ -150,15 +150,15 @@
                 <label>Select Plan <span class="required">*</span></label>
                 <div class="radio-group">
                     <label>
-                        <input type="radio" name="plan" value="explorer" required>
+                        <input type="radio" name="plan" id="plan_explorer" value="explorer" required>
                         Explorer (FREE)
                     </label>
                     <label>
-                        <input type="radio" name="plan" value="builder">
+                        <input type="radio" name="plan" id="plan_builder" value="builder">
                         Builder (₹99)
                     </label>
                     <label>
-                        <input type="radio" name="plan" value="professional">
+                        <input type="radio" name="plan" id="plan_professional" value="professional">
                         Professional (₹199)
                     </label>
                 </div>
@@ -166,7 +166,7 @@
             
             <div class="form-group">
                 <label>Current Status <span class="required">*</span></label>
-                <select name="status" required>
+                <select name="status" id="status" required>
                     <option value="">Select your status...</option>
                     <option value="school">School Student</option>
                     <option value="college">College Student</option>
@@ -178,45 +178,61 @@
             
             <div class="form-group">
                 <label>Why do you want to join? <span class="required">*</span></label>
-                <textarea name="reason" required placeholder="Tell us your motivation..."></textarea>
+                <textarea name="reason" id="reason" required placeholder="Tell us your motivation..."></textarea>
             </div>
             
-            <button type="submit" class="submit-btn">Submit Registration 🚀</button>
+            <div style="display: flex; gap: 15px; margin-top: 10px;">
+                <button type="button" onclick="submitViaEmail()" class="submit-btn" style="flex: 1; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">📧 Submit via Email</button>
+                <button type="button" onclick="submitViaWhatsApp()" class="submit-btn" style="flex: 1; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);">💬 Submit via WhatsApp</button>
+            </div>
         </form>
     </div>
     
     <script>
-        document.getElementById('registrationForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData);
-            
-            const submitBtn = e.target.querySelector('.submit-btn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
-            
-            try {
-                const response = await fetch('submit-registration.php', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert('✅ Registration Successful!\n\nThank you for joining NextGen InnoHub!\n\nSomeone from our team will connect with you soon at: ' + data.email);
-                    e.target.reset();
-                } else {
-                    throw new Error(result.message || 'Submission failed');
-                }
-            } catch (error) {
-                alert('❌ Submission failed. Please try again or contact us directly at contact@nextgeninnohub.in');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit Registration 🚀';
+        function getFormData() {
+            return {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                domain: document.getElementById('domain').value,
+                plan: document.querySelector('input[name="plan"]:checked')?.value || '',
+                status: document.getElementById('status').value,
+                reason: document.getElementById('reason').value
+            };
+        }
+        
+        function submitViaEmail() {
+            const data = getFormData();
+            if (!data.name || !data.email || !data.phone || !data.domain || !data.plan || !data.status || !data.reason) {
+                alert('Please fill all required fields');
+                return;
             }
-        });
+            
+            const subject = 'Internship Registration - ' + data.name;
+            const body = `New Internship Registration\n\nName: ${data.name}\nEmail: ${data.email}\nPhone: ${data.phone}\nDomain: ${data.domain}\nPlan: ${data.plan}\nStatus: ${data.status}\nReason: ${data.reason}`;
+            
+            window.location.href = `mailto:contact@nextgeninnohub.in?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            setTimeout(() => {
+                alert('✅ Email client opened!\n\nPlease send the email to complete your registration.\n\nSomeone will connect with you soon!');
+            }, 500);
+        }
+        
+        function submitViaWhatsApp() {
+            const data = getFormData();
+            if (!data.name || !data.email || !data.phone || !data.domain || !data.plan || !data.status || !data.reason) {
+                alert('Please fill all required fields');
+                return;
+            }
+            
+            const message = `*Internship Registration*%0A%0AName: ${data.name}%0AEmail: ${data.email}%0APhone: ${data.phone}%0ADomain: ${data.domain}%0APlan: ${data.plan}%0AStatus: ${data.status}%0AReason: ${data.reason}`;
+            
+            window.open(`https://wa.me/919760327132?text=${message}`, '_blank');
+            
+            setTimeout(() => {
+                alert('✅ WhatsApp opened!\n\nPlease send the message to complete your registration.\n\nSomeone will connect with you soon!');
+            }, 500);
+        }
     </script>
 </body>
 </html>
