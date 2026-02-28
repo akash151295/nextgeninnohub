@@ -304,7 +304,7 @@
         function viewPerformance() {
             const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
             const myTasks = tasks.filter(t => t.internName === user.name);
-            const reviewedTasks = myTasks.filter(t => t.rating);
+            const reviewedTasks = myTasks.filter(t => t.rating && (t.status === 'Approved' || t.status === 'Rejected'));
             
             const modal = document.createElement('div');
             modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;';
@@ -335,9 +335,11 @@
             
             if (reviewedTasks.length > 0) {
                 html += '<h4 style="margin-top: 20px;">Rating History</h4>';
-                html += '<table style="width: 100%; border-collapse: collapse; margin-top: 15px;"><tr style="background: #f0f9ff;"><th style="padding: 10px; text-align: left;">Task</th><th style="padding: 10px; text-align: left;">Rating</th><th style="padding: 10px; text-align: left;">Feedback</th></tr>';
+                html += '<table style="width: 100%; border-collapse: collapse; margin-top: 15px;"><tr style="background: #f0f9ff;"><th style="padding: 10px; text-align: left;">Task</th><th style="padding: 10px; text-align: left;">Status</th><th style="padding: 10px; text-align: left;">Rating</th><th style="padding: 10px; text-align: left;">Feedback</th></tr>';
                 reviewedTasks.forEach(task => {
-                    html += `<tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 10px;">${task.title}</td><td style="padding: 10px;">${task.rating}/5 ⭐</td><td style="padding: 10px;">${task.performanceFeedback || task.reviewComment || '-'}</td></tr>`;
+                    const statusColor = task.status === 'Approved' ? '#10b981' : '#ef4444';
+                    const statusIcon = task.status === 'Approved' ? '✅' : '❌';
+                    html += `<tr style="border-bottom: 1px solid #e0e0e0;"><td style="padding: 10px;">${task.title}</td><td style="padding: 10px; color: ${statusColor}; font-weight: 600;">${statusIcon} ${task.status}</td><td style="padding: 10px;">${task.rating}/10 ⭐</td><td style="padding: 10px;">${task.performanceFeedback || task.reviewComment || '-'}</td></tr>`;
                 });
                 html += '</table>';
             }
