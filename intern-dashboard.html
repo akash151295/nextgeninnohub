@@ -185,7 +185,9 @@
             const myTasks = tasks.filter(t => t.internName === user.name && t.status === 'Assigned');
             
             if (myTasks.length === 0) {
-                alert('❌ No pending tasks to submit!');
+                const allMyTasks = tasks.filter(t => t.internName === user.name);
+                console.log('All my tasks:', allMyTasks);
+                alert(`❌ No pending tasks to submit!\n\nYou have ${allMyTasks.length} total task(s).\nCheck "View My Tasks" to see their status.`);
                 return;
             }
             
