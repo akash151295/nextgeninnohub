@@ -539,7 +539,7 @@
         
         /* Contact Section */
         .contact {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
             color: white;
             text-align: center;
         }
@@ -548,15 +548,52 @@
             color: white;
         }
         
-        .contact a {
-            color: #fff;
-            font-size: 1.3em;
+        .contact-details {
+            max-width: 600px;
+            margin: 40px auto;
+            font-size: 1.2em;
+            line-height: 2;
+        }
+        
+        .contact-details a {
+            color: white;
             text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.3s;
+        }
+        
+        .contact-details a:hover {
+            opacity: 0.8;
+        }
+        
+        .contact-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
             background: rgba(255,255,255,0.2);
-            padding: 15px 30px;
-            border-radius: 10px;
-            display: inline-block;
-            margin-top: 20px;
+            color: white;
+            padding: 15px 35px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: 700;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .contact-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
         
         /* Footer */
@@ -1042,8 +1079,25 @@
     <section class="contact">
         <div class="container">
             <h2>📩 Contact Us</h2>
-            <p style="font-size: 1.2em;">Have questions or want custom training for institutions?</p>
-            <a href="mailto:contact@nextgeninnohub.in">contact@nextgeninnohub.in</a>
+            <p style="font-size: 1.2em; margin-bottom: 30px;">Have questions or want custom training for institutions?</p>
+            
+            <div class="contact-details">
+                <p>📧 Email: <a href="mailto:contact@nextgeninnohub.in">contact@nextgeninnohub.in</a></p>
+                <p>🌐 Website: <a href="https://www.nextgeninnohub.in" target="_blank">www.nextgeninnohub.in</a></p>
+                <p>📱 Phone: <a href="tel:+919760327132">+91 9760327132</a></p>
+            </div>
+            
+            <div class="contact-buttons">
+                <a href="https://wa.me/919760327132?text=Hi%2C%20I%20want%20to%20know%20more%20about%20NextGen%20InnoHub%20internships" target="_blank" class="contact-btn">
+                    <span>💬</span> WhatsApp
+                </a>
+                <a href="tel:+919760327132" class="contact-btn">
+                    <span>📞</span> Call Now
+                </a>
+                <a href="mailto:contact@nextgeninnohub.in" class="contact-btn">
+                    <span>✉️</span> Email Us
+                </a>
+            </div>
         </div>
     </section>
 
