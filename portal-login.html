@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Login - NextGen InnoHub</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-container {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>🔐 Portal Login</h1>
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Role</label>
+                <select id="role" required>
+                    <option value="">Select Role</option>
+                    <option value="admin">Admin</option>
+                    <option value="employee">Employee / Lead Intern</option>
+                    <option value="intern">Intern</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="username" required placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" required placeholder="Enter password">
+            </div>
+            <button type="submit" class="btn">Login</button>
+        </form>
+        <div class="back-link">
+            <a href="index.html">← Back to Home</a>
+        </div>
+        <div style="margin-top: 20px; padding: 15px; background: #f0f9ff; border-radius: 8px; font-size: 14px;">
+            <strong>Demo Credentials:</strong><br>
+            Admin: admin / admin123<br>
+            Employee: employee / emp123<br>
+            Intern: intern / int123
+        </div>
+    </div>
+
+    <script>
+        // Initialize default users
+        if (!localStorage.getItem('users')) {
+            const defaultUsers = {
+                admin: { username: 'admin', password: 'admin123', role: 'admin', name: 'Admin User' },
+                employee: { username: 'employee', password: 'emp123', role: 'employee', name: 'Lead Intern' },
+                intern: { username: 'intern', password: 'int123', role: 'intern', name: 'Intern User', domain: 'HR' }
+            };
+            localStorage.setItem('users', JSON.stringify(defaultUsers));
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const role = document.getElementById('role').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const users = JSON.parse(localStorage.getItem('users'));
+            const user = Object.values(users).find(u => u.username === username && u.password === password && u.role === role);
+            
+            if (user) {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                
+                if (role === 'admin') {
+                    window.location.href = 'admin-dashboard.html';
+                } else if (role === 'employee') {
+                    window.location.href = 'employee-dashboard.html';
+                } else {
+                    window.location.href = 'intern-dashboard.html';
+                }
+            } else {
+                alert('❌ Invalid credentials! Please check your username, password, and role.');
+            }
+        });
+    </script>
+</body>
+</html>
