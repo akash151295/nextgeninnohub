@@ -252,8 +252,8 @@
         function closeModal(type) { document.getElementById(type + 'Modal').style.display = 'none'; }
 
         function loadLeadInterns() {
-            const users = DB.getAll('users');
-            const leadInterns = users.filter(u => u.role === 'employee');
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            const leadInterns = Object.values(users).filter(u => u.role === 'employee');
             const select = document.getElementById('leadInternSelect');
             select.innerHTML = '<option value="">Select Lead Intern</option>';
             leadInterns.forEach(lead => {
@@ -276,14 +276,16 @@
             const leadData = Object.fromEntries(data);
             leadData.role = 'employee';
             
-            const users = DB.getAll('users');
-            const exists = users.find(u => u.username === leadData.username);
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            const usersList = Object.values(users);
+            const exists = usersList.find(u => u.username === leadData.username);
             if (exists) {
                 alert('❌ Username already exists!');
                 return;
             }
             
-            DB.addUser(leadData);
+            users[leadData.username] = leadData;
+            localStorage.setItem('users', JSON.stringify(users));
             alert('✅ Lead Intern added successfully!');
             e.target.reset();
             closeModal('addLeadIntern');
@@ -304,9 +306,8 @@
                 return;
             }
             
-            const users = DB.getAll('users');
-            const exists = users.find(u => u.username === username);
-            if (exists) {
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            if (users[username]) {
                 alert('❌ Username already exists!');
                 return;
             }
@@ -320,7 +321,8 @@
                 domain: intern.domain
             };
             
-            DB.addUser(leadData);
+            users[username] = leadData;
+            localStorage.setItem('users', JSON.stringify(users));
             alert(`✅ ${intern.name} promoted to Lead Intern successfully!`);
             e.target.reset();
             closeModal('promoteIntern');
@@ -336,8 +338,8 @@
                 return;
             }
             
-            const users = DB.getAll('users');
-            const leadExists = users.find(u => u.role === 'employee' && u.name === internData.assignedTo);
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            const leadExists = Object.values(users).find(u => u.role === 'employee' && u.name === internData.assignedTo);
             
             if (!leadExists) {
                 alert(`❌ Lead Intern "${internData.assignedTo}" does not exist! Please add them first.`);
@@ -351,8 +353,8 @@
         }
 
         function viewLeadInterns() {
-            const users = DB.getAll('users');
-            const leadInterns = users.filter(u => u.role === 'employee');
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            const leadInterns = Object.values(users).filter(u => u.role === 'employee');
             const view = document.getElementById('dataView');
             const content = document.getElementById('dataContent');
             document.getElementById('dataTitle').textContent = 'LEAD INTERNS';
@@ -374,9 +376,9 @@
         function deleteLeadIntern(username) {
             if (!confirm('Are you sure you want to delete this Lead Intern? This will also unassign all their interns.')) return;
             
-            const users = DB.getAll('users');
-            const filtered = users.filter(u => u.username !== username);
-            localStorage.setItem('users', JSON.stringify(filtered));
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            delete users[username];
+            localStorage.setItem('users', JSON.stringify(users));
             
             const interns = DB.getAll('interns');
             interns.forEach(intern => {
