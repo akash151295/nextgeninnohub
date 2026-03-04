@@ -278,10 +278,16 @@
         // Check auth and load users
         auth.onAuthStateChanged(user => {
             if (!user) {
+                // Redirect to login if not authenticated
+                alert('Please login first');
                 window.location.href = 'portal-login.html';
             } else {
-                // Wait a moment for auth to fully initialize
-                setTimeout(() => loadUsers(), 500);
+                console.log('User authenticated:', user.email);
+                // Wait longer for auth context to fully initialize
+                setTimeout(() => {
+                    console.log('Loading users...');
+                    loadUsers();
+                }, 2000);
             }
         });
     </script>
