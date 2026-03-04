@@ -28,13 +28,13 @@
 </head>
 <body>
     <div class="header">
-        <h1>👨💼 Employee Dashboard</h1>
+        <h1>👨💼 Team Lead Dashboard</h1>
         <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
 
     <div class="container">
         <div class="welcome">
-            <h2>Welcome, <span id="employeeName">Employee</span>! 👋</h2>
+            <h2>Welcome, <span id="employeeName">Team Lead</span>! 👋</h2>
             <p style="color: #64748b; margin-top: 10px;">Manage your team and assign tasks.</p>
         </div>
 
@@ -146,7 +146,7 @@
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
-                    if (userData.role !== 'employee') {
+                    if (userData.role !== 'tl') {
                         window.location.href = 'portal-login.html';
                         return;
                     }

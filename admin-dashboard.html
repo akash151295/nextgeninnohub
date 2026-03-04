@@ -54,9 +54,9 @@
             </div>
 
             <div class="card">
-                <h3>👨💼 Employees (Team Leads)</h3>
-                <button class="btn" onclick="loadEmployees()">🔄 Refresh</button>
-                <div id="employeesList" style="margin-top: 20px;">
+                <h3>👨💼 Team Leads</h3>
+                <button class="btn" onclick="loadTeamLeads()">🔄 Refresh</button>
+                <div id="teamLeadsList" style="margin-top: 20px;">
                     <p class="loading">Click refresh to load...</p>
                 </div>
             </div>
@@ -70,7 +70,7 @@
             </div>
 
             <div class="card">
-                <h3>🔗 Assign Intern to Employee</h3>
+                <h3>🔗 Assign Intern to Team Lead</h3>
                 <button class="btn" onclick="openAssignModal()">➕ Assign Intern</button>
                 <div id="assignStatus" style="margin-top: 15px;"></div>
             </div>
@@ -95,9 +95,9 @@
     <div id="assignModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('assign')">&times;</span>
-            <h3>Assign Intern to Employee</h3>
+            <h3>Assign Intern to Team Lead</h3>
             <form onsubmit="assignInternToEmployee(event)">
-                <label>Select Employee (Team Lead):</label>
+                <label>Select Team Lead:</label>
                 <select id="employeeSelect" required>
                     <option value="">Loading...</option>
                 </select>
@@ -186,17 +186,17 @@
             }
         };
 
-        window.loadEmployees = async () => {
-            const container = document.getElementById('employeesList');
+        window.loadTeamLeads = async () => {
+            const container = document.getElementById('teamLeadsList');
             container.innerHTML = '<p class="loading">Loading...</p>';
             
             try {
-                const q = query(collection(db, 'users'), where('role', '==', 'employee'));
+                const q = query(collection(db, 'users'), where('role', '==', 'tl'));
                 const snapshot = await getDocs(q);
                 let html = '';
                 
                 if (snapshot.empty) {
-                    html = '<p>No employees found</p>';
+                    html = '<p>No team leads found</p>';
                 } else {
                     snapshot.forEach(doc => {
                         const user = doc.data();
@@ -246,10 +246,10 @@
 
         window.openAssignModal = async () => {
             try {
-                // Load employees
+                // Load team leads
                 const empSelect = document.getElementById('employeeSelect');
-                const empSnapshot = await getDocs(query(collection(db, 'users'), where('role', '==', 'employee')));
-                let empHtml = '<option value="">Select Employee</option>';
+                const empSnapshot = await getDocs(query(collection(db, 'users'), where('role', '==', 'tl')));
+                let empHtml = '<option value="">Select Team Lead</option>';
                 empSnapshot.forEach(doc => {
                     const user = doc.data();
                     empHtml += `<option value="${doc.id}">${user.name}</option>`;
@@ -310,13 +310,13 @@
                 for (const userDoc of usersSnapshot.docs) {
                     const user = userDoc.data();
                     if (user.role === 'intern' && user.assignedTo) {
-                        const empDoc = await getDoc(doc(db, 'users', user.assignedTo));
-                        if (empDoc.exists()) {
-                            const emp = empDoc.data();
+                        const tlDoc = await getDoc(doc(db, 'users', user.assignedTo));
+                        if (tlDoc.exists()) {
+                            const tl = tlDoc.data();
                             html += `
                                 <div class="user-item">
                                     <strong>${user.name}</strong> (Intern)<br>
-                                    → Assigned to: <strong>${emp.name}</strong> (Employee)
+                                    → Assigned to: <strong>${tl.name}</strong> (Team Lead)
                                 </div>
                             `;
                             count++;
