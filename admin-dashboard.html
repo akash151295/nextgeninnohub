@@ -559,6 +559,8 @@
         function showUserManager() {
             document.getElementById('userManagerView').style.display = 'block';
             document.getElementById('dataView').style.display = 'none';
+            // Scroll to User Manager section
+            document.getElementById('userManagerView').scrollIntoView({ behavior: 'smooth' });
             initializeUserManager();
         }
 
