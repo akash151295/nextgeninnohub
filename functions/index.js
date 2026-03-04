@@ -53,11 +53,12 @@ exports.createUser = functions.https.onCall(async (data, context) => {
         // Generate password
         const password = generatePassword();
 
-        // Create user in Authentication
+        // Create user in Authentication using Admin SDK (won't sign them in)
         const userRecord = await admin.auth().createUser({
             email: email,
             password: password,
-            displayName: name
+            displayName: name,
+            emailVerified: false
         });
 
         // Create user document in Firestore
