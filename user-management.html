@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+        .add-user-form {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        input, select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .users-table {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        .delete-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .success-msg, .error-msg {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .success-msg {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error-msg {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .credentials-box {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="admin-dashboard.html" class="back-link">← Back to Dashboard</a>
+        
+        <h1>👥 User Management</h1>
+
+        <div id="messageBox"></div>
+
+        <!-- Add User Form -->
+        <div class="add-user-form">
+            <h2>➕ Add New User</h2>
+            <form id="addUserForm">
+                <div class="form-row">
+                    <input type="text" id="userName" placeholder="Full Name" required>
+                    <input type="email" id="userEmail" placeholder="Email" required>
+                    <select id="userRole" required>
+                        <option value="">Select Role</option>
+                        <option value="admin">Admin</option>
+                        <option value="employee">Employee / Lead Intern</option>
+                        <option value="intern">Intern</option>
+                    </select>
+                    <input type="text" id="userDomain" placeholder="Domain (for interns)">
+                </div>
+                <button type="submit" class="btn" id="addBtn">Create User</button>
+            </form>
+
+            <div id="credentialsBox" style="display: none;" class="credentials-box">
+                <h3>✅ User Created Successfully!</h3>
+                <p><strong>Email:</strong> <span id="createdEmail"></span></p>
+                <p><strong>Password:</strong> <span id="createdPassword"></span></p>
+                <p style="margin-top: 10px; color: #856404;">⚠️ Save these credentials! Password won't be shown again.</p>
+            </div>
+        </div>
+
+        <!-- Users List -->
+        <div class="users-table">
+            <h2>📋 All Users</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Domain</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <tr><td colspan="5" style="text-align: center;">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAFoXIPtkRJdTxcTcXQkDYDUxmzcoownWA",
+            authDomain: "nextgen-innohub.firebaseapp.com",
+            projectId: "nextgen-innohub",
+            storageBucket: "nextgen-innohub.firebasestorage.app",
+            messagingSenderId: "28087223200",
+            appId: "1:28087223200:web:f4885a48ac45fdccfc1ac5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const functions = getFunctions(app);
+
+        const messageBox = document.getElementById('messageBox');
+        const addUserForm = document.getElementById('addUserForm');
+        const addBtn = document.getElementById('addBtn');
+        const credentialsBox = document.getElementById('credentialsBox');
+
+        // Show message
+        function showMessage(message, type) {
+            messageBox.innerHTML = `<div class="${type}-msg">${message}</div>`;
+            setTimeout(() => messageBox.innerHTML = '', 5000);
+        }
+
+        // Load all users
+        async function loadUsers() {
+            try {
+                const getAllUsers = httpsCallable(functions, 'getAllUsers');
+                const result = await getAllUsers();
+                
+                const tbody = document.getElementById('usersTableBody');
+                tbody.innerHTML = '';
+
+                if (result.data.users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No users found</td></tr>';
+                    return;
+                }
+
+                result.data.users.forEach(user => {
+                    const row = `
+                        <tr>
+                            <td>${user.name}</td>
+                            <td>${user.email}</td>
+                            <td>${user.role}</td>
+                            <td>${user.domain || '-'}</td>
+                            <td>
+                                <button class="delete-btn" onclick="deleteUser('${user.uid}', '${user.email}')">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showMessage('Error loading users: ' + error.message, 'error');
+            }
+        }
+
+        // Add new user
+        addUserForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+            const role = document.getElementById('userRole').value;
+            const domain = document.getElementById('userDomain').value;
+
+            addBtn.disabled = true;
+            addBtn.textContent = 'Creating...';
+            credentialsBox.style.display = 'none';
+
+            try {
+                const createUser = httpsCallable(functions, 'createUser');
+                const result = await createUser({ name, email, role, domain });
+
+                // Show credentials
+                document.getElementById('createdEmail').textContent = result.data.email;
+                document.getElementById('createdPassword').textContent = result.data.password;
+                credentialsBox.style.display = 'block';
+
+                showMessage('User created successfully!', 'success');
+                addUserForm.reset();
+                loadUsers();
+
+            } catch (error) {
+                console.error('Error creating user:', error);
+                showMessage('Error: ' + error.message, 'error');
+            } finally {
+                addBtn.disabled = false;
+                addBtn.textContent = 'Create User';
+            }
+        });
+
+        // Delete user
+        window.deleteUser = async function(uid, email) {
+            if (!confirm(`Delete user ${email}?`)) return;
+
+            try {
+                const deleteUserFunc = httpsCallable(functions, 'deleteUser');
+                await deleteUserFunc({ uid });
+                
+                showMessage('User deleted successfully', 'success');
+                loadUsers();
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                showMessage('Error: ' + error.message, 'error');
+            }
+        };
+
+        // Check auth and load users
+        auth.onAuthStateChanged(user => {
+            if (!user) {
+                window.location.href = 'portal-login.html';
+            } else {
+                loadUsers();
+            }
+        });
+    </script>
+</body>
+</html>
