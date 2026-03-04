@@ -646,10 +646,9 @@
         }
 
         async function initializeUserManager(filterRole = null) {
-            // Import Firebase modules
             const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
-            const { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
-            const { getFirestore, doc, setDoc, collection, getDocs, deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+            const { getAuth, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
+            const { getFunctions, httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js');
 
             const firebaseConfig = {
                 apiKey: "AIzaSyAFoXIPtkRJdTxcTcXQkDYDUxmzcoownWA",
@@ -662,7 +661,7 @@
 
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
-            const db = getFirestore(app);
+            const functions = getFunctions(app);
 
             function generatePassword() {
                 const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
@@ -675,34 +674,31 @@
 
             async function loadUsers() {
                 try {
-                    const usersSnapshot = await getDocs(collection(db, 'users'));
-                    const usersList = document.getElementById('usersList');
-                    
-                    if (usersSnapshot.empty) {
-                        usersList.innerHTML = '<p>No users found</p>';
+                    const user = auth.currentUser;
+                    if (!user) {
+                        document.getElementById('usersList').innerHTML = '<p>Please login first</p>';
                         return;
                     }
-
+                    
+                    await user.getIdToken(true);
+                    const getAllUsers = httpsCallable(functions, 'getAllUsers');
+                    const result = await getAllUsers();
+                    
+                    const usersList = document.getElementById('usersList');
                     let html = '';
                     let filteredCount = 0;
                     
-                    usersSnapshot.forEach(doc => {
-                        const user = doc.data();
-                        const currentUserEmail = auth.currentUser?.email;
-                        const isCurrentUser = user.email === currentUserEmail;
-                        
-                        // Apply role filter if specified
-                        if (filterRole && user.role !== filterRole) {
-                            return; // Skip this user
+                    result.data.users.forEach(u => {
+                        if (filterRole && u.role !== filterRole) {
+                            return;
                         }
-                        
                         filteredCount++;
-                        
+                        const isCurrentUser = u.email === user.email;
                         html += `
                             <div style="background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px;">
-                                <strong>${user.name}</strong> (${user.email})<br>
-                                Role: ${user.role} | Domain: ${user.domain || 'N/A'}
-                                ${!isCurrentUser ? `<br><button class="btn" style="background: #dc3545; margin-top: 10px; padding: 5px 10px; font-size: 12px;" onclick="deleteUser('${doc.id}', '${user.email}')">Delete User</button>` : '<br><em>Current User</em>'}
+                                <strong>${u.name}</strong> (${u.email})<br>
+                                Role: ${u.role} | Domain: ${u.domain || 'N/A'}
+                                ${!isCurrentUser ? `<br><button class="btn" style="background: #dc3545; margin-top: 10px; padding: 5px 10px; font-size: 12px;" onclick="deleteUser('${u.uid}', '${u.email}')">Delete User</button>` : '<br><em>Current User</em>'}
                             </div>
                         `;
                     });
@@ -714,6 +710,7 @@
                         usersList.innerHTML = html;
                     }
                 } catch (error) {
+                    console.error('Error:', error);
                     document.getElementById('usersList').innerHTML = 'Error loading users: ' + error.message;
                 }
             }
@@ -736,7 +733,6 @@
                 const email = document.getElementById('userEmail').value;
                 const role = document.getElementById('userRole').value;
                 const domain = document.getElementById('userDomain').value;
-                const password = generatePassword();
                 
                 const messageDiv = document.getElementById('userMessage');
                 const createBtn = document.getElementById('createBtn');
@@ -747,19 +743,17 @@
                 credentialsBox.style.display = 'none';
 
                 try {
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    const newUser = userCredential.user;
+                    const user = auth.currentUser;
+                    if (!user) {
+                        throw new Error('Not authenticated');
+                    }
+                    await user.getIdToken(true);
+                    
+                    const createUser = httpsCallable(functions, 'createUser');
+                    const result = await createUser({ name, email, role, domain });
 
-                    await setDoc(doc(db, 'users', newUser.uid), {
-                        email: email,
-                        name: name,
-                        role: role,
-                        domain: domain || null,
-                        createdAt: new Date()
-                    });
-
-                    document.getElementById('createdEmail').textContent = email;
-                    document.getElementById('createdPassword').textContent = password;
+                    document.getElementById('createdEmail').textContent = result.data.email;
+                    document.getElementById('createdPassword').textContent = result.data.password;
                     credentialsBox.style.display = 'block';
 
                     messageDiv.innerHTML = `<div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin: 15px 0;">✅ User created successfully!</div>`;
@@ -781,12 +775,16 @@
                 }
 
                 try {
-                    await deleteDoc(doc(db, 'users', uid));
+                    const user = auth.currentUser;
+                    if (!user) throw new Error('Not authenticated');
+                    await user.getIdToken(true);
+                    
+                    const deleteUserFunc = httpsCallable(functions, 'deleteUser');
+                    await deleteUserFunc({ uid });
                     
                     document.getElementById('userMessage').innerHTML = `
                         <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin: 15px 0;">
-                            ✅ User ${email} deleted successfully!<br>
-                            <small>Note: User still exists in Firebase Auth but cannot login.</small>
+                            ✅ User ${email} deleted successfully!
                         </div>
                     `;
                     
