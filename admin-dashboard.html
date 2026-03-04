@@ -46,7 +46,7 @@
         <div class="grid">
             <div class="card">
                 <h3>👥 User Management</h3>
-                <button class="btn" onclick="window.location.href='simple-user-creator.html'">🚀 User Manager (Create & Delete)</button>
+                <button class="btn" onclick="showUserManager()">🚀 User Manager (Create & Delete)</button>
                 <button class="btn btn-secondary" onclick="viewData('users')">📊 View All Users</button>
             </div>
 
@@ -85,6 +85,40 @@
         <div id="dataView" class="card" style="margin-top: 30px; display: none;">
             <h3 id="dataTitle">Data View</h3>
             <div id="dataContent"></div>
+        </div>
+
+        <!-- User Manager Section -->
+        <div id="userManagerView" class="card" style="margin-top: 30px; display: none;">
+            <h3>👥 User Manager</h3>
+            <div id="authStatus"></div>
+            <div id="userMessage"></div>
+
+            <form id="createUserForm" style="margin-bottom: 30px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                    <input type="text" id="userName" placeholder="Full Name" required>
+                    <input type="email" id="userEmail" placeholder="Email" required>
+                    <select id="userRole" required>
+                        <option value="">Select Role</option>
+                        <option value="admin">Admin</option>
+                        <option value="employee">Employee / Lead Intern</option>
+                        <option value="intern">Intern</option>
+                    </select>
+                    <input type="text" id="userDomain" placeholder="Domain (AI, Web Dev, etc.)">
+                </div>
+                <button type="submit" class="btn" id="createBtn">Create User</button>
+            </form>
+
+            <div id="credentialsBox" style="display: none; background: #fff3cd; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <h4>✅ User Created Successfully!</h4>
+                <p><strong>Email:</strong> <span id="createdEmail"></span></p>
+                <p><strong>Password:</strong> <span id="createdPassword"></span></p>
+                <p style="margin-top: 10px; color: #856404;">⚠️ Save these credentials! Password won't be shown again.</p>
+            </div>
+
+            <div>
+                <h4>📋 All Users</h4>
+                <div id="usersList">Loading...</div>
+            </div>
         </div>
     </div>
 
@@ -519,6 +553,151 @@
         function logout() {
             localStorage.removeItem('currentUser');
             window.location.href = 'portal-login.html';
+        }
+
+        // User Manager Functions
+        function showUserManager() {
+            document.getElementById('userManagerView').style.display = 'block';
+            document.getElementById('dataView').style.display = 'none';
+            initializeUserManager();
+        }
+
+        async function initializeUserManager() {
+            // Import Firebase modules
+            const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
+            const { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
+            const { getFirestore, doc, setDoc, collection, getDocs, deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyAFoXIPtkRJdTxcTcXQkDYDUxmzcoownWA",
+                authDomain: "nextgen-innohub.firebaseapp.com",
+                projectId: "nextgen-innohub",
+                storageBucket: "nextgen-innohub.firebasestorage.app",
+                messagingSenderId: "28087223200",
+                appId: "1:28087223200:web:f4885a48ac45fdccfc1ac5"
+            };
+
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+
+            function generatePassword() {
+                const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+                let password = '';
+                for (let i = 0; i < 8; i++) {
+                    password += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return password;
+            }
+
+            async function loadUsers() {
+                try {
+                    const usersSnapshot = await getDocs(collection(db, 'users'));
+                    const usersList = document.getElementById('usersList');
+                    
+                    if (usersSnapshot.empty) {
+                        usersList.innerHTML = '<p>No users found</p>';
+                        return;
+                    }
+
+                    let html = '';
+                    usersSnapshot.forEach(doc => {
+                        const user = doc.data();
+                        const currentUserEmail = auth.currentUser?.email;
+                        const isCurrentUser = user.email === currentUserEmail;
+                        
+                        html += `
+                            <div style="background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px;">
+                                <strong>${user.name}</strong> (${user.email})<br>
+                                Role: ${user.role} | Domain: ${user.domain || 'N/A'}
+                                ${!isCurrentUser ? `<br><button class="btn" style="background: #dc3545; margin-top: 10px; padding: 5px 10px; font-size: 12px;" onclick="deleteUser('${doc.id}', '${user.email}')">Delete User</button>` : '<br><em>Current User</em>'}
+                            </div>
+                        `;
+                    });
+                    usersList.innerHTML = html;
+                } catch (error) {
+                    document.getElementById('usersList').innerHTML = 'Error loading users: ' + error.message;
+                }
+            }
+
+            onAuthStateChanged(auth, (user) => {
+                const authStatus = document.getElementById('authStatus');
+                if (user) {
+                    authStatus.innerHTML = `<div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 15px;">✅ Logged in as: ${user.email}</div>`;
+                    loadUsers();
+                } else {
+                    authStatus.innerHTML = `<div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 15px;">❌ Not logged in. <a href="portal-login.html">Login here</a></div>`;
+                }
+            });
+
+            document.getElementById('createUserForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const name = document.getElementById('userName').value;
+                const email = document.getElementById('userEmail').value;
+                const role = document.getElementById('userRole').value;
+                const domain = document.getElementById('userDomain').value;
+                const password = generatePassword();
+                
+                const messageDiv = document.getElementById('userMessage');
+                const createBtn = document.getElementById('createBtn');
+                const credentialsBox = document.getElementById('credentialsBox');
+
+                createBtn.disabled = true;
+                createBtn.textContent = 'Creating...';
+                credentialsBox.style.display = 'none';
+
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const newUser = userCredential.user;
+
+                    await setDoc(doc(db, 'users', newUser.uid), {
+                        email: email,
+                        name: name,
+                        role: role,
+                        domain: domain || null,
+                        createdAt: new Date()
+                    });
+
+                    document.getElementById('createdEmail').textContent = email;
+                    document.getElementById('createdPassword').textContent = password;
+                    credentialsBox.style.display = 'block';
+
+                    messageDiv.innerHTML = `<div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin: 15px 0;">✅ User created successfully!</div>`;
+                    document.getElementById('createUserForm').reset();
+                    loadUsers();
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    messageDiv.innerHTML = `<div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin: 15px 0;">❌ Error: ${error.message}</div>`;
+                } finally {
+                    createBtn.disabled = false;
+                    createBtn.textContent = 'Create User';
+                }
+            });
+
+            window.deleteUser = async function(uid, email) {
+                if (!confirm(`Are you sure you want to delete user: ${email}?`)) {
+                    return;
+                }
+
+                try {
+                    await deleteDoc(doc(db, 'users', uid));
+                    
+                    document.getElementById('userMessage').innerHTML = `
+                        <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                            ✅ User ${email} deleted successfully!<br>
+                            <small>Note: User still exists in Firebase Auth but cannot login.</small>
+                        </div>
+                    `;
+                    
+                    loadUsers();
+                } catch (error) {
+                    document.getElementById('userMessage').innerHTML = `
+                        <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin: 15px 0;">❌ Error deleting user: ${error.message}</div>
+                    `;
+                }
+            };
         }
     </script>
 </body>
