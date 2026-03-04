@@ -124,35 +124,6 @@
         </div>
     </div>
 
-    <!-- Modals -->
-    <div id="addUserModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('addUser')">&times;</span>
-            <h3>Add New User</h3>
-            <form onsubmit="addUser(event)">
-                <input type="text" placeholder="Username" required name="username">
-                <input type="password" placeholder="Password" required name="password">
-                <select name="role" required>
-                    <option value="">Select Role</option>
-                    <option value="admin">Admin</option>
-                    <option value="employee">Employee</option>
-                    <option value="intern">Intern</option>
-                </select>
-                <input type="text" placeholder="Full Name" required name="name">
-                <input type="email" placeholder="Email" required name="email">
-                <select name="domain">
-                    <option value="">Select Domain</option>
-                    <option value="HR">HR</option>
-                    <option value="Marketing">Marketing</option>
-                    <option value="Testing">Testing</option>
-                    <option value="Python">Python</option>
-                    <option value="React">React</option>
-                </select>
-                <button type="submit" class="btn">Add User</button>
-            </form>
-        </div>
-    </div>
-
     <div id="addTaskModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('addTask')">&times;</span>
@@ -176,8 +147,9 @@
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyAFoXIPtkRJdTxcTcXQkDYDUxmzcoownWA",
@@ -191,6 +163,9 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const functions = getFunctions(app);
+
+        window.firebaseApp = { auth, db, functions };
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
@@ -215,78 +190,13 @@
                 window.location.href = 'portal-login.html';
             }
         });
-    </script>
-    <script src="db.js"></script>
-    <script>
-        function openModal(type) { 
-            const modal = document.getElementById(type + 'Modal');
-            if (modal) {
-                modal.style.display = 'block';
-            }
-        }
-        function closeModal(type) { document.getElementById(type + 'Modal').style.display = 'none'; }
 
-        function addUser(e) {
-            e.preventDefault();
-            const data = new FormData(e.target);
-            DB.addUser(Object.fromEntries(data));
-            alert('✅ User added successfully!');
-            e.target.reset();
-            closeModal('addUser');
-        }
+        window.logout = async () => {
+            await signOut(auth);
+            window.location.href = 'portal-login.html';
+        };
 
-        function addTask(e) {
-            e.preventDefault();
-            const data = new FormData(e.target);
-            const task = Object.fromEntries(data);
-            task.id = 'TASK' + Date.now();
-            task.status = 'Template';
-            task.createdBy = 'Admin';
-            task.createdAt = new Date().toISOString();
-            DB.addTask(task);
-            alert('✅ Task template created successfully!');
-            e.target.reset();
-            closeModal('addTask');
-        }
-
-        function exportData() {
-            const data = {
-                users: DB.getAll('users'),
-                interns: DB.getAll('interns'),
-                tasks: DB.getAll('tasks'),
-                certificates: DB.getAll('certificates')
-            };
-            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'nextgen-innohub-data-' + new Date().toISOString().split('T')[0] + '.json';
-            a.click();
-            alert('✅ Data exported successfully!');
-        }
-
-        function importData() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            input.onchange = e => {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                reader.onload = event => {
-                    const data = JSON.parse(event.target.result);
-                    localStorage.setItem('users', JSON.stringify(data.users || []));
-                    localStorage.setItem('interns', JSON.stringify(data.interns || []));
-                    localStorage.setItem('tasks', JSON.stringify(data.tasks || []));
-                    localStorage.setItem('certificates', JSON.stringify(data.certificates || []));
-                    alert('✅ Data imported successfully!');
-                    location.reload();
-                };
-                reader.readAsText(file);
-            };
-            input.click();
-        }
-
-        async function deleteAllUsersConfirm() {
+        window.deleteAllUsersConfirm = async () => {
             if (!confirm('⚠️ WARNING: This will delete ALL users except the admin account. This action cannot be undone. Continue?')) {
                 return;
             }
@@ -295,13 +205,7 @@
             }
 
             try {
-                const { getAuth } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
-                const { getFunctions, httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js');
-                
-                const auth = getAuth();
-                const functions = getFunctions();
                 const user = auth.currentUser;
-                
                 if (!user) {
                     alert('❌ Not authenticated');
                     return;
@@ -316,22 +220,12 @@
                 console.error('Error:', error);
                 alert(`❌ Error: ${error.message}`);
             }
-        }
+        };
 
-        function logout() {
-            const { getAuth } = import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js').then(({ getAuth }) => {
-                const auth = getAuth();
-                auth.signOut().then(() => {
-                    window.location.href = 'portal-login.html';
-                });
-            });
-        }
-
-        function showUserManager() {
+        window.showUserManager = () => {
             document.getElementById('userManagerView').style.display = 'block';
             document.getElementById('dataView').style.display = 'none';
-            const roleSelect = document.getElementById('userRole');
-            roleSelect.innerHTML = `
+            document.getElementById('userRole').innerHTML = `
                 <option value="">Select Role</option>
                 <option value="admin">Admin</option>
                 <option value="employee">Employee / Lead Intern</option>
@@ -339,9 +233,9 @@
             `;
             document.getElementById('userManagerView').scrollIntoView({ behavior: 'smooth' });
             initializeUserManager();
-        }
+        };
 
-        function showUserManagerForRole(role) {
+        window.showUserManagerForRole = (role) => {
             document.getElementById('userManagerView').style.display = 'block';
             document.getElementById('dataView').style.display = 'none';
             const roleSelect = document.getElementById('userRole');
@@ -352,46 +246,74 @@
             }
             document.getElementById('userManagerView').scrollIntoView({ behavior: 'smooth' });
             initializeUserManager();
-        }
+        };
 
-        function showUsersByRole(role) {
+        window.showUsersByRole = (role) => {
             document.getElementById('userManagerView').style.display = 'block';
             document.getElementById('dataView').style.display = 'none';
             document.getElementById('userManagerView').scrollIntoView({ behavior: 'smooth' });
             initializeUserManager(role);
-        }
+        };
 
-        function showPromoteIntern() {
+        window.showPromoteIntern = () => {
             alert('Promote feature coming soon! For now, create a new Lead Intern account.');
-        }
+        };
+
+        window.openModal = (type) => {
+            const modal = document.getElementById(type + 'Modal');
+            if (modal) modal.style.display = 'block';
+        };
+
+        window.closeModal = (type) => {
+            document.getElementById(type + 'Modal').style.display = 'none';
+        };
+
+        window.addTask = (e) => {
+            e.preventDefault();
+            const data = new FormData(e.target);
+            const task = Object.fromEntries(data);
+            task.id = 'TASK' + Date.now();
+            task.status = 'Template';
+            task.createdBy = 'Admin';
+            task.createdAt = new Date().toISOString();
+            alert('✅ Task template created successfully!');
+            e.target.reset();
+            closeModal('addTask');
+        };
+
+        window.exportData = () => {
+            const data = {
+                users: [],
+                interns: [],
+                tasks: [],
+                certificates: []
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'nextgen-innohub-data-' + new Date().toISOString().split('T')[0] + '.json';
+            a.click();
+            alert('✅ Data exported successfully!');
+        };
+
+        window.importData = () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    alert('✅ Data imported successfully!');
+                    location.reload();
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        };
 
         async function initializeUserManager(filterRole = null) {
-            const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
-            const { getAuth, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
-            const { getFunctions, httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js');
-
-            const firebaseConfig = {
-                apiKey: "AIzaSyAFoXIPtkRJdTxcTcXQkDYDUxmzcoownWA",
-                authDomain: "nextgen-innohub.firebaseapp.com",
-                projectId: "nextgen-innohub",
-                storageBucket: "nextgen-innohub.firebasestorage.app",
-                messagingSenderId: "28087223200",
-                appId: "1:28087223200:web:f4885a48ac45fdccfc1ac5"
-            };
-
-            const app = initializeApp(firebaseConfig);
-            const auth = getAuth(app);
-            const functions = getFunctions(app);
-
-            function generatePassword() {
-                const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
-                let password = '';
-                for (let i = 0; i < 8; i++) {
-                    password += chars.charAt(Math.floor(Math.random() * chars.length));
-                }
-                return password;
-            }
-
             async function loadUsers() {
                 try {
                     const user = auth.currentUser;
@@ -446,7 +368,7 @@
                 }
             });
 
-            document.getElementById('createUserForm').addEventListener('submit', async (e) => {
+            document.getElementById('createUserForm').onsubmit = async (e) => {
                 e.preventDefault();
                 
                 const name = document.getElementById('userName').value;
@@ -487,7 +409,7 @@
                     createBtn.disabled = false;
                     createBtn.textContent = 'Create User';
                 }
-            });
+            };
 
             window.deleteUser = async function(uid, email) {
                 if (!confirm(`Are you sure you want to delete user: ${email}?`)) {
@@ -517,5 +439,6 @@
             };
         }
     </script>
+    <script src="db.js"></script>
 </body>
 </html>
