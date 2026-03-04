@@ -146,7 +146,7 @@
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
-                    if (userData.role !== 'tl') {
+                    if (userData.role !== 'TL') {
                         window.location.href = 'portal-login.html';
                         return;
                     }
@@ -168,7 +168,7 @@
             try {
                 const q = query(
                     collection(db, 'users'),
-                    where('role', '==', 'intern'),
+                    where('role', '==', 'Intern'),
                     where('assignedTo', '==', currentEmployeeId)
                 );
                 const snapshot = await getDocs(q);
@@ -201,7 +201,7 @@
             try {
                 const q = query(
                     collection(db, 'users'),
-                    where('role', '==', 'intern'),
+                    where('role', '==', 'Intern'),
                     where('assignedTo', '==', currentEmployeeId)
                 );
                 const snapshot = await getDocs(q);

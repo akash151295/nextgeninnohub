@@ -191,7 +191,7 @@
             container.innerHTML = '<p class="loading">Loading...</p>';
             
             try {
-                const q = query(collection(db, 'users'), where('role', '==', 'tl'));
+                const q = query(collection(db, 'users'), where('role', '==', 'TL'));
                 const snapshot = await getDocs(q);
                 let html = '';
                 
@@ -220,7 +220,7 @@
             container.innerHTML = '<p class="loading">Loading...</p>';
             
             try {
-                const q = query(collection(db, 'users'), where('role', '==', 'intern'));
+                const q = query(collection(db, 'users'), where('role', '==', 'Intern'));
                 const snapshot = await getDocs(q);
                 let html = '';
                 
@@ -248,7 +248,7 @@
             try {
                 // Load team leads
                 const empSelect = document.getElementById('employeeSelect');
-                const empSnapshot = await getDocs(query(collection(db, 'users'), where('role', '==', 'tl')));
+                const empSnapshot = await getDocs(query(collection(db, 'users'), where('role', '==', 'TL')));
                 let empHtml = '<option value="">Select Team Lead</option>';
                 empSnapshot.forEach(doc => {
                     const user = doc.data();
@@ -258,7 +258,7 @@
 
                 // Load interns
                 const intSelect = document.getElementById('internSelect');
-                const intSnapshot = await getDocs(query(collection(db, 'users'), where('role', '==', 'intern')));
+                const intSnapshot = await getDocs(query(collection(db, 'users'), where('role', '==', 'Intern')));
                 let intHtml = '<option value="">Select Intern</option>';
                 intSnapshot.forEach(doc => {
                     const user = doc.data();
