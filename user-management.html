@@ -279,7 +279,8 @@
             if (!user) {
                 window.location.href = 'portal-login.html';
             } else {
-                loadUsers();
+                // Wait a moment for auth to fully initialize
+                setTimeout(() => loadUsers(), 500);
             }
         });
     </script>
