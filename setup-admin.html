@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Setup Admin</title>
+</head>
+<body>
+    <h1>Setting up admin...</h1>
+    <div id="status">Please wait...</div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAFoXIPtkRJdTxcTcXQkDYDUxmzcoownWA",
+            authDomain: "nextgen-innohub.firebaseapp.com",
+            projectId: "nextgen-innohub",
+            storageBucket: "nextgen-innohub.firebasestorage.app",
+            messagingSenderId: "28087223200",
+            appId: "1:28087223200:web:f4885a48ac45fdccfc1ac5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    await setDoc(doc(db, 'users', user.uid), {
+                        email: user.email,
+                        name: user.displayName || 'Admin',
+                        role: 'admin',
+                        domain: null,
+                        createdAt: new Date()
+                    });
+                    document.getElementById('status').innerHTML = '✅ Admin setup complete! <a href="user-management.html">Go to User Management</a>';
+                } catch (error) {
+                    document.getElementById('status').innerHTML = '❌ Error: ' + error.message;
+                }
+            } else {
+                document.getElementById('status').innerHTML = '❌ Please login first at <a href="portal-login.html">portal-login.html</a>';
+            }
+        });
+    </script>
+</body>
+</html>
