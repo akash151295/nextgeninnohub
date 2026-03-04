@@ -128,10 +128,13 @@
 
         let currentInternId = '';
         let assignedToId = '';
+        let authChecked = false;
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
-                window.location.href = 'portal-login.html';
+                if (authChecked) {
+                    window.location.href = 'portal-login.html';
+                }
                 return;
             }
 
@@ -139,13 +142,14 @@
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
-                    if (userData.role !== 'intern') {
+                    if (userData.role !== 'Intern') {
                         window.location.href = 'portal-login.html';
                         return;
                     }
                     document.getElementById('internName').textContent = userData.name;
                     currentInternId = user.uid;
                     assignedToId = userData.assignedTo || '';
+                    authChecked = true;
                 } else {
                     window.location.href = 'portal-login.html';
                 }
