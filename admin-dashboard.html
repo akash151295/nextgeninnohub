@@ -52,15 +52,15 @@
 
             <div class="card">
                 <h3>👨‍💼 Lead Intern Management</h3>
-                <button class="btn" onclick="openModal('addLeadIntern')">➕ Add Lead Intern</button>
-                <button class="btn btn-secondary" onclick="openModal('promoteIntern')">⬆️ Promote to Lead</button>
-                <button class="btn btn-secondary" onclick="viewLeadInterns()">📊 View Lead Interns</button>
+                <button class="btn" onclick="showUserManagerForRole('employee')">➕ Add Lead Intern</button>
+                <button class="btn btn-secondary" onclick="showPromoteIntern()">⬆️ Promote to Lead</button>
+                <button class="btn btn-secondary" onclick="showUsersByRole('employee')">📊 View Lead Interns</button>
             </div>
 
             <div class="card">
                 <h3>🎓 Intern Management</h3>
-                <button class="btn" onclick="openModal('addIntern')">➕ Add Intern</button>
-                <button class="btn btn-secondary" onclick="viewData('interns')">📊 View All Interns</button>
+                <button class="btn" onclick="showUserManagerForRole('intern')">➕ Add Intern</button>
+                <button class="btn btn-secondary" onclick="showUsersByRole('intern')">📊 View All Interns</button>
             </div>
 
             <div class="card">
@@ -567,9 +567,41 @@
         function showUserManager() {
             document.getElementById('userManagerView').style.display = 'block';
             document.getElementById('dataView').style.display = 'none';
+            // Reset role dropdown to show all options
+            const roleSelect = document.getElementById('userRole');
+            roleSelect.innerHTML = `
+                <option value="">Select Role</option>
+                <option value="admin">Admin</option>
+                <option value="employee">Employee / Lead Intern</option>
+                <option value="intern">Intern</option>
+            `;
             // Scroll to User Manager section
             document.getElementById('userManagerView').scrollIntoView({ behavior: 'smooth' });
             initializeUserManager();
+        }
+
+        function showUserManagerForRole(role) {
+            document.getElementById('userManagerView').style.display = 'block';
+            document.getElementById('dataView').style.display = 'none';
+            const roleSelect = document.getElementById('userRole');
+            if (role === 'employee') {
+                roleSelect.innerHTML = '<option value="employee" selected>Employee / Lead Intern</option>';
+            } else if (role === 'intern') {
+                roleSelect.innerHTML = '<option value="intern" selected>Intern</option>';
+            }
+            document.getElementById('userManagerView').scrollIntoView({ behavior: 'smooth' });
+            initializeUserManager();
+        }
+
+        function showUsersByRole(role) {
+            document.getElementById('userManagerView').style.display = 'block';
+            document.getElementById('dataView').style.display = 'none';
+            document.getElementById('userManagerView').scrollIntoView({ behavior: 'smooth' });
+            initializeUserManager(role);
+        }
+
+        function showPromoteIntern() {
+            alert('Promote feature coming soon! For now, create a new Lead Intern account.');
         }
 
         async function initializeUserManager() {
