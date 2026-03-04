@@ -20,13 +20,11 @@
         .btn:hover { transform: translateY(-2px); }
         .btn-secondary { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
         .btn-danger { background: #dc3545; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; }
         th { background: #f0f9ff; color: #667eea; font-weight: 600; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto; }
-        .modal-content { background: white; margin: 50px auto; padding: 30px; border-radius: 15px; max-width: 500px; max-height: 80vh; overflow-y: auto; position: relative; }
-        .close { float: right; font-size: 28px; cursor: pointer; }
+        .user-item { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .loading { color: #667eea; font-style: italic; }
     </style>
 </head>
 <body>
@@ -41,115 +39,59 @@
     <div class="container">
         <div class="welcome">
             <h2>Welcome, <span id="adminName">Admin</span>! 👋</h2>
-            <p style="color: #64748b; margin-top: 10px;">All data is stored locally in your browser. Export regularly!</p>
+            <p style="color: #64748b; margin-top: 10px;">Manage employees and view all users in the system.</p>
         </div>
 
         <div class="grid">
             <div class="card">
-                <h3>👥 User Management</h3>
-                <button class="btn" onclick="showUserManager()">🚀 User Manager (Create & Delete)</button>
-                <button class="btn btn-secondary" onclick="showUserManager()">📋 View All Users</button>
+                <h3>👥 All Users</h3>
+                <button class="btn" onclick="loadAllUsers()">🔄 Refresh Users</button>
+                <button class="btn btn-secondary" onclick="exportUsers()">📥 Export Users</button>
+                <div id="allUsersList" style="margin-top: 20px;">
+                    <p class="loading">Click refresh to load users...</p>
+                </div>
             </div>
 
             <div class="card">
-                <h3>👨💼 Lead Intern Management</h3>
-                <button class="btn" onclick="showUserManagerForRole('employee')">➕ Add Lead Intern</button>
-                <button class="btn btn-secondary" onclick="showPromoteIntern()">⬆️ Promote to Lead</button>
-                <button class="btn btn-secondary" onclick="showUsersByRole('employee')">📊 View Lead Interns</button>
+                <h3>👨💼 Lead Interns</h3>
+                <button class="btn" onclick="loadLeadInterns()">🔄 Refresh</button>
+                <div id="leadInternsList" style="margin-top: 20px;">
+                    <p class="loading">Click refresh to load...</p>
+                </div>
             </div>
 
             <div class="card">
-                <h3>🎓 Intern Management</h3>
-                <button class="btn" onclick="showUserManagerForRole('intern')">➕ Add Intern</button>
-                <button class="btn btn-secondary" onclick="showUsersByRole('intern')">📊 View All Interns</button>
+                <h3>🎓 Interns</h3>
+                <button class="btn" onclick="loadInterns()">🔄 Refresh</button>
+                <div id="internsList" style="margin-top: 20px;">
+                    <p class="loading">Click refresh to load...</p>
+                </div>
             </div>
 
             <div class="card">
                 <h3>📋 Task Management</h3>
-                <button class="btn" onclick="openModal('addTask')">➕ Create Task Template</button>
-                <button class="btn btn-secondary" onclick="viewData('tasks')">📊 View All Tasks</button>
+                <button class="btn" onclick="alert('Task management coming soon!')">📝 View Tasks</button>
+                <button class="btn btn-secondary" onclick="alert('Task management coming soon!')">📊 Task Reports</button>
             </div>
 
             <div class="card">
                 <h3>📜 Certificates</h3>
                 <button class="btn" onclick="window.location.href='generate-certificate.html'">🎖️ Generate Certificate</button>
-                <button class="btn btn-secondary" onclick="viewData('certificates')">📊 View Certificates</button>
+                <button class="btn btn-secondary" onclick="alert('Certificate management coming soon!')">📊 View Certificates</button>
             </div>
 
             <div class="card">
                 <h3>💾 Data Management</h3>
-                <button class="btn" onclick="exportData()">📥 Export All Data</button>
+                <button class="btn" onclick="exportAllData()">📥 Export All Data</button>
                 <button class="btn btn-secondary" onclick="importData()">📤 Import Data</button>
-                <button class="btn btn-danger" onclick="deleteAllUsersConfirm()" style="margin-top: 10px;">🗑️ Delete All Users</button>
             </div>
-        </div>
-
-        <div id="dataView" class="card" style="margin-top: 30px; display: none;">
-            <h3 id="dataTitle">Data View</h3>
-            <div id="dataContent"></div>
-        </div>
-
-        <!-- User Manager Section -->
-        <div id="userManagerView" class="card" style="margin-top: 30px; display: none;">
-            <h3>👥 User Manager</h3>
-            <div id="authStatus"></div>
-            <div id="userMessage"></div>
-
-            <form id="createUserForm" style="margin-bottom: 30px;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
-                    <input type="text" id="userName" placeholder="Full Name" required>
-                    <input type="email" id="userEmail" placeholder="Email" required>
-                    <select id="userRole" required>
-                        <option value="">Select Role</option>
-                        <option value="admin">Admin</option>
-                        <option value="employee">Employee / Lead Intern</option>
-                        <option value="intern">Intern</option>
-                    </select>
-                    <input type="text" id="userDomain" placeholder="Domain (AI, Web Dev, etc.)">
-                </div>
-                <button type="submit" class="btn" id="createBtn">Create User</button>
-            </form>
-
-            <div id="credentialsBox" style="display: none; background: #fff3cd; padding: 20px; border-radius: 10px; margin: 20px 0;">
-                <h4>✅ User Created Successfully!</h4>
-                <p><strong>Email:</strong> <span id="createdEmail"></span></p>
-                <p><strong>Password:</strong> <span id="createdPassword"></span></p>
-                <p style="margin-top: 10px; color: #856404;">⚠️ Save these credentials! Password won't be shown again.</p>
-            </div>
-
-            <div>
-                <h4>📋 All Users</h4>
-                <div id="usersList">Loading...</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="addTaskModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('addTask')">&times;</span>
-            <h3>Create Task Template</h3>
-            <form onsubmit="addTask(event)">
-                <input type="text" placeholder="Task Title" required name="title">
-                <textarea placeholder="Task Description" required name="description" rows="3"></textarea>
-                <select name="domain" required>
-                    <option value="">Select Domain</option>
-                    <option value="HR">HR</option>
-                    <option value="Marketing">Marketing</option>
-                    <option value="Testing">Testing</option>
-                    <option value="Python">Python</option>
-                    <option value="React">React</option>
-                </select>
-                <input type="text" placeholder="Estimated Duration (e.g., 2 days)" name="duration">
-                <button type="submit" class="btn">Create Task Template</button>
-            </form>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-        import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js';
+        import { getFirestore, doc, getDoc, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyAFoXIPtkRJdTxcTcXQkDYDUxmzcoownWA",
@@ -163,9 +105,6 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const functions = getFunctions(app);
-
-        window.firebaseApp = { auth, db, functions };
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
@@ -196,105 +135,147 @@
             window.location.href = 'portal-login.html';
         };
 
-        window.deleteAllUsersConfirm = async () => {
-            if (!confirm('⚠️ WARNING: This will delete ALL users except the admin account. This action cannot be undone. Continue?')) {
-                return;
-            }
-            if (!confirm('🔴 FINAL WARNING: Are you absolutely sure? This will permanently delete all non-admin users from Firebase.')) {
-                return;
-            }
-
+        window.loadAllUsers = async () => {
+            const container = document.getElementById('allUsersList');
+            container.innerHTML = '<p class="loading">Loading...</p>';
+            
             try {
-                const user = auth.currentUser;
-                if (!user) {
-                    alert('❌ Not authenticated');
-                    return;
-                }
-
-                await user.getIdToken(true);
-                const deleteAllUsers = httpsCallable(functions, 'deleteAllUsers');
-                const result = await deleteAllUsers();
+                const usersSnapshot = await getDocs(collection(db, 'users'));
+                let html = '';
                 
-                alert(`✅ ${result.data.message}`);
+                if (usersSnapshot.empty) {
+                    html = '<p>No users found</p>';
+                } else {
+                    usersSnapshot.forEach(doc => {
+                        const user = doc.data();
+                        html += `
+                            <div class="user-item">
+                                <strong>${user.name}</strong><br>
+                                Email: ${user.email}<br>
+                                Role: <span style="background: #667eea; color: white; padding: 2px 8px; border-radius: 3px;">${user.role}</span><br>
+                                Domain: ${user.domain || 'N/A'}
+                            </div>
+                        `;
+                    });
+                }
+                
+                container.innerHTML = html;
             } catch (error) {
-                console.error('Error:', error);
-                alert(`❌ Error: ${error.message}`);
+                container.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
             }
         };
 
-        window.showUserManager = () => {
-            document.getElementById('userManagerView').style.display = 'block';
-            document.getElementById('dataView').style.display = 'none';
-            document.getElementById('userRole').innerHTML = `
-                <option value="">Select Role</option>
-                <option value="admin">Admin</option>
-                <option value="employee">Employee / Lead Intern</option>
-                <option value="intern">Intern</option>
-            `;
-            document.getElementById('userManagerView').scrollIntoView({ behavior: 'smooth' });
-            initializeUserManager();
-        };
-
-        window.showUserManagerForRole = (role) => {
-            document.getElementById('userManagerView').style.display = 'block';
-            document.getElementById('dataView').style.display = 'none';
-            const roleSelect = document.getElementById('userRole');
-            if (role === 'employee') {
-                roleSelect.innerHTML = '<option value="employee" selected>Employee / Lead Intern</option>';
-            } else if (role === 'intern') {
-                roleSelect.innerHTML = '<option value="intern" selected>Intern</option>';
+        window.loadLeadInterns = async () => {
+            const container = document.getElementById('leadInternsList');
+            container.innerHTML = '<p class="loading">Loading...</p>';
+            
+            try {
+                const q = query(collection(db, 'users'), where('role', '==', 'employee'));
+                const snapshot = await getDocs(q);
+                let html = '';
+                
+                if (snapshot.empty) {
+                    html = '<p>No lead interns found</p>';
+                } else {
+                    snapshot.forEach(doc => {
+                        const user = doc.data();
+                        html += `
+                            <div class="user-item">
+                                <strong>${user.name}</strong><br>
+                                Email: ${user.email}<br>
+                                Domain: ${user.domain || 'N/A'}
+                            </div>
+                        `;
+                    });
+                }
+                
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
             }
-            document.getElementById('userManagerView').scrollIntoView({ behavior: 'smooth' });
-            initializeUserManager();
         };
 
-        window.showUsersByRole = (role) => {
-            document.getElementById('userManagerView').style.display = 'block';
-            document.getElementById('dataView').style.display = 'none';
-            document.getElementById('userManagerView').scrollIntoView({ behavior: 'smooth' });
-            initializeUserManager(role);
+        window.loadInterns = async () => {
+            const container = document.getElementById('internsList');
+            container.innerHTML = '<p class="loading">Loading...</p>';
+            
+            try {
+                const q = query(collection(db, 'users'), where('role', '==', 'intern'));
+                const snapshot = await getDocs(q);
+                let html = '';
+                
+                if (snapshot.empty) {
+                    html = '<p>No interns found</p>';
+                } else {
+                    snapshot.forEach(doc => {
+                        const user = doc.data();
+                        html += `
+                            <div class="user-item">
+                                <strong>${user.name}</strong><br>
+                                Email: ${user.email}<br>
+                                Domain: ${user.domain || 'N/A'}
+                            </div>
+                        `;
+                    });
+                }
+                
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
         };
 
-        window.showPromoteIntern = () => {
-            alert('Promote feature coming soon! For now, create a new Lead Intern account.');
+        window.exportUsers = async () => {
+            try {
+                const usersSnapshot = await getDocs(collection(db, 'users'));
+                const users = [];
+                
+                usersSnapshot.forEach(doc => {
+                    users.push({
+                        uid: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                const blob = new Blob([JSON.stringify(users, null, 2)], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'users-' + new Date().toISOString().split('T')[0] + '.json';
+                a.click();
+                alert('✅ Users exported successfully!');
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
         };
 
-        window.openModal = (type) => {
-            const modal = document.getElementById(type + 'Modal');
-            if (modal) modal.style.display = 'block';
-        };
-
-        window.closeModal = (type) => {
-            document.getElementById(type + 'Modal').style.display = 'none';
-        };
-
-        window.addTask = (e) => {
-            e.preventDefault();
-            const data = new FormData(e.target);
-            const task = Object.fromEntries(data);
-            task.id = 'TASK' + Date.now();
-            task.status = 'Template';
-            task.createdBy = 'Admin';
-            task.createdAt = new Date().toISOString();
-            alert('✅ Task template created successfully!');
-            e.target.reset();
-            closeModal('addTask');
-        };
-
-        window.exportData = () => {
-            const data = {
-                users: [],
-                interns: [],
-                tasks: [],
-                certificates: []
-            };
-            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'nextgen-innohub-data-' + new Date().toISOString().split('T')[0] + '.json';
-            a.click();
-            alert('✅ Data exported successfully!');
+        window.exportAllData = async () => {
+            try {
+                const usersSnapshot = await getDocs(collection(db, 'users'));
+                const users = [];
+                
+                usersSnapshot.forEach(doc => {
+                    users.push({
+                        uid: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                const data = {
+                    users: users,
+                    exportDate: new Date().toISOString()
+                };
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'all-data-' + new Date().toISOString().split('T')[0] + '.json';
+                a.click();
+                alert('✅ All data exported successfully!');
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
         };
 
         window.importData = () => {
@@ -305,140 +286,12 @@
                 const file = e.target.files[0];
                 const reader = new FileReader();
                 reader.onload = event => {
-                    alert('✅ Data imported successfully!');
-                    location.reload();
+                    alert('✅ Data import feature coming soon!');
                 };
                 reader.readAsText(file);
             };
             input.click();
         };
-
-        async function initializeUserManager(filterRole = null) {
-            async function loadUsers() {
-                try {
-                    const user = auth.currentUser;
-                    if (!user) {
-                        document.getElementById('usersList').innerHTML = '<p>Please login first</p>';
-                        return;
-                    }
-                    
-                    await user.getIdToken(true);
-                    const getAllUsers = httpsCallable(functions, 'getAllUsers');
-                    const result = await getAllUsers();
-                    
-                    const usersList = document.getElementById('usersList');
-                    let html = '';
-                    let filteredCount = 0;
-                    
-                    result.data.users.forEach(u => {
-                        if (filterRole && u.role !== filterRole) {
-                            return;
-                        }
-                        filteredCount++;
-                        const isCurrentUser = u.email === user.email;
-                        html += `
-                            <div style="background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px;">
-                                <strong>${u.name}</strong> (${u.email})<br>
-                                Role: ${u.role} | Domain: ${u.domain || 'N/A'}
-                                ${!isCurrentUser ? `<br><button class="btn" style="background: #dc3545; margin-top: 10px; padding: 5px 10px; font-size: 12px;" onclick="deleteUser('${u.uid}', '${u.email}')">Delete User</button>` : '<br><em>Current User</em>'}
-                            </div>
-                        `;
-                    });
-                    
-                    if (filteredCount === 0) {
-                        const roleText = filterRole === 'employee' ? 'Lead Interns' : filterRole === 'intern' ? 'Interns' : 'users';
-                        usersList.innerHTML = `<p>No ${roleText} found</p>`;
-                    } else {
-                        usersList.innerHTML = html;
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    document.getElementById('usersList').innerHTML = 'Error loading users: ' + error.message;
-                }
-            }
-
-            onAuthStateChanged(auth, (user) => {
-                const authStatus = document.getElementById('authStatus');
-                if (user) {
-                    const roleText = filterRole === 'employee' ? ' (Lead Interns Only)' : filterRole === 'intern' ? ' (Interns Only)' : '';
-                    authStatus.innerHTML = `<div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 15px;">✅ Logged in as: ${user.email}${roleText}</div>`;
-                    loadUsers();
-                } else {
-                    authStatus.innerHTML = `<div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 15px;">❌ Not logged in. <a href="portal-login.html">Login here</a></div>`;
-                }
-            });
-
-            document.getElementById('createUserForm').onsubmit = async (e) => {
-                e.preventDefault();
-                
-                const name = document.getElementById('userName').value;
-                const email = document.getElementById('userEmail').value;
-                const role = document.getElementById('userRole').value;
-                const domain = document.getElementById('userDomain').value;
-                
-                const messageDiv = document.getElementById('userMessage');
-                const createBtn = document.getElementById('createBtn');
-                const credentialsBox = document.getElementById('credentialsBox');
-
-                createBtn.disabled = true;
-                createBtn.textContent = 'Creating...';
-                credentialsBox.style.display = 'none';
-
-                try {
-                    const user = auth.currentUser;
-                    if (!user) {
-                        throw new Error('Not authenticated');
-                    }
-                    await user.getIdToken(true);
-                    
-                    const createUser = httpsCallable(functions, 'createUser');
-                    const result = await createUser({ name, email, role, domain });
-
-                    document.getElementById('createdEmail').textContent = result.data.email;
-                    document.getElementById('createdPassword').textContent = result.data.password;
-                    credentialsBox.style.display = 'block';
-
-                    messageDiv.innerHTML = `<div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin: 15px 0;">✅ User created successfully!</div>`;
-                    document.getElementById('createUserForm').reset();
-                    loadUsers();
-
-                } catch (error) {
-                    console.error('Error:', error);
-                    messageDiv.innerHTML = `<div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin: 15px 0;">❌ Error: ${error.message}</div>`;
-                } finally {
-                    createBtn.disabled = false;
-                    createBtn.textContent = 'Create User';
-                }
-            };
-
-            window.deleteUser = async function(uid, email) {
-                if (!confirm(`Are you sure you want to delete user: ${email}?`)) {
-                    return;
-                }
-
-                try {
-                    const user = auth.currentUser;
-                    if (!user) throw new Error('Not authenticated');
-                    await user.getIdToken(true);
-                    
-                    const deleteUserFunc = httpsCallable(functions, 'deleteUser');
-                    await deleteUserFunc({ uid });
-                    
-                    document.getElementById('userMessage').innerHTML = `
-                        <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin: 15px 0;">
-                            ✅ User ${email} deleted successfully!
-                        </div>
-                    `;
-                    
-                    loadUsers();
-                } catch (error) {
-                    document.getElementById('userMessage').innerHTML = `
-                        <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin: 15px 0;">❌ Error deleting user: ${error.message}</div>
-                    `;
-                }
-            };
-        }
     </script>
-    <script src="db.js"></script>
 </body>
 </html>
