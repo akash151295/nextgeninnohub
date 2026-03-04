@@ -131,6 +131,54 @@ exports.getAllUsers = functions.https.onCall(async (data, context) => {
     }
 });
 
+// Delete all users except admin
+exports.deleteAllUsers = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+    }
+
+    let callerDoc = await admin.firestore().collection('users').doc(context.auth.uid).get();
+    
+    if (!callerDoc.exists) {
+        await admin.firestore().collection('users').doc(context.auth.uid).set({
+            email: context.auth.token.email,
+            name: context.auth.token.name || 'Admin',
+            role: 'admin',
+            domain: null,
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+        callerDoc = await admin.firestore().collection('users').doc(context.auth.uid).get();
+    }
+
+    if (callerDoc.data().role !== 'admin') {
+        throw new functions.https.HttpsError('permission-denied', 'Only admins can delete all users');
+    }
+
+    try {
+        const usersSnapshot = await admin.firestore().collection('users').get();
+        let deletedCount = 0;
+        const adminEmail = context.auth.token.email;
+
+        for (const doc of usersSnapshot.docs) {
+            const user = doc.data();
+            if (user.email === adminEmail) continue;
+
+            await admin.firestore().collection('users').doc(doc.id).delete();
+            try {
+                await admin.auth().deleteUser(doc.id);
+            } catch (e) {
+                console.log('Auth delete error:', e.message);
+            }
+            deletedCount++;
+        }
+
+        return { success: true, message: `Deleted ${deletedCount} users`, deletedCount };
+    } catch (error) {
+        console.error('Error deleting users:', error);
+        throw new functions.https.HttpsError('internal', error.message);
+    }
+});
+
 // Delete user
 exports.deleteUser = functions.https.onCall(async (data, context) => {
     if (!context.auth) {

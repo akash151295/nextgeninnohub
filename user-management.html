@@ -183,26 +183,21 @@
         const addBtn = document.getElementById('addBtn');
         const credentialsBox = document.getElementById('credentialsBox');
 
-        // Show message
         function showMessage(message, type) {
             messageBox.innerHTML = `<div class="${type}-msg">${message}</div>`;
             setTimeout(() => messageBox.innerHTML = '', 5000);
         }
 
-        // Load all users
         async function loadUsers() {
             const tbody = document.getElementById('usersTableBody');
             try {
-                // Wait for user to be fully authenticated
                 const user = auth.currentUser;
                 if (!user) {
                     tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Please login first</td></tr>';
                     return;
                 }
                 
-                // Get fresh ID token
                 await user.getIdToken(true);
-                
                 const getAllUsers = httpsCallable(functions, 'getAllUsers');
                 const result = await getAllUsers();
                 
@@ -233,7 +228,6 @@
             }
         }
 
-        // Add new user
         addUserForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -247,17 +241,15 @@
             credentialsBox.style.display = 'none';
 
             try {
-                // Ensure user is authenticated and get fresh token
                 const user = auth.currentUser;
                 if (!user) {
-                    throw new Error('Not authenticated');
+                    throw new Error('Not authenticated. Please login first.');
                 }
-                await user.getIdToken(true);
                 
+                await user.getIdToken(true);
                 const createUser = httpsCallable(functions, 'createUser');
                 const result = await createUser({ name, email, role, domain });
 
-                // Show credentials
                 document.getElementById('createdEmail').textContent = result.data.email;
                 document.getElementById('createdPassword').textContent = result.data.password;
                 credentialsBox.style.display = 'block';
@@ -275,11 +267,14 @@
             }
         });
 
-        // Delete user
         window.deleteUser = async function(uid, email) {
             if (!confirm(`Delete user ${email}?`)) return;
 
             try {
+                const user = auth.currentUser;
+                if (!user) throw new Error('Not authenticated');
+                
+                await user.getIdToken(true);
                 const deleteUserFunc = httpsCallable(functions, 'deleteUser');
                 await deleteUserFunc({ uid });
                 
@@ -291,20 +286,15 @@
             }
         };
 
-        // Check auth and load users
         auth.onAuthStateChanged(async (user) => {
             if (!user) {
                 alert('Please login first');
                 window.location.href = 'portal-login.html';
             } else {
                 console.log('User authenticated:', user.email);
-                // Wait for auth to stabilize and get fresh token
                 try {
                     await user.getIdToken(true);
-                    setTimeout(() => {
-                        console.log('Loading users...');
-                        loadUsers();
-                    }, 1000);
+                    loadUsers();
                 } catch (error) {
                     console.error('Token error:', error);
                     window.location.href = 'portal-login.html';

@@ -19,6 +19,7 @@
         .btn { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 25px; border: none; border-radius: 8px; margin: 5px; font-weight: 600; cursor: pointer; }
         .btn:hover { transform: translateY(-2px); }
         .btn-secondary { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .btn-danger { background: #dc3545; }
         input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; }
@@ -51,7 +52,7 @@
             </div>
 
             <div class="card">
-                <h3>👨‍💼 Lead Intern Management</h3>
+                <h3>👨💼 Lead Intern Management</h3>
                 <button class="btn" onclick="showUserManagerForRole('employee')">➕ Add Lead Intern</button>
                 <button class="btn btn-secondary" onclick="showPromoteIntern()">⬆️ Promote to Lead</button>
                 <button class="btn btn-secondary" onclick="showUsersByRole('employee')">📊 View Lead Interns</button>
@@ -79,6 +80,7 @@
                 <h3>💾 Data Management</h3>
                 <button class="btn" onclick="exportData()">📥 Export All Data</button>
                 <button class="btn btn-secondary" onclick="importData()">📤 Import Data</button>
+                <button class="btn btn-danger" onclick="deleteAllUsersConfirm()" style="margin-top: 10px;">🗑️ Delete All Users</button>
             </div>
         </div>
 
@@ -151,69 +153,6 @@
         </div>
     </div>
 
-    <div id="addInternModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('addIntern')">&times;</span>
-            <h3>Add Intern</h3>
-            <form onsubmit="addIntern(event)">
-                <input type="text" placeholder="Intern Name" required name="name">
-                <input type="text" placeholder="Username for Login" required name="username">
-                <input type="password" placeholder="Password" required name="password" minlength="6">
-                <input type="email" placeholder="Email" required name="email">
-                <input type="tel" placeholder="Phone" required name="phone">
-                <select name="domain" required>
-                    <option value="">Select Domain</option>
-                    <option value="HR">HR</option>
-                    <option value="Marketing">Marketing</option>
-                    <option value="Testing">Testing</option>
-                    <option value="Python">Python</option>
-                    <option value="React">React</option>
-                </select>
-                <select name="assignedTo" id="leadInternSelect" required>
-                    <option value="">Select Lead Intern</option>
-                </select>
-                <button type="submit" class="btn">Add Intern</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="addLeadInternModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('addLeadIntern')">&times;</span>
-            <h3>Add Lead Intern</h3>
-            <form onsubmit="addLeadIntern(event)">
-                <input type="text" placeholder="Username" required name="username">
-                <input type="password" placeholder="Password" required name="password" minlength="6">
-                <input type="text" placeholder="Full Name" required name="name">
-                <input type="email" placeholder="Email" required name="email">
-                <select name="domain" required>
-                    <option value="">Select Domain</option>
-                    <option value="HR">HR</option>
-                    <option value="Marketing">Marketing</option>
-                    <option value="Testing">Testing</option>
-                    <option value="Python">Python</option>
-                    <option value="React">React</option>
-                </select>
-                <button type="submit" class="btn">Add Lead Intern</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="promoteInternModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('promoteIntern')">&times;</span>
-            <h3>Promote Intern to Lead</h3>
-            <form onsubmit="promoteIntern(event)">
-                <select name="internId" id="internPromoteSelect" required>
-                    <option value="">Select Intern to Promote</option>
-                </select>
-                <input type="text" placeholder="Username for Login" required name="username">
-                <input type="password" placeholder="Password" required name="password" minlength="6">
-                <button type="submit" class="btn">Promote to Lead Intern</button>
-            </form>
-        </div>
-    </div>
-
     <div id="addTaskModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('addTask')">&times;</span>
@@ -231,40 +170,6 @@
                 </select>
                 <input type="text" placeholder="Estimated Duration (e.g., 2 days)" name="duration">
                 <button type="submit" class="btn">Create Task Template</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="addCertModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('addCert')">&times;</span>
-            <h3>Generate Certificate</h3>
-            <form onsubmit="addCertificate(event)">
-                <input type="text" placeholder="Intern Name" required name="name">
-                <input type="date" placeholder="Date of Birth" name="dob">
-                <input type="text" placeholder="Place" name="place">
-                <select name="domain" required>
-                    <option value="">Select Domain</option>
-                    <option value="HR">HR</option>
-                    <option value="Marketing">Marketing</option>
-                    <option value="Testing">Testing</option>
-                    <option value="Python">Python</option>
-                    <option value="React">React</option>
-                </select>
-                <select name="months" required>
-                    <option value="">Duration</option>
-                    <option value="1">1 Month</option>
-                    <option value="2">2 Months</option>
-                    <option value="3">3 Months</option>
-                    <option value="6">6 Months</option>
-                </select>
-                <select name="performance" required>
-                    <option value="">Performance</option>
-                    <option value="Excellent">Excellent</option>
-                    <option value="Very Good">Very Good</option>
-                    <option value="Good">Good</option>
-                </select>
-                <button type="submit" class="btn">Generate</button>
             </form>
         </div>
     </div>
@@ -313,179 +218,13 @@
     </script>
     <script src="db.js"></script>
     <script>
-
-
         function openModal(type) { 
             const modal = document.getElementById(type + 'Modal');
             if (modal) {
                 modal.style.display = 'block';
-                if (type === 'addIntern') loadLeadInterns();
-                if (type === 'promoteIntern') loadInternsForPromotion();
-            } else {
-                console.error('Modal not found:', type + 'Modal');
             }
         }
         function closeModal(type) { document.getElementById(type + 'Modal').style.display = 'none'; }
-
-        function loadLeadInterns() {
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
-            const leadInterns = Object.values(users).filter(u => u.role === 'employee');
-            const select = document.getElementById('leadInternSelect');
-            select.innerHTML = '<option value="">Select Lead Intern</option>';
-            leadInterns.forEach(lead => {
-                select.innerHTML += `<option value="${lead.name}">${lead.name} (${lead.domain || 'All'})</option>`;
-            });
-        }
-
-        function loadInternsForPromotion() {
-            const interns = DB.getAll('interns');
-            const select = document.getElementById('internPromoteSelect');
-            select.innerHTML = '<option value="">Select Intern to Promote</option>';
-            interns.forEach(intern => {
-                select.innerHTML += `<option value="${intern.id}">${intern.name} - ${intern.domain}</option>`;
-            });
-        }
-
-        function addLeadIntern(e) {
-            e.preventDefault();
-            const data = new FormData(e.target);
-            const leadData = Object.fromEntries(data);
-            leadData.role = 'employee';
-            
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
-            const usersList = Object.values(users);
-            const exists = usersList.find(u => u.username === leadData.username);
-            if (exists) {
-                alert('❌ Username already exists!');
-                return;
-            }
-            
-            users[leadData.username] = leadData;
-            localStorage.setItem('users', JSON.stringify(users));
-            alert('✅ Lead Intern added successfully!');
-            e.target.reset();
-            closeModal('addLeadIntern');
-        }
-
-        function promoteIntern(e) {
-            e.preventDefault();
-            const data = new FormData(e.target);
-            const internId = data.get('internId');
-            const username = data.get('username');
-            const password = data.get('password');
-            
-            const interns = DB.getAll('interns');
-            const intern = interns.find(i => i.id == internId);
-            
-            if (!intern) {
-                alert('❌ Intern not found!');
-                return;
-            }
-            
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
-            if (users[username]) {
-                alert('❌ Username already exists!');
-                return;
-            }
-            
-            const leadData = {
-                username: username,
-                password: password,
-                role: 'employee',
-                name: intern.name,
-                email: intern.email,
-                domain: intern.domain
-            };
-            
-            users[username] = leadData;
-            localStorage.setItem('users', JSON.stringify(users));
-            alert(`✅ ${intern.name} promoted to Lead Intern successfully!`);
-            e.target.reset();
-            closeModal('promoteIntern');
-        }
-
-        function addIntern(e) {
-            e.preventDefault();
-            const data = new FormData(e.target);
-            const internData = Object.fromEntries(data);
-            
-            if (!internData.assignedTo) {
-                alert('❌ Please select a Lead Intern!');
-                return;
-            }
-            
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
-            const leadExists = Object.values(users).find(u => u.role === 'employee' && u.name === internData.assignedTo);
-            
-            if (!leadExists) {
-                alert(`❌ Lead Intern "${internData.assignedTo}" does not exist! Please add them first.`);
-                return;
-            }
-            
-            // Check if username already exists
-            if (users[internData.username]) {
-                alert('❌ Username already exists! Please choose a different username.');
-                return;
-            }
-            
-            // Create user account for intern
-            const userAccount = {
-                username: internData.username,
-                password: internData.password,
-                role: 'intern',
-                name: internData.name,
-                email: internData.email,
-                domain: internData.domain
-            };
-            users[internData.username] = userAccount;
-            localStorage.setItem('users', JSON.stringify(users));
-            
-            // Add intern data
-            DB.addIntern(internData);
-            alert('✅ Intern added successfully! They can now login with their credentials.');
-            e.target.reset();
-            closeModal('addIntern');
-        }
-
-        function viewLeadInterns() {
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
-            const leadInterns = Object.values(users).filter(u => u.role === 'employee');
-            const view = document.getElementById('dataView');
-            const content = document.getElementById('dataContent');
-            document.getElementById('dataTitle').textContent = 'LEAD INTERNS';
-            
-            if (leadInterns.length === 0) {
-                content.innerHTML = '<p>No lead interns found</p>';
-            } else {
-                let html = '<table><tr><th>Name</th><th>Username</th><th>Email</th><th>Domain</th><th>Actions</th></tr>';
-                leadInterns.forEach(lead => {
-                    html += `<tr><td>${lead.name}</td><td>${lead.username}</td><td>${lead.email || '-'}</td><td>${lead.domain || 'All'}</td>`;
-                    html += `<td><button class="btn" style="background: #ef4444; padding: 8px 16px;" onclick="deleteLeadIntern('${lead.username}')">Delete</button></td></tr>`;
-                });
-                html += '</table>';
-                content.innerHTML = html;
-            }
-            view.style.display = 'block';
-        }
-
-        function deleteLeadIntern(username) {
-            if (!confirm('Are you sure you want to delete this Lead Intern? This will also unassign all their interns.')) return;
-            
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
-            delete users[username];
-            localStorage.setItem('users', JSON.stringify(users));
-            
-            const interns = DB.getAll('interns');
-            interns.forEach(intern => {
-                if (intern.assignedTo === username) {
-                    intern.assignedTo = '';
-                }
-            });
-            localStorage.setItem('interns', JSON.stringify(interns));
-            
-            alert('✅ Lead Intern deleted successfully!');
-            viewLeadInterns();
-        }
 
         function addUser(e) {
             e.preventDefault();
@@ -505,60 +244,9 @@
             task.createdBy = 'Admin';
             task.createdAt = new Date().toISOString();
             DB.addTask(task);
-            alert('✅ Task template created successfully! Lead Interns can now assign this to their team.');
+            alert('✅ Task template created successfully!');
             e.target.reset();
             closeModal('addTask');
-        }
-
-        function addCertificate(e) {
-            e.preventDefault();
-            const data = new FormData(e.target);
-            const cert = Object.fromEntries(data);
-            cert.dateIssued = new Date().toLocaleDateString();
-            DB.addCertificate(cert);
-            alert('✅ Certificate generated!');
-            e.target.reset();
-            closeModal('addCert');
-        }
-
-        function viewData(type) {
-            if (type === 'users') {
-                // Show User Manager section instead of local data
-                showUserManager();
-                return;
-            }
-            
-            const data = DB.getAll(type);
-            const view = document.getElementById('dataView');
-            const content = document.getElementById('dataContent');
-            document.getElementById('dataTitle').textContent = type.toUpperCase();
-            
-            if (data.length === 0) {
-                content.innerHTML = '<p>No data found</p>';
-            } else {
-                const keys = Object.keys(data[0]);
-                let html = '<table><tr>';
-                keys.forEach(k => html += `<th>${k}</th>`);
-                html += '<th>Actions</th></tr>';
-                data.forEach(row => {
-                    html += '<tr>';
-                    keys.forEach(k => html += `<td>${row[k] || '-'}</td>`);
-                    html += `<td><button class="btn" style="background: #ef4444; padding: 8px 16px;" onclick="deleteItem('${type}', '${row.id}')">Delete</button></td>`;
-                    html += '</tr>';
-                });
-                html += '</table>';
-                content.innerHTML = html;
-            }
-            view.style.display = 'block';
-            // Scroll to the data view
-            view.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function deleteItem(type, id) {
-            if (!confirm('Are you sure you want to delete this item?')) return;
-            DB.delete(type, id);
-            alert('✅ Item deleted successfully!');
-            viewData(type);
         }
 
         function exportData() {
@@ -598,17 +286,50 @@
             input.click();
         }
 
+        async function deleteAllUsersConfirm() {
+            if (!confirm('⚠️ WARNING: This will delete ALL users except the admin account. This action cannot be undone. Continue?')) {
+                return;
+            }
+            if (!confirm('🔴 FINAL WARNING: Are you absolutely sure? This will permanently delete all non-admin users from Firebase.')) {
+                return;
+            }
+
+            try {
+                const { getAuth } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
+                const { getFunctions, httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js');
+                
+                const auth = getAuth();
+                const functions = getFunctions();
+                const user = auth.currentUser;
+                
+                if (!user) {
+                    alert('❌ Not authenticated');
+                    return;
+                }
+
+                await user.getIdToken(true);
+                const deleteAllUsers = httpsCallable(functions, 'deleteAllUsers');
+                const result = await deleteAllUsers();
+                
+                alert(`✅ ${result.data.message}`);
+            } catch (error) {
+                console.error('Error:', error);
+                alert(`❌ Error: ${error.message}`);
+            }
+        }
+
         function logout() {
-            auth.signOut().then(() => {
-                window.location.href = 'portal-login.html';
+            const { getAuth } = import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js').then(({ getAuth }) => {
+                const auth = getAuth();
+                auth.signOut().then(() => {
+                    window.location.href = 'portal-login.html';
+                });
             });
         }
 
-        // User Manager Functions
         function showUserManager() {
             document.getElementById('userManagerView').style.display = 'block';
             document.getElementById('dataView').style.display = 'none';
-            // Reset role dropdown to show all options
             const roleSelect = document.getElementById('userRole');
             roleSelect.innerHTML = `
                 <option value="">Select Role</option>
@@ -616,7 +337,6 @@
                 <option value="employee">Employee / Lead Intern</option>
                 <option value="intern">Intern</option>
             `;
-            // Scroll to User Manager section
             document.getElementById('userManagerView').scrollIntoView({ behavior: 'smooth' });
             initializeUserManager();
         }
