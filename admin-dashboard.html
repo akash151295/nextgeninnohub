@@ -47,7 +47,7 @@
             <div class="card">
                 <h3>👥 User Management</h3>
                 <button class="btn" onclick="showUserManager()">🚀 User Manager (Create & Delete)</button>
-                <button class="btn btn-secondary" onclick="viewData('users')">📊 View All Users</button>
+                <button class="btn btn-secondary" onclick="showUserManager()">📋 View All Users</button>
             </div>
 
             <div class="card">
@@ -482,6 +482,12 @@
         }
 
         function viewData(type) {
+            if (type === 'users') {
+                // Show User Manager section instead of local data
+                showUserManager();
+                return;
+            }
+            
             const data = DB.getAll(type);
             const view = document.getElementById('dataView');
             const content = document.getElementById('dataContent');
@@ -504,6 +510,8 @@
                 content.innerHTML = html;
             }
             view.style.display = 'block';
+            // Scroll to the data view
+            view.scrollIntoView({ behavior: 'smooth' });
         }
 
         function deleteItem(type, id) {
