@@ -193,6 +193,16 @@
         async function loadUsers() {
             const tbody = document.getElementById('usersTableBody');
             try {
+                // Wait for user to be fully authenticated
+                const user = auth.currentUser;
+                if (!user) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Please login first</td></tr>';
+                    return;
+                }
+                
+                // Get fresh ID token
+                await user.getIdToken(true);
+                
                 const getAllUsers = httpsCallable(functions, 'getAllUsers');
                 const result = await getAllUsers();
                 
@@ -238,6 +248,13 @@
             credentialsBox.style.display = 'none';
 
             try {
+                // Ensure user is authenticated and get fresh token
+                const user = auth.currentUser;
+                if (!user) {
+                    throw new Error('Not authenticated');
+                }
+                await user.getIdToken(true);
+                
                 const createUser = httpsCallable(functions, 'createUser');
                 const result = await createUser({ name, email, role, domain });
 
@@ -276,18 +293,23 @@
         };
 
         // Check auth and load users
-        auth.onAuthStateChanged(user => {
+        auth.onAuthStateChanged(async (user) => {
             if (!user) {
-                // Redirect to login if not authenticated
                 alert('Please login first');
                 window.location.href = 'portal-login.html';
             } else {
                 console.log('User authenticated:', user.email);
-                // Wait longer for auth context to fully initialize
-                setTimeout(() => {
-                    console.log('Loading users...');
-                    loadUsers();
-                }, 2000);
+                // Wait for auth to stabilize and get fresh token
+                try {
+                    await user.getIdToken(true);
+                    setTimeout(() => {
+                        console.log('Loading users...');
+                        loadUsers();
+                    }, 1000);
+                } catch (error) {
+                    console.error('Token error:', error);
+                    window.location.href = 'portal-login.html';
+                }
             }
         });
     </script>
