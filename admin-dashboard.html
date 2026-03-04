@@ -20,11 +20,12 @@
         .btn:hover { transform: translateY(-2px); }
         .btn-secondary { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
         .btn-danger { background: #dc3545; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; }
-        th { background: #f0f9ff; color: #667eea; font-weight: 600; }
         .user-item { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; }
         .loading { color: #667eea; font-style: italic; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto; }
+        .modal-content { background: white; margin: 50px auto; padding: 30px; border-radius: 15px; max-width: 500px; position: relative; }
+        .close { float: right; font-size: 28px; cursor: pointer; }
+        input, select { width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -39,7 +40,7 @@
     <div class="container">
         <div class="welcome">
             <h2>Welcome, <span id="adminName">Admin</span>! 👋</h2>
-            <p style="color: #64748b; margin-top: 10px;">Manage employees and view all users in the system.</p>
+            <p style="color: #64748b; margin-top: 10px;">Manage employees, interns, and assignments.</p>
         </div>
 
         <div class="grid">
@@ -53,9 +54,9 @@
             </div>
 
             <div class="card">
-                <h3>👨💼 Lead Interns</h3>
-                <button class="btn" onclick="loadLeadInterns()">🔄 Refresh</button>
-                <div id="leadInternsList" style="margin-top: 20px;">
+                <h3>👨💼 Employees (Team Leads)</h3>
+                <button class="btn" onclick="loadEmployees()">🔄 Refresh</button>
+                <div id="employeesList" style="margin-top: 20px;">
                     <p class="loading">Click refresh to load...</p>
                 </div>
             </div>
@@ -69,15 +70,17 @@
             </div>
 
             <div class="card">
-                <h3>📋 Task Management</h3>
-                <button class="btn" onclick="alert('Task management coming soon!')">📝 View Tasks</button>
-                <button class="btn btn-secondary" onclick="alert('Task management coming soon!')">📊 Task Reports</button>
+                <h3>🔗 Assign Intern to Employee</h3>
+                <button class="btn" onclick="openAssignModal()">➕ Assign Intern</button>
+                <div id="assignStatus" style="margin-top: 15px;"></div>
             </div>
 
             <div class="card">
-                <h3>📜 Certificates</h3>
-                <button class="btn" onclick="window.location.href='generate-certificate.html'">🎖️ Generate Certificate</button>
-                <button class="btn btn-secondary" onclick="alert('Certificate management coming soon!')">📊 View Certificates</button>
+                <h3>📊 Assignments Overview</h3>
+                <button class="btn" onclick="loadAssignments()">🔄 View Assignments</button>
+                <div id="assignmentsList" style="margin-top: 20px;">
+                    <p class="loading">Click to load...</p>
+                </div>
             </div>
 
             <div class="card">
@@ -88,10 +91,29 @@
         </div>
     </div>
 
+    <!-- Assign Modal -->
+    <div id="assignModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('assign')">&times;</span>
+            <h3>Assign Intern to Employee</h3>
+            <form onsubmit="assignInternToEmployee(event)">
+                <label>Select Employee (Team Lead):</label>
+                <select id="employeeSelect" required>
+                    <option value="">Loading...</option>
+                </select>
+                <label>Select Intern:</label>
+                <select id="internSelect" required>
+                    <option value="">Loading...</option>
+                </select>
+                <button type="submit" class="btn" style="width: 100%; margin-top: 15px;">Assign</button>
+            </form>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, getDoc, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, getDoc, collection, getDocs, query, where, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyAFoXIPtkRJdTxcTcXQkDYDUxmzcoownWA",
@@ -152,8 +174,7 @@
                             <div class="user-item">
                                 <strong>${user.name}</strong><br>
                                 Email: ${user.email}<br>
-                                Role: <span style="background: #667eea; color: white; padding: 2px 8px; border-radius: 3px;">${user.role}</span><br>
-                                Domain: ${user.domain || 'N/A'}
+                                Role: <span style="background: #667eea; color: white; padding: 2px 8px; border-radius: 3px;">${user.role}</span>
                             </div>
                         `;
                     });
@@ -165,8 +186,8 @@
             }
         };
 
-        window.loadLeadInterns = async () => {
-            const container = document.getElementById('leadInternsList');
+        window.loadEmployees = async () => {
+            const container = document.getElementById('employeesList');
             container.innerHTML = '<p class="loading">Loading...</p>';
             
             try {
@@ -175,15 +196,14 @@
                 let html = '';
                 
                 if (snapshot.empty) {
-                    html = '<p>No lead interns found</p>';
+                    html = '<p>No employees found</p>';
                 } else {
                     snapshot.forEach(doc => {
                         const user = doc.data();
                         html += `
                             <div class="user-item">
                                 <strong>${user.name}</strong><br>
-                                Email: ${user.email}<br>
-                                Domain: ${user.domain || 'N/A'}
+                                Email: ${user.email}
                             </div>
                         `;
                     });
@@ -212,8 +232,7 @@
                         html += `
                             <div class="user-item">
                                 <strong>${user.name}</strong><br>
-                                Email: ${user.email}<br>
-                                Domain: ${user.domain || 'N/A'}
+                                Email: ${user.email}
                             </div>
                         `;
                     });
@@ -223,6 +242,100 @@
             } catch (error) {
                 container.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
             }
+        };
+
+        window.openAssignModal = async () => {
+            try {
+                // Load employees
+                const empSelect = document.getElementById('employeeSelect');
+                const empSnapshot = await getDocs(query(collection(db, 'users'), where('role', '==', 'employee')));
+                let empHtml = '<option value="">Select Employee</option>';
+                empSnapshot.forEach(doc => {
+                    const user = doc.data();
+                    empHtml += `<option value="${doc.id}">${user.name}</option>`;
+                });
+                empSelect.innerHTML = empHtml;
+
+                // Load interns
+                const intSelect = document.getElementById('internSelect');
+                const intSnapshot = await getDocs(query(collection(db, 'users'), where('role', '==', 'intern')));
+                let intHtml = '<option value="">Select Intern</option>';
+                intSnapshot.forEach(doc => {
+                    const user = doc.data();
+                    intHtml += `<option value="${doc.id}">${user.name}</option>`;
+                });
+                intSelect.innerHTML = intHtml;
+
+                document.getElementById('assignModal').style.display = 'block';
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        };
+
+        window.assignInternToEmployee = async (e) => {
+            e.preventDefault();
+            const employeeId = document.getElementById('employeeSelect').value;
+            const internId = document.getElementById('internSelect').value;
+
+            if (!employeeId || !internId) {
+                alert('Please select both employee and intern');
+                return;
+            }
+
+            try {
+                // Update intern with assigned employee
+                await updateDoc(doc(db, 'users', internId), {
+                    assignedTo: employeeId
+                });
+
+                document.getElementById('assignStatus').innerHTML = '<p style="color: green;">✅ Intern assigned successfully!</p>';
+                closeModal('assign');
+                setTimeout(() => {
+                    document.getElementById('assignStatus').innerHTML = '';
+                }, 3000);
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        };
+
+        window.loadAssignments = async () => {
+            const container = document.getElementById('assignmentsList');
+            container.innerHTML = '<p class="loading">Loading...</p>';
+            
+            try {
+                const usersSnapshot = await getDocs(collection(db, 'users'));
+                let html = '';
+                let count = 0;
+
+                for (const userDoc of usersSnapshot.docs) {
+                    const user = userDoc.data();
+                    if (user.role === 'intern' && user.assignedTo) {
+                        const empDoc = await getDoc(doc(db, 'users', user.assignedTo));
+                        if (empDoc.exists()) {
+                            const emp = empDoc.data();
+                            html += `
+                                <div class="user-item">
+                                    <strong>${user.name}</strong> (Intern)<br>
+                                    → Assigned to: <strong>${emp.name}</strong> (Employee)
+                                </div>
+                            `;
+                            count++;
+                        }
+                    }
+                }
+
+                if (count === 0) {
+                    html = '<p>No assignments yet</p>';
+                }
+                
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        };
+
+        window.closeModal = (type) => {
+            document.getElementById(type + 'Modal').style.display = 'none';
         };
 
         window.exportUsers = async () => {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lead Intern Dashboard - NextGen InnoHub</title>
+    <title>Employee Dashboard - NextGen InnoHub</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #f5f7fa; }
@@ -20,7 +20,7 @@
         .btn-secondary { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
         .user-item { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; }
         .loading { color: #667eea; font-style: italic; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto; }
         .modal-content { background: white; margin: 50px auto; padding: 30px; border-radius: 15px; max-width: 500px; position: relative; }
         .close { float: right; font-size: 28px; cursor: pointer; }
         input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px; }
@@ -28,19 +28,19 @@
 </head>
 <body>
     <div class="header">
-        <h1>👨💼 Lead Intern Dashboard</h1>
+        <h1>👨💼 Employee Dashboard</h1>
         <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
 
     <div class="container">
         <div class="welcome">
-            <h2>Welcome, <span id="leadName">Lead Intern</span>! 👋</h2>
-            <p style="color: #64748b; margin-top: 10px;">Manage your team, assign tasks, and track progress.</p>
+            <h2>Welcome, <span id="employeeName">Employee</span>! 👋</h2>
+            <p style="color: #64748b; margin-top: 10px;">Manage your team and assign tasks.</p>
         </div>
 
         <div class="grid">
             <div class="card">
-                <h3>👥 My Team (Interns)</h3>
+                <h3>👥 My Interns</h3>
                 <button class="btn" onclick="loadMyInterns()">🔄 Refresh</button>
                 <div id="myInternsList" style="margin-top: 20px;">
                     <p class="loading">Click refresh to load...</p>
@@ -50,13 +50,15 @@
             <div class="card">
                 <h3>📋 Task Management</h3>
                 <button class="btn" onclick="openAssignTaskModal()">➕ Assign Task</button>
-                <button class="btn btn-secondary" onclick="viewTasks()">📝 View Tasks</button>
+                <button class="btn btn-secondary" onclick="openAddTaskModal()">➕ Add New Task</button>
             </div>
 
             <div class="card">
-                <h3>⬆️ Promote Intern</h3>
-                <button class="btn" onclick="openPromoteModal()">🚀 Promote to Lead</button>
-                <div id="promoteStatus" style="margin-top: 15px;"></div>
+                <h3>📝 View Tasks</h3>
+                <button class="btn" onclick="loadTasks()">🔄 Refresh Tasks</button>
+                <div id="tasksList" style="margin-top: 20px;">
+                    <p class="loading">Click refresh to load...</p>
+                </div>
             </div>
 
             <div class="card">
@@ -88,17 +90,28 @@
         </div>
     </div>
 
-    <!-- Promote Modal -->
-    <div id="promoteModal" class="modal">
+    <!-- Add New Task Modal -->
+    <div id="addTaskModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal('promote')">&times;</span>
-            <h3>Promote Intern to Lead</h3>
-            <form onsubmit="promoteIntern(event)">
-                <label>Select Intern:</label>
-                <select id="promoteInternSelect" required>
-                    <option value="">Loading interns...</option>
+            <span class="close" onclick="closeModal('addTask')">&times;</span>
+            <h3>Add New Task Template</h3>
+            <form onsubmit="addNewTask(event)">
+                <label>Task Title:</label>
+                <input type="text" id="newTaskTitle" placeholder="Task title" required>
+                <label>Description:</label>
+                <textarea id="newTaskDesc" placeholder="Task description" rows="3" required></textarea>
+                <label>Category:</label>
+                <select id="taskCategory" required>
+                    <option value="">Select Category</option>
+                    <option value="Development">Development</option>
+                    <option value="Testing">Testing</option>
+                    <option value="Documentation">Documentation</option>
+                    <option value="Research">Research</option>
+                    <option value="Other">Other</option>
                 </select>
-                <button type="submit" class="btn" style="width: 100%; margin-top: 15px;">Promote</button>
+                <label>Estimated Duration:</label>
+                <input type="text" id="taskDuration" placeholder="e.g., 2 days" required>
+                <button type="submit" class="btn" style="width: 100%; margin-top: 15px;">Create Task</button>
             </form>
         </div>
     </div>
@@ -106,7 +119,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, getDoc, collection, getDocs, query, where, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, getDoc, collection, getDocs, query, where, addDoc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyAFoXIPtkRJdTxcTcXQkDYDUxmzcoownWA",
@@ -121,7 +134,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let currentLeadDomain = '';
+        let currentEmployeeId = '';
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
@@ -137,8 +150,8 @@
                         window.location.href = 'portal-login.html';
                         return;
                     }
-                    document.getElementById('leadName').textContent = userData.name;
-                    currentLeadDomain = userData.domain;
+                    document.getElementById('employeeName').textContent = userData.name;
+                    currentEmployeeId = user.uid;
                 } else {
                     window.location.href = 'portal-login.html';
                 }
@@ -156,21 +169,20 @@
                 const q = query(
                     collection(db, 'users'),
                     where('role', '==', 'intern'),
-                    where('domain', '==', currentLeadDomain)
+                    where('assignedTo', '==', currentEmployeeId)
                 );
                 const snapshot = await getDocs(q);
                 let html = '';
                 
                 if (snapshot.empty) {
-                    html = '<p>No interns in your domain yet</p>';
+                    html = '<p>No interns assigned to you yet</p>';
                 } else {
                     snapshot.forEach(doc => {
                         const user = doc.data();
                         html += `
                             <div class="user-item">
                                 <strong>${user.name}</strong><br>
-                                Email: ${user.email}<br>
-                                Domain: ${user.domain}
+                                Email: ${user.email}
                             </div>
                         `;
                     });
@@ -190,14 +202,14 @@
                 const q = query(
                     collection(db, 'users'),
                     where('role', '==', 'intern'),
-                    where('domain', '==', currentLeadDomain)
+                    where('assignedTo', '==', currentEmployeeId)
                 );
                 const snapshot = await getDocs(q);
                 let html = '<option value="">Select an intern</option>';
                 
                 snapshot.forEach(doc => {
                     const user = doc.data();
-                    html += `<option value="${doc.id}">${user.name} (${user.email})</option>`;
+                    html += `<option value="${doc.id}">${user.name}</option>`;
                 });
                 
                 select.innerHTML = html;
@@ -207,77 +219,101 @@
             }
         };
 
-        window.openPromoteModal = async () => {
-            const select = document.getElementById('promoteInternSelect');
-            select.innerHTML = '<option value="">Loading...</option>';
-            
-            try {
-                const q = query(
-                    collection(db, 'users'),
-                    where('role', '==', 'intern'),
-                    where('domain', '==', currentLeadDomain)
-                );
-                const snapshot = await getDocs(q);
-                let html = '<option value="">Select an intern</option>';
-                
-                snapshot.forEach(doc => {
-                    const user = doc.data();
-                    html += `<option value="${doc.id}">${user.name} (${user.email})</option>`;
-                });
-                
-                select.innerHTML = html;
-                document.getElementById('promoteModal').style.display = 'block';
-            } catch (error) {
-                alert('Error: ' + error.message);
-            }
+        window.openAddTaskModal = () => {
+            document.getElementById('addTaskModal').style.display = 'block';
         };
 
-        window.assignTask = (e) => {
+        window.assignTask = async (e) => {
             e.preventDefault();
             const internId = document.getElementById('internSelect').value;
             const title = document.getElementById('taskTitle').value;
             const desc = document.getElementById('taskDesc').value;
             const dueDate = document.getElementById('taskDue').value;
             
-            alert(`✅ Task "${title}" assigned to intern!\n\nNote: Task management feature coming soon!`);
-            closeModal('assignTask');
-            e.target.reset();
-        };
-
-        window.promoteIntern = async (e) => {
-            e.preventDefault();
-            const internId = document.getElementById('promoteInternSelect').value;
-            
             if (!internId) {
                 alert('Please select an intern');
                 return;
             }
-            
+
             try {
-                await updateDoc(doc(db, 'users', internId), {
-                    role: 'employee'
+                await addDoc(collection(db, 'tasks'), {
+                    title: title,
+                    description: desc,
+                    assignedTo: internId,
+                    assignedBy: currentEmployeeId,
+                    dueDate: dueDate,
+                    status: 'pending',
+                    createdAt: serverTimestamp()
                 });
-                
-                document.getElementById('promoteStatus').innerHTML = '<p style="color: green;">✅ Intern promoted to Lead successfully!</p>';
-                closeModal('promote');
-                setTimeout(() => {
-                    document.getElementById('promoteStatus').innerHTML = '';
-                }, 3000);
+
+                alert('✅ Task assigned successfully!');
+                closeModal('assignTask');
+                e.target.reset();
+                loadTasks();
             } catch (error) {
                 alert('Error: ' + error.message);
             }
         };
 
-        window.closeModal = (type) => {
-            if (type === 'assignTask') {
-                document.getElementById('assignTaskModal').style.display = 'none';
-            } else if (type === 'promote') {
-                document.getElementById('promoteModal').style.display = 'none';
+        window.addNewTask = async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('newTaskTitle').value;
+            const desc = document.getElementById('newTaskDesc').value;
+            const category = document.getElementById('taskCategory').value;
+            const duration = document.getElementById('taskDuration').value;
+
+            try {
+                await addDoc(collection(db, 'tasks'), {
+                    title: title,
+                    description: desc,
+                    category: category,
+                    duration: duration,
+                    createdBy: currentEmployeeId,
+                    isTemplate: true,
+                    createdAt: serverTimestamp()
+                });
+
+                alert('✅ Task template created successfully!');
+                closeModal('addTask');
+                e.target.reset();
+                loadTasks();
+            } catch (error) {
+                alert('Error: ' + error.message);
             }
         };
 
-        window.viewTasks = () => {
-            alert('Task viewing feature coming soon!');
+        window.loadTasks = async () => {
+            const container = document.getElementById('tasksList');
+            container.innerHTML = '<p class="loading">Loading...</p>';
+            
+            try {
+                const q = query(collection(db, 'tasks'), where('assignedBy', '==', currentEmployeeId));
+                const snapshot = await getDocs(q);
+                let html = '';
+                
+                if (snapshot.empty) {
+                    html = '<p>No tasks created yet</p>';
+                } else {
+                    snapshot.forEach(doc => {
+                        const task = doc.data();
+                        html += `
+                            <div class="user-item">
+                                <strong>${task.title}</strong><br>
+                                Status: ${task.status || 'pending'}<br>
+                                Due: ${task.dueDate || 'N/A'}
+                            </div>
+                        `;
+                    });
+                }
+                
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        };
+
+        window.closeModal = (type) => {
+            document.getElementById(type + 'Modal').style.display = 'none';
         };
 
         window.generateReport = () => {

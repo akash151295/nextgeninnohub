@@ -21,7 +21,12 @@
         .progress-bar { background: #e0e0e0; border-radius: 10px; height: 20px; margin: 10px 0; }
         .progress-fill { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100%; border-radius: 10px; width: 0%; transition: width 0.3s; }
         .user-item { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .task-item { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #667eea; }
         .loading { color: #667eea; font-style: italic; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto; }
+        .modal-content { background: white; margin: 50px auto; padding: 30px; border-radius: 15px; max-width: 500px; position: relative; }
+        .close { float: right; font-size: 28px; cursor: pointer; }
+        textarea { width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -34,27 +39,29 @@
         <div class="welcome">
             <h2>Welcome, <span id="internName">Intern</span>! 👋</h2>
             <p style="color: #64748b; margin-top: 10px;">Track your progress and complete assigned tasks.</p>
-            <div style="margin-top: 15px;">
-                <strong>Domain:</strong> <span id="internDomain">-</span>
-            </div>
         </div>
 
         <div class="grid">
             <div class="card">
-                <h3>📋 My Tasks</h3>
-                <button class="btn" onclick="loadMyTasks()">🔄 Refresh Tasks</button>
-                <button class="btn btn-secondary" onclick="submitWork()">📤 Submit Work</button>
-                <div id="tasksList" style="margin-top: 20px;">
-                    <p class="loading">Click refresh to load tasks...</p>
+                <h3>👨💼 My Team Lead</h3>
+                <button class="btn" onclick="loadMyTL()">🔄 Refresh</button>
+                <div id="tlInfo" style="margin-top: 20px;">
+                    <p class="loading">Click refresh to load...</p>
                 </div>
             </div>
 
             <div class="card">
-                <h3>👨💼 My Lead Intern</h3>
-                <button class="btn" onclick="loadLeadIntern()">🔄 Refresh</button>
-                <div id="leadInternInfo" style="margin-top: 20px;">
+                <h3>📋 My Tasks</h3>
+                <button class="btn" onclick="loadMyTasks()">🔄 Refresh Tasks</button>
+                <div id="tasksList" style="margin-top: 20px;">
                     <p class="loading">Click refresh to load...</p>
                 </div>
+            </div>
+
+            <div class="card">
+                <h3>📤 Submit Work</h3>
+                <button class="btn" onclick="openSubmitModal()">📤 Submit Task</button>
+                <div id="submitStatus" style="margin-top: 15px;"></div>
             </div>
 
             <div class="card">
@@ -75,12 +82,6 @@
             </div>
 
             <div class="card">
-                <h3>💬 Communication</h3>
-                <button class="btn" onclick="contactLead()">👨💼 Contact Lead</button>
-                <button class="btn btn-secondary" onclick="viewFeedback()">📝 View Feedback</button>
-            </div>
-
-            <div class="card">
                 <h3>🏆 Achievements</h3>
                 <button class="btn" onclick="viewCertificates()">🎖️ My Certificates</button>
                 <button class="btn btn-secondary" onclick="viewBadges()">🏅 Badges Earned</button>
@@ -88,10 +89,29 @@
         </div>
     </div>
 
+    <!-- Submit Task Modal -->
+    <div id="submitModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('submit')">&times;</span>
+            <h3>Submit Task</h3>
+            <form onsubmit="submitTask(event)">
+                <label>Select Task:</label>
+                <select id="taskSelect" required>
+                    <option value="">Loading tasks...</option>
+                </select>
+                <label>Submission Notes:</label>
+                <textarea id="submissionNotes" placeholder="Describe what you've completed..." rows="4" required></textarea>
+                <label>Attachment URL (optional):</label>
+                <input type="url" id="attachmentUrl" placeholder="Link to your work">
+                <button type="submit" class="btn" style="width: 100%; margin-top: 15px;">Submit</button>
+            </form>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, getDoc, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, getDoc, collection, getDocs, query, where, addDoc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyAFoXIPtkRJdTxcTcXQkDYDUxmzcoownWA",
@@ -106,7 +126,8 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let currentInternDomain = '';
+        let currentInternId = '';
+        let assignedToId = '';
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
@@ -123,8 +144,8 @@
                         return;
                     }
                     document.getElementById('internName').textContent = userData.name;
-                    document.getElementById('internDomain').textContent = userData.domain || 'Not assigned';
-                    currentInternDomain = userData.domain;
+                    currentInternId = user.uid;
+                    assignedToId = userData.assignedTo || '';
                 } else {
                     window.location.href = 'portal-login.html';
                 }
@@ -134,41 +155,56 @@
             }
         });
 
-        window.loadMyTasks = async () => {
-            const container = document.getElementById('tasksList');
+        window.loadMyTL = async () => {
+            const container = document.getElementById('tlInfo');
             container.innerHTML = '<p class="loading">Loading...</p>';
             
             try {
-                // Placeholder for task loading
-                container.innerHTML = '<p>No tasks assigned yet. Check back soon!</p>';
+                if (!assignedToId) {
+                    container.innerHTML = '<p>No team lead assigned yet</p>';
+                    return;
+                }
+
+                const tlDoc = await getDoc(doc(db, 'users', assignedToId));
+                if (tlDoc.exists()) {
+                    const tl = tlDoc.data();
+                    container.innerHTML = `
+                        <div class="user-item">
+                            <strong>${tl.name}</strong><br>
+                            Email: ${tl.email}<br>
+                            Role: Team Lead
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = '<p>Team lead not found</p>';
+                }
             } catch (error) {
                 container.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
             }
         };
 
-        window.loadLeadIntern = async () => {
-            const container = document.getElementById('leadInternInfo');
+        window.loadMyTasks = async () => {
+            const container = document.getElementById('tasksList');
             container.innerHTML = '<p class="loading">Loading...</p>';
             
             try {
                 const q = query(
-                    collection(db, 'users'),
-                    where('role', '==', 'employee'),
-                    where('domain', '==', currentInternDomain)
+                    collection(db, 'tasks'),
+                    where('assignedTo', '==', currentInternId)
                 );
                 const snapshot = await getDocs(q);
                 let html = '';
                 
                 if (snapshot.empty) {
-                    html = '<p>No lead intern assigned to your domain yet</p>';
+                    html = '<p>No tasks assigned yet</p>';
                 } else {
                     snapshot.forEach(doc => {
-                        const user = doc.data();
+                        const task = doc.data();
                         html += `
-                            <div class="user-item">
-                                <strong>${user.name}</strong><br>
-                                Email: ${user.email}<br>
-                                Domain: ${user.domain}
+                            <div class="task-item">
+                                <strong>${task.title}</strong><br>
+                                ${task.description}<br>
+                                <small>Due: ${task.dueDate || 'N/A'} | Status: ${task.status || 'pending'}</small>
                             </div>
                         `;
                     });
@@ -180,8 +216,64 @@
             }
         };
 
-        window.submitWork = () => {
-            alert('Work submission feature coming soon!');
+        window.openSubmitModal = async () => {
+            const select = document.getElementById('taskSelect');
+            select.innerHTML = '<option value="">Loading...</option>';
+            
+            try {
+                const q = query(
+                    collection(db, 'tasks'),
+                    where('assignedTo', '==', currentInternId)
+                );
+                const snapshot = await getDocs(q);
+                let html = '<option value="">Select a task</option>';
+                
+                snapshot.forEach(doc => {
+                    const task = doc.data();
+                    html += `<option value="${doc.id}">${task.title}</option>`;
+                });
+                
+                select.innerHTML = html;
+                document.getElementById('submitModal').style.display = 'block';
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        };
+
+        window.submitTask = async (e) => {
+            e.preventDefault();
+            const taskId = document.getElementById('taskSelect').value;
+            const notes = document.getElementById('submissionNotes').value;
+            const attachment = document.getElementById('attachmentUrl').value;
+
+            if (!taskId) {
+                alert('Please select a task');
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, 'submissions'), {
+                    taskId: taskId,
+                    submittedBy: currentInternId,
+                    notes: notes,
+                    attachment: attachment,
+                    status: 'pending_review',
+                    submittedAt: serverTimestamp()
+                });
+
+                document.getElementById('submitStatus').innerHTML = '<p style="color: green;">✅ Task submitted successfully!</p>';
+                closeModal('submit');
+                e.target.reset();
+                setTimeout(() => {
+                    document.getElementById('submitStatus').innerHTML = '';
+                }, 3000);
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        };
+
+        window.closeModal = (type) => {
+            document.getElementById(type + 'Modal').style.display = 'none';
         };
 
         window.viewResources = () => {
@@ -190,14 +282,6 @@
 
         window.viewTutorials = () => {
             alert('Tutorials feature coming soon!');
-        };
-
-        window.contactLead = () => {
-            alert('Contact lead feature coming soon!');
-        };
-
-        window.viewFeedback = () => {
-            alert('Feedback viewing feature coming soon!');
         };
 
         window.viewCertificates = () => {
