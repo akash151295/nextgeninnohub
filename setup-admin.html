@@ -2,10 +2,18 @@
 <html>
 <head>
     <title>Setup Admin</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .status { padding: 20px; border-radius: 10px; margin: 20px 0; }
+        .loading { background: #fff3cd; }
+        .success { background: #d4edda; }
+        .error { background: #f8d7da; }
+    </style>
 </head>
 <body>
-    <h1>Setting up admin...</h1>
-    <div id="status">Please wait...</div>
+    <h1>🔧 Admin Setup</h1>
+    <div id="status" class="status loading">Checking authentication...</div>
+    <div id="debug"></div>
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -24,9 +32,12 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const statusDiv = document.getElementById('status');
+        const debugDiv = document.getElementById('debug');
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
+                debugDiv.innerHTML = `<p>User found: ${user.email} (${user.uid})</p>`;
                 try {
                     await setDoc(doc(db, 'users', user.uid), {
                         email: user.email,
@@ -35,12 +46,16 @@
                         domain: null,
                         createdAt: new Date()
                     });
-                    document.getElementById('status').innerHTML = '✅ Admin setup complete! <a href="user-management.html">Go to User Management</a>';
+                    statusDiv.className = 'status success';
+                    statusDiv.innerHTML = '✅ Admin setup complete! <br><a href="user-management.html">Go to User Management</a>';
                 } catch (error) {
-                    document.getElementById('status').innerHTML = '❌ Error: ' + error.message;
+                    statusDiv.className = 'status error';
+                    statusDiv.innerHTML = '❌ Error: ' + error.message;
+                    debugDiv.innerHTML += `<p>Error: ${error}</p>`;
                 }
             } else {
-                document.getElementById('status').innerHTML = '❌ Please login first at <a href="portal-login.html">portal-login.html</a>';
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '❌ Not logged in. <br><a href="portal-login.html">Login first</a>';
             }
         });
     </script>
