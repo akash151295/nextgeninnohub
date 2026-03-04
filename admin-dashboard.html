@@ -269,11 +269,51 @@
         </div>
     </div>
 
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAFoXIPtkRJdTxcTcXQkDYDUxmzcoownWA",
+            authDomain: "nextgen-innohub.firebaseapp.com",
+            projectId: "nextgen-innohub",
+            storageBucket: "nextgen-innohub.firebasestorage.app",
+            messagingSenderId: "28087223200",
+            appId: "1:28087223200:web:f4885a48ac45fdccfc1ac5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'portal-login.html';
+                return;
+            }
+
+            try {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    if (userData.role !== 'admin') {
+                        window.location.href = 'portal-login.html';
+                        return;
+                    }
+                    document.getElementById('adminName').textContent = userData.name;
+                } else {
+                    window.location.href = 'portal-login.html';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                window.location.href = 'portal-login.html';
+            }
+        });
+    </script>
     <script src="db.js"></script>
     <script>
-        const user = JSON.parse(localStorage.getItem('currentUser'));
-        if (!user || user.role !== 'admin') window.location.href = 'portal-login.html';
-        document.getElementById('adminName').textContent = user.name;
+
 
         function openModal(type) { 
             const modal = document.getElementById(type + 'Modal');
@@ -559,8 +599,9 @@
         }
 
         function logout() {
-            localStorage.removeItem('currentUser');
-            window.location.href = 'portal-login.html';
+            auth.signOut().then(() => {
+                window.location.href = 'portal-login.html';
+            });
         }
 
         // User Manager Functions

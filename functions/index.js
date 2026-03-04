@@ -18,14 +18,28 @@ function generatePassword() {
 
 // Create new user (callable from frontend)
 exports.createUser = functions.https.onCall(async (data, context) => {
-    // Check if caller is authenticated and is admin
+    // Check if caller is authenticated
     if (!context.auth) {
         throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
     }
 
+    // Get or create caller's user document
+    let callerDoc = await admin.firestore().collection('users').doc(context.auth.uid).get();
+    
+    // If caller doesn't exist in Firestore, create as admin (first user)
+    if (!callerDoc.exists) {
+        await admin.firestore().collection('users').doc(context.auth.uid).set({
+            email: context.auth.token.email,
+            name: context.auth.token.name || 'Admin',
+            role: 'admin',
+            domain: null,
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+        callerDoc = await admin.firestore().collection('users').doc(context.auth.uid).get();
+    }
+
     // Verify caller is admin
-    const callerDoc = await admin.firestore().collection('users').doc(context.auth.uid).get();
-    if (!callerDoc.exists || callerDoc.data().role !== 'admin') {
+    if (callerDoc.data().role !== 'admin') {
         throw new functions.https.HttpsError('permission-denied', 'Only admins can create users');
     }
 
@@ -73,13 +87,28 @@ exports.createUser = functions.https.onCall(async (data, context) => {
 
 // Get all users (for admin dashboard)
 exports.getAllUsers = functions.https.onCall(async (data, context) => {
-    // Check if caller is authenticated and is admin
+    // Check if caller is authenticated
     if (!context.auth) {
         throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
     }
 
-    const callerDoc = await admin.firestore().collection('users').doc(context.auth.uid).get();
-    if (!callerDoc.exists || callerDoc.data().role !== 'admin') {
+    // Get or create caller's user document
+    let callerDoc = await admin.firestore().collection('users').doc(context.auth.uid).get();
+    
+    // If caller doesn't exist in Firestore, create as admin (first user)
+    if (!callerDoc.exists) {
+        await admin.firestore().collection('users').doc(context.auth.uid).set({
+            email: context.auth.token.email,
+            name: context.auth.token.name || 'Admin',
+            role: 'admin',
+            domain: null,
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+        callerDoc = await admin.firestore().collection('users').doc(context.auth.uid).get();
+    }
+
+    // Verify caller is admin
+    if (callerDoc.data().role !== 'admin') {
         throw new functions.https.HttpsError('permission-denied', 'Only admins can view all users');
     }
 
@@ -107,8 +136,23 @@ exports.deleteUser = functions.https.onCall(async (data, context) => {
         throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
     }
 
-    const callerDoc = await admin.firestore().collection('users').doc(context.auth.uid).get();
-    if (!callerDoc.exists || callerDoc.data().role !== 'admin') {
+    // Get or create caller's user document
+    let callerDoc = await admin.firestore().collection('users').doc(context.auth.uid).get();
+    
+    // If caller doesn't exist in Firestore, create as admin (first user)
+    if (!callerDoc.exists) {
+        await admin.firestore().collection('users').doc(context.auth.uid).set({
+            email: context.auth.token.email,
+            name: context.auth.token.name || 'Admin',
+            role: 'admin',
+            domain: null,
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+        callerDoc = await admin.firestore().collection('users').doc(context.auth.uid).get();
+    }
+
+    // Verify caller is admin
+    if (callerDoc.data().role !== 'admin') {
         throw new functions.https.HttpsError('permission-denied', 'Only admins can delete users');
     }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intern Dashboard - NextGen InnoHub</title>
+    <title>Lead Intern Dashboard - NextGen InnoHub</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #f5f7fa; }
@@ -18,55 +18,42 @@
         .btn { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 25px; border: none; border-radius: 8px; margin: 5px; font-weight: 600; cursor: pointer; }
         .btn:hover { transform: translateY(-2px); }
         .btn-secondary { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
-        .progress-bar { background: #e0e0e0; border-radius: 10px; height: 20px; margin: 10px 0; }
-        .progress-fill { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100%; border-radius: 10px; width: 0%; transition: width 0.3s; }
+        .user-list { margin-top: 20px; }
+        .user-item { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>🎓 Intern Dashboard</h1>
+        <h1>👨💼 Lead Intern Dashboard</h1>
         <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
 
     <div class="container">
         <div class="welcome">
-            <h2>Welcome, <span id="internName">Intern</span>! 👋</h2>
-            <p style="color: #64748b; margin-top: 10px;">Track your progress and complete tasks.</p>
-            <div style="margin-top: 15px;">
-                <strong>Domain:</strong> <span id="internDomain">-</span>
-            </div>
+            <h2>Welcome, <span id="leadName">Lead Intern</span>! 👋</h2>
+            <p style="color: #64748b; margin-top: 10px;">Manage your team and track progress.</p>
         </div>
 
         <div class="grid">
             <div class="card">
-                <h3>📋 My Tasks</h3>
-                <button class="btn" onclick="viewMyTasks()">📝 View Tasks</button>
-                <button class="btn btn-secondary" onclick="submitWork()">📤 Submit Work</button>
-                <div style="margin-top: 20px;">
-                    <h4>Progress Overview:</h4>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill" style="width: 65%;"></div>
-                    </div>
-                    <p style="text-align: center; margin-top: 5px;">65% Complete</p>
+                <h3>👥 My Team</h3>
+                <button class="btn" onclick="viewMyInterns()">📊 View My Interns</button>
+                <div id="myInterns" style="display: none;">
+                    <h4>My Interns:</h4>
+                    <div id="internsList">Loading...</div>
                 </div>
             </div>
 
             <div class="card">
-                <h3>📚 Learning Resources</h3>
-                <button class="btn" onclick="viewResources()">📖 View Resources</button>
-                <button class="btn btn-secondary" onclick="viewTutorials()">🎥 Tutorials</button>
+                <h3>📋 Task Management</h3>
+                <button class="btn" onclick="viewTasks()">📝 Assign Tasks</button>
+                <button class="btn btn-secondary" onclick="viewProgress()">📈 View Progress</button>
             </div>
 
             <div class="card">
-                <h3>💬 Communication</h3>
-                <button class="btn" onclick="contactLead()">👨💼 Contact Lead</button>
-                <button class="btn btn-secondary" onclick="viewFeedback()">📝 View Feedback</button>
-            </div>
-
-            <div class="card">
-                <h3>🏆 Achievements</h3>
-                <button class="btn" onclick="viewCertificates()">🎖️ My Certificates</button>
-                <button class="btn btn-secondary" onclick="viewBadges()">🏅 Badges Earned</button>
+                <h3>📊 Reports</h3>
+                <button class="btn" onclick="generateReport()">📄 Generate Report</button>
+                <button class="btn btn-secondary" onclick="viewAnalytics()">📈 View Analytics</button>
             </div>
         </div>
     </div>
@@ -74,7 +61,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, getDoc, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyAFoXIPtkRJdTxcTcXQkDYDUxmzcoownWA",
@@ -99,12 +86,11 @@
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
-                    if (userData.role !== 'intern') {
+                    if (userData.role !== 'employee') {
                         window.location.href = 'portal-login.html';
                         return;
                     }
-                    document.getElementById('internName').textContent = userData.name;
-                    document.getElementById('internDomain').textContent = userData.domain || 'Not assigned';
+                    document.getElementById('leadName').textContent = userData.name;
                 } else {
                     window.location.href = 'portal-login.html';
                 }
@@ -114,36 +100,60 @@
             }
         });
 
-        window.viewMyTasks = function() {
-            alert('Task viewing feature coming soon!');
+        window.viewMyInterns = async function() {
+            const internsDiv = document.getElementById('myInterns');
+            const internsList = document.getElementById('internsList');
+            
+            try {
+                const user = auth.currentUser;
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                const userData = userDoc.data();
+                
+                // Get interns in the same domain
+                const internsQuery = query(
+                    collection(db, 'users'), 
+                    where('role', '==', 'intern'),
+                    where('domain', '==', userData.domain)
+                );
+                const internsSnapshot = await getDocs(internsQuery);
+                
+                if (internsSnapshot.empty) {
+                    internsList.innerHTML = '<p>No interns assigned to your domain yet.</p>';
+                } else {
+                    let html = '';
+                    internsSnapshot.forEach(doc => {
+                        const intern = doc.data();
+                        html += `
+                            <div class="user-item">
+                                <strong>${intern.name}</strong> (${intern.email})<br>
+                                Domain: ${intern.domain}
+                            </div>
+                        `;
+                    });
+                    internsList.innerHTML = html;
+                }
+                
+                internsDiv.style.display = 'block';
+            } catch (error) {
+                internsList.innerHTML = 'Error loading interns: ' + error.message;
+                internsDiv.style.display = 'block';
+            }
         };
 
-        window.submitWork = function() {
-            alert('Work submission feature coming soon!');
+        window.viewTasks = function() {
+            alert('Task assignment feature coming soon!');
         };
 
-        window.viewResources = function() {
-            alert('Learning resources feature coming soon!');
+        window.viewProgress = function() {
+            alert('Progress tracking feature coming soon!');
         };
 
-        window.viewTutorials = function() {
-            alert('Tutorials feature coming soon!');
+        window.generateReport = function() {
+            alert('Report generation feature coming soon!');
         };
 
-        window.contactLead = function() {
-            alert('Contact lead feature coming soon!');
-        };
-
-        window.viewFeedback = function() {
-            alert('Feedback viewing feature coming soon!');
-        };
-
-        window.viewCertificates = function() {
-            alert('Certificates feature coming soon!');
-        };
-
-        window.viewBadges = function() {
-            alert('Badges feature coming soon!');
+        window.viewAnalytics = function() {
+            alert('Analytics feature coming soon!');
         };
 
         window.logout = function() {

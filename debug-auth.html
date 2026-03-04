@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .info { background: #e3f2fd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #ffebee; padding: 15px; margin: 10px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Authentication Debug</h1>
+    <div id="status">Checking...</div>
+    <div id="userInfo"></div>
+    <div id="testResult"></div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAFoXIPtkRJdTxcTcXQkDYDUxmzcoownWA",
+            authDomain: "nextgen-innohub.firebaseapp.com",
+            projectId: "nextgen-innohub",
+            storageBucket: "nextgen-innohub.firebasestorage.app",
+            messagingSenderId: "28087223200",
+            appId: "1:28087223200:web:f4885a48ac45fdccfc1ac5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const functions = getFunctions(app);
+
+        onAuthStateChanged(auth, async (user) => {
+            const statusDiv = document.getElementById('status');
+            const userDiv = document.getElementById('userInfo');
+            const testDiv = document.getElementById('testResult');
+
+            if (user) {
+                statusDiv.innerHTML = '<div class="info">✅ User is authenticated!</div>';
+                userDiv.innerHTML = `
+                    <div class="info">
+                        <h3>User Details:</h3>
+                        <p><strong>Email:</strong> ${user.email}</p>
+                        <p><strong>UID:</strong> ${user.uid}</p>
+                        <p><strong>Display Name:</strong> ${user.displayName || 'Not set'}</p>
+                    </div>
+                `;
+
+                // Test Cloud Function
+                try {
+                    testDiv.innerHTML = '<div class="info">Testing Cloud Function...</div>';
+                    const getAllUsers = httpsCallable(functions, 'getAllUsers');
+                    const result = await getAllUsers();
+                    testDiv.innerHTML = '<div class="info">✅ Cloud Function works! Found ' + result.data.users.length + ' users.</div>';
+                } catch (error) {
+                    testDiv.innerHTML = '<div class="error">❌ Cloud Function Error: ' + error.message + '</div>';
+                    console.error('Function error:', error);
+                }
+            } else {
+                statusDiv.innerHTML = '<div class="error">❌ User is NOT authenticated</div>';
+                userDiv.innerHTML = '<div class="error">Please <a href="portal-login.html">login first</a></div>';
+            }
+        });
+    </script>
+</body>
+</html>
