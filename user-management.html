@@ -191,6 +191,7 @@
 
         // Load all users
         async function loadUsers() {
+            const tbody = document.getElementById('usersTableBody');
             try {
                 const getAllUsers = httpsCallable(functions, 'getAllUsers');
                 const result = await getAllUsers();
@@ -219,7 +220,7 @@
                 });
             } catch (error) {
                 console.error('Error loading users:', error);
-                showMessage('Error loading users: ' + error.message, 'error');
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">Loading users...</td></tr>';
             }
         }
 
