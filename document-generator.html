@@ -73,8 +73,9 @@
         
         @media print {
             body { background: white; }
-            .form-section, .action-buttons, .tabs { display: none; }
-            .document-preview { box-shadow: none; border: none; }
+            .form-section, .action-buttons, .tabs, .header, .preview-section h2 { display: none; }
+            .main-grid { grid-template-columns: 1fr; }
+            .document-preview { box-shadow: none; border: none; background: white; }
         }
     </style>
 </head>
@@ -235,7 +236,6 @@
 
             <!-- Preview Section -->
             <div class="preview-section">
-                <h2>Document Preview</h2>
                 <div class="document-preview" id="documentPreview">
                     <div style="text-align: center; color: #9ca3af; padding: 100px 20px;">
                         <p style="font-size: 1.2em;">Fill in the form and click "Generate" to preview the document here</p>
@@ -523,11 +523,12 @@
         function downloadDocument() {
             const element = document.getElementById('documentPreview');
             const opt = {
-                margin: 10,
+                margin: [10, 10, 10, 10],
                 filename: 'document.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
             html2pdf().set(opt).from(element).save();
         }
