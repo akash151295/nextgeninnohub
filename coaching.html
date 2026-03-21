@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motivation & Discipline Coaching - NextGen InnoHub</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f5f7fa; color: #333; }
+
+        /* NAV */
+        nav { background: white; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        nav .logo { font-size: 1.4em; font-weight: 700; color: #667eea; }
+        nav .nav-links a { margin-left: 20px; text-decoration: none; color: #333; font-weight: 500; }
+        nav .nav-links a:hover { color: #667eea; }
+        .btn { display: inline-block; padding: 12px 28px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; text-decoration: none; }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102,126,234,0.4); }
+        .btn-outline { border: 2px solid #667eea; color: #667eea; background: transparent; }
+        .btn-outline:hover { background: #667eea; color: white; }
+
+        /* HERO */
+        .hero { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 100px 40px; text-align: center; }
+        .hero h1 { font-size: 3em; margin-bottom: 20px; }
+        .hero p { font-size: 1.2em; max-width: 600px; margin: 0 auto 40px; opacity: 0.9; }
+        .hero-btns { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+
+        /* SECTION */
+        section { padding: 80px 40px; }
+        .section-title { text-align: center; font-size: 2em; margin-bottom: 10px; color: #333; }
+        .section-sub { text-align: center; color: #64748b; margin-bottom: 50px; font-size: 1.1em; }
+
+        /* SERVICES */
+        .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; }
+        .service-card { background: white; border-radius: 20px; padding: 35px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); transition: transform 0.3s; }
+        .service-card:hover { transform: translateY(-5px); }
+        .service-icon { font-size: 3em; margin-bottom: 20px; }
+        .service-card h3 { font-size: 1.4em; margin-bottom: 15px; color: #333; }
+        .service-card p { color: #64748b; line-height: 1.7; margin-bottom: 20px; }
+        .benefits { list-style: none; margin-bottom: 25px; }
+        .benefits li { padding: 6px 0; color: #64748b; }
+        .benefits li::before { content: "✅ "; }
+        .audience-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px; }
+        .tag { background: #f0f4ff; color: #667eea; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 500; }
+
+        /* PRICING */
+        .pricing-section { background: #f8f9ff; }
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; max-width: 1100px; margin: 0 auto; }
+        .pricing-card { background: white; border-radius: 20px; padding: 35px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); text-align: center; position: relative; }
+        .pricing-card.featured { border: 3px solid #667eea; }
+        .featured-badge { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: #667eea; color: white; padding: 5px 20px; border-radius: 20px; font-size: 0.85em; font-weight: 600; }
+        .price { font-size: 2.5em; font-weight: 700; color: #667eea; margin: 20px 0 5px; }
+        .price span { font-size: 0.4em; color: #64748b; }
+        .pricing-card h3 { font-size: 1.3em; color: #333; }
+        .pricing-features { list-style: none; margin: 20px 0 30px; text-align: left; }
+        .pricing-features li { padding: 8px 0; border-bottom: 1px solid #f0f0f0; color: #64748b; }
+        .pricing-features li::before { content: "✓ "; color: #667eea; font-weight: 700; }
+        .dynamic-pricing { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 15px; padding: 25px; margin-top: 40px; max-width: 700px; margin-left: auto; margin-right: auto; }
+        .dynamic-pricing h4 { font-size: 1.3em; margin-bottom: 15px; }
+        .pricing-example { background: rgba(255,255,255,0.15); border-radius: 10px; padding: 15px; margin: 10px 0; }
+
+        /* HOW IT WORKS */
+        .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; max-width: 1000px; margin: 0 auto; }
+        .step { text-align: center; }
+        .step-num { width: 60px; height: 60px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5em; font-weight: 700; margin: 0 auto 20px; }
+        .step h4 { font-size: 1.1em; margin-bottom: 10px; }
+        .step p { color: #64748b; font-size: 0.95em; }
+
+        /* TESTIMONIALS */
+        .testimonials-section { background: #f8f9ff; }
+        .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; max-width: 1100px; margin: 0 auto; }
+        .testimonial-card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 3px 15px rgba(0,0,0,0.07); }
+        .stars { color: #f59e0b; font-size: 1.2em; margin-bottom: 15px; }
+        .testimonial-card p { color: #64748b; line-height: 1.7; margin-bottom: 20px; font-style: italic; }
+        .reviewer { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
+        .reviewer-info strong { display: block; }
+        .reviewer-info span { color: #64748b; font-size: 0.9em; }
+
+        /* GAMIFICATION */
+        .badges-grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; max-width: 800px; margin: 0 auto; }
+        .badge { text-align: center; background: white; border-radius: 15px; padding: 20px; box-shadow: 0 3px 15px rgba(0,0,0,0.07); width: 140px; }
+        .badge-icon { font-size: 2.5em; margin-bottom: 10px; }
+        .badge h4 { font-size: 0.9em; color: #333; }
+        .badge p { font-size: 0.8em; color: #64748b; }
+
+        /* CTA */
+        .cta-section { background: linear-gradient(135deg, #667eea, #764ba2); color: white; text-align: center; padding: 80px 40px; }
+        .cta-section h2 { font-size: 2.5em; margin-bottom: 20px; }
+        .cta-section p { font-size: 1.1em; opacity: 0.9; margin-bottom: 40px; }
+        .btn-white { background: white; color: #667eea; }
+        .btn-white:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+        /* FOOTER */
+        footer { background: #1a1a2e; color: #aaa; text-align: center; padding: 30px; }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2em; }
+            section { padding: 50px 20px; }
+            nav { padding: 15px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">🚀 NextGen InnoHub</div>
+    <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="#services">Services</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#testimonials">Reviews</a>
+        <a href="coaching-onboarding.html" class="btn btn-primary" style="padding: 8px 20px;">Get Started</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+    <h1>🔥 Transform Your Life with Expert Coaching</h1>
+    <p>Motivation, Discipline & Fitness Coaching designed for students, freshers, and professionals ready to level up.</p>
+    <div class="hero-btns">
+        <a href="coaching-onboarding.html" class="btn btn-white">Start Your Journey</a>
+        <a href="#services" class="btn btn-outline" style="border-color: white; color: white;">Explore Services</a>
+    </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+    <h2 class="section-title">Our Coaching Services</h2>
+    <p class="section-sub">Choose the coaching that fits your goals</p>
+    <div class="services-grid">
+
+        <div class="service-card">
+            <div class="service-icon">🧠</div>
+            <h3>Motivation Coach</h3>
+            <p>Break through mental blocks, build unstoppable confidence, and stay driven toward your goals every single day.</p>
+            <ul class="benefits">
+                <li>Daily mindset sessions</li>
+                <li>Goal setting & tracking</li>
+                <li>Accountability check-ins</li>
+                <li>Personalized action plans</li>
+                <li>Weekly progress reviews</li>
+            </ul>
+            <div class="audience-tags">
+                <span class="tag">Students</span>
+                <span class="tag">Freshers</span>
+                <span class="tag">Professionals</span>
+            </div>
+            <a href="coaching-onboarding.html?type=motivation" class="btn btn-primary">Get a Motivation Coach</a>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon">⚡</div>
+            <h3>Discipline Coach</h3>
+            <p>Build iron-clad habits, eliminate procrastination, and create a structured routine that drives consistent results.</p>
+            <ul class="benefits">
+                <li>Habit building system</li>
+                <li>Strict daily routines</li>
+                <li>Procrastination elimination</li>
+                <li>Time management mastery</li>
+                <li>Daily task accountability</li>
+            </ul>
+            <div class="audience-tags">
+                <span class="tag">Students</span>
+                <span class="tag">Freshers</span>
+                <span class="tag">Professionals</span>
+            </div>
+            <a href="coaching-onboarding.html?type=discipline" class="btn btn-primary">Get a Discipline Coach</a>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon">💪</div>
+            <h3>Fitness Coach</h3>
+            <p>Transform your body with personalized fitness plans, nutrition guidance, and our unique "Pay as you lose weight" model.</p>
+            <ul class="benefits">
+                <li>Personalized workout plans</li>
+                <li>Nutrition & diet guidance</li>
+                <li>Daily fitness tracking</li>
+                <li>Body transformation support</li>
+                <li>Pay only for real results</li>
+            </ul>
+            <div class="audience-tags">
+                <span class="tag">Students</span>
+                <span class="tag">Freshers</span>
+                <span class="tag">Professionals</span>
+            </div>
+            <a href="coaching-onboarding.html?type=fitness" class="btn btn-primary">Get a Fitness Coach</a>
+        </div>
+
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section style="background: white;">
+    <h2 class="section-title">How It Works</h2>
+    <p class="section-sub">Simple 4-step process to start your transformation</p>
+    <div class="steps">
+        <div class="step">
+            <div class="step-num">1</div>
+            <h4>Choose Your Coach</h4>
+            <p>Select Motivation, Discipline, or Fitness coaching based on your goals.</p>
+        </div>
+        <div class="step">
+            <div class="step-num">2</div>
+            <h4>Fill Onboarding Form</h4>
+            <p>Share your goals, current status, habits, and what you want to achieve.</p>
+        </div>
+        <div class="step">
+            <div class="step-num">3</div>
+            <h4>Get Assigned a Coach</h4>
+            <p>We match you with the perfect coach based on your profile and goals.</p>
+        </div>
+        <div class="step">
+            <div class="step-num">4</div>
+            <h4>Track Your Progress</h4>
+            <p>Daily tasks, streaks, reports, and accountability to keep you on track.</p>
+        </div>
+    </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="pricing-section">
+    <h2 class="section-title">Transparent Pricing</h2>
+    <p class="section-sub">Flexible plans designed for every budget</p>
+    <div class="pricing-grid">
+
+        <div class="pricing-card">
+            <h3>Motivation Coaching</h3>
+            <div class="price">₹1,999<span>/month</span></div>
+            <ul class="pricing-features">
+                <li>Daily motivation sessions</li>
+                <li>Goal tracking dashboard</li>
+                <li>Weekly 1:1 calls</li>
+                <li>Accountability partner</li>
+                <li>Progress reports</li>
+            </ul>
+            <a href="coaching-onboarding.html?type=motivation" class="btn btn-outline" style="width: 100%; text-align: center;">Get Started</a>
+        </div>
+
+        <div class="pricing-card featured">
+            <div class="featured-badge">Most Popular</div>
+            <h3>Discipline Coaching</h3>
+            <div class="price">₹2,499<span>/month</span></div>
+            <ul class="pricing-features">
+                <li>Daily habit tracking</li>
+                <li>Strict routine building</li>
+                <li>Daily check-in calls</li>
+                <li>Task management system</li>
+                <li>Weekly performance review</li>
+                <li>Priority coach access</li>
+            </ul>
+            <a href="coaching-onboarding.html?type=discipline" class="btn btn-primary" style="width: 100%; text-align: center;">Get Started</a>
+        </div>
+
+        <div class="pricing-card">
+            <h3>Fitness Coaching</h3>
+            <div class="price">Pay as<span> you lose</span></div>
+            <ul class="pricing-features">
+                <li>₹500 base/month</li>
+                <li>+ ₹200 per kg lost</li>
+                <li>Personalized workout plan</li>
+                <li>Nutrition guidance</li>
+                <li>Daily fitness tracking</li>
+                <li>Body transformation report</li>
+            </ul>
+            <a href="coaching-onboarding.html?type=fitness" class="btn btn-outline" style="width: 100%; text-align: center;">Get Started</a>
+        </div>
+
+    </div>
+
+    <!-- Dynamic Pricing Example -->
+    <div class="dynamic-pricing">
+        <h4>💡 How "Pay as you lose weight" works:</h4>
+        <div class="pricing-example">
+            <strong>Example 1:</strong> Lost 3 kg in a month → ₹500 + (3 × ₹200) = <strong>₹1,100</strong>
+        </div>
+        <div class="pricing-example">
+            <strong>Example 2:</strong> Lost 5 kg in a month → ₹500 + (5 × ₹200) = <strong>₹1,500</strong>
+        </div>
+        <div class="pricing-example">
+            <strong>Example 3:</strong> Lost 0 kg → Only ₹500 base fee (we keep coaching you!)
+        </div>
+        <p style="margin-top: 15px; opacity: 0.85; font-size: 0.9em;">* Weight verified monthly via submitted photos/reports. Max cap: ₹3,000/month.</p>
+    </div>
+</section>
+
+<!-- GAMIFICATION -->
+<section style="background: white;">
+    <h2 class="section-title">🏆 Earn Badges & Rewards</h2>
+    <p class="section-sub">Stay motivated with our gamification system</p>
+    <div class="badges-grid">
+        <div class="badge">
+            <div class="badge-icon">🔥</div>
+            <h4>7-Day Streak</h4>
+            <p>Complete tasks 7 days in a row</p>
+        </div>
+        <div class="badge">
+            <div class="badge-icon">⚡</div>
+            <h4>Discipline King</h4>
+            <p>30 days of perfect routine</p>
+        </div>
+        <div class="badge">
+            <div class="badge-icon">💪</div>
+            <h4>First 5kg</h4>
+            <p>Lose your first 5kg</p>
+        </div>
+        <div class="badge">
+            <div class="badge-icon">🎯</div>
+            <h4>Goal Crusher</h4>
+            <p>Complete all monthly goals</p>
+        </div>
+        <div class="badge">
+            <div class="badge-icon">🌟</div>
+            <h4>Top Performer</h4>
+            <p>Ranked #1 in your batch</p>
+        </div>
+        <div class="badge">
+            <div class="badge-icon">🏅</div>
+            <h4>100 Day Club</h4>
+            <p>100 consecutive active days</p>
+        </div>
+    </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials" class="testimonials-section">
+    <h2 class="section-title">What Our Users Say</h2>
+    <p class="section-sub">Real results from real people</p>
+    <div class="testimonials-grid">
+        <div class="testimonial-card">
+            <div class="stars">★★★★★</div>
+            <p>"The discipline coaching completely changed my life. I went from procrastinating every day to completing all my tasks on time. My productivity tripled in just 30 days!"</p>
+            <div class="reviewer">
+                <div class="avatar">R</div>
+                <div class="reviewer-info">
+                    <strong>Rahul Sharma</strong>
+                    <span>Software Engineer, Fresher</span>
+                </div>
+            </div>
+        </div>
+        <div class="testimonial-card">
+            <div class="stars">★★★★★</div>
+            <p>"Lost 8kg in 2 months with the fitness coaching! The pay-as-you-lose model kept me super motivated. My coach was always available and the daily tracking really works."</p>
+            <div class="reviewer">
+                <div class="avatar">P</div>
+                <div class="reviewer-info">
+                    <strong>Priya Patel</strong>
+                    <span>College Student</span>
+                </div>
+            </div>
+        </div>
+        <div class="testimonial-card">
+            <div class="stars">★★★★★</div>
+            <p>"The motivation coaching helped me crack my placement interviews. My coach helped me stay focused and confident throughout the preparation. Highly recommend!"</p>
+            <div class="reviewer">
+                <div class="avatar">A</div>
+                <div class="reviewer-info">
+                    <strong>Arjun Mehta</strong>
+                    <span>Final Year Student</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+    <h2>Ready to Transform Your Life?</h2>
+    <p>Join 500+ people already on their transformation journey</p>
+    <a href="coaching-onboarding.html" class="btn btn-white btn-primary">Start Your Free Consultation</a>
+</section>
+
+<footer>
+    <p>© 2024 NextGen InnoHub. All rights reserved. | <a href="index.html" style="color: #667eea;">Home</a></p>
+</footer>
+
+</body>
+</html>

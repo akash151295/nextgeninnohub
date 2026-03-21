@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coaching Onboarding - NextGen InnoHub</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 40px 20px; }
+        .container { max-width: 700px; margin: 0 auto; background: white; border-radius: 20px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+        h1 { color: #667eea; font-size: 1.8em; margin-bottom: 8px; }
+        .subtitle { color: #64748b; margin-bottom: 30px; }
+        .progress-bar { background: #e0e0e0; border-radius: 10px; height: 8px; margin-bottom: 30px; }
+        .progress-fill { background: linear-gradient(135deg, #667eea, #764ba2); height: 100%; border-radius: 10px; transition: width 0.3s; }
+        .step { display: none; }
+        .step.active { display: block; }
+        .step h3 { font-size: 1.2em; color: #333; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f0f0f0; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; color: #333; margin-bottom: 8px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em; transition: border-color 0.3s; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #667eea; }
+        .radio-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+        .radio-option { border: 2px solid #e0e0e0; border-radius: 10px; padding: 15px; cursor: pointer; text-align: center; transition: all 0.3s; }
+        .radio-option:hover { border-color: #667eea; background: #f0f4ff; }
+        .radio-option.selected { border-color: #667eea; background: #f0f4ff; color: #667eea; font-weight: 600; }
+        .radio-option input { display: none; }
+        .radio-option .icon { font-size: 2em; display: block; margin-bottom: 8px; }
+        .btn { padding: 14px 30px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; font-size: 1em; }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; width: 100%; margin-top: 10px; }
+        .btn-back { background: #f0f0f0; color: #333; margin-right: 10px; }
+        .btn-row { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-row .btn-primary { flex: 1; margin-top: 0; }
+        .success-screen { display: none; text-align: center; padding: 40px 0; }
+        .success-screen .icon { font-size: 4em; margin-bottom: 20px; }
+        .success-screen h2 { color: #667eea; margin-bottom: 15px; }
+        .success-screen p { color: #64748b; margin-bottom: 30px; line-height: 1.7; }
+        .step-indicator { display: flex; justify-content: center; gap: 8px; margin-bottom: 30px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #e0e0e0; }
+        .dot.active { background: #667eea; }
+        .dot.done { background: #10b981; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🚀 Start Your Coaching Journey</h1>
+    <p class="subtitle">Fill in your details and we'll match you with the perfect coach</p>
+
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 25%;"></div>
+    </div>
+
+    <div class="step-indicator">
+        <div class="dot active" id="dot1"></div>
+        <div class="dot" id="dot2"></div>
+        <div class="dot" id="dot3"></div>
+        <div class="dot" id="dot4"></div>
+    </div>
+
+    <!-- Step 1: Coach Type -->
+    <div class="step active" id="step1">
+        <h3>Step 1: Choose Your Coaching Type</h3>
+        <div class="form-group">
+            <div class="radio-group">
+                <label class="radio-option" id="opt-motivation">
+                    <span class="icon">🧠</span>
+                    Motivation Coach
+                    <input type="radio" name="coachType" value="motivation">
+                </label>
+                <label class="radio-option" id="opt-discipline">
+                    <span class="icon">⚡</span>
+                    Discipline Coach
+                    <input type="radio" name="coachType" value="discipline">
+                </label>
+                <label class="radio-option" id="opt-fitness">
+                    <span class="icon">💪</span>
+                    Fitness Coach
+                    <input type="radio" name="coachType" value="fitness">
+                </label>
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="nextStep(1)">Continue →</button>
+    </div>
+
+    <!-- Step 2: Personal Info -->
+    <div class="step" id="step2">
+        <h3>Step 2: Personal Information</h3>
+        <div class="form-group">
+            <label>Full Name *</label>
+            <input type="text" id="fullName" placeholder="Your full name" required>
+        </div>
+        <div class="form-group">
+            <label>Email *</label>
+            <input type="email" id="email" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+            <label>Phone *</label>
+            <input type="tel" id="phone" placeholder="+91 XXXXX XXXXX" required>
+        </div>
+        <div class="form-group">
+            <label>Age</label>
+            <input type="number" id="age" placeholder="Your age" min="15" max="60">
+        </div>
+        <div class="form-group">
+            <label>I am a...</label>
+            <select id="userType">
+                <option value="">Select your profile</option>
+                <option value="student">Student</option>
+                <option value="fresher">Fresher (0-1 year experience)</option>
+                <option value="professional">Working Professional</option>
+            </select>
+        </div>
+        <div class="btn-row">
+            <button class="btn btn-back" onclick="prevStep(2)">← Back</button>
+            <button class="btn btn-primary" onclick="nextStep(2)">Continue →</button>
+        </div>
+    </div>
+
+    <!-- Step 3: Goals & Current Status -->
+    <div class="step" id="step3">
+        <h3>Step 3: Your Goals & Current Status</h3>
+        <div class="form-group">
+            <label>What is your main goal? *</label>
+            <textarea id="mainGoal" rows="3" placeholder="e.g., I want to build a consistent study routine and crack my placement exams..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>Current challenges you face</label>
+            <textarea id="challenges" rows="3" placeholder="e.g., I procrastinate a lot, can't wake up early, no motivation..."></textarea>
+        </div>
+        <div class="form-group" id="fitnessFields" style="display:none;">
+            <label>Current Weight (kg)</label>
+            <input type="number" id="currentWeight" placeholder="e.g., 80">
+            <label style="margin-top: 15px;">Target Weight (kg)</label>
+            <input type="number" id="targetWeight" placeholder="e.g., 70">
+        </div>
+        <div class="form-group">
+            <label>How many hours per day can you dedicate?</label>
+            <select id="hoursPerDay">
+                <option value="1">1 hour</option>
+                <option value="2">2 hours</option>
+                <option value="3">3+ hours</option>
+            </select>
+        </div>
+        <div class="btn-row">
+            <button class="btn btn-back" onclick="prevStep(3)">← Back</button>
+            <button class="btn btn-primary" onclick="nextStep(3)">Continue →</button>
+        </div>
+    </div>
+
+    <!-- Step 4: Habits & Preferences -->
+    <div class="step" id="step4">
+        <h3>Step 4: Habits & Preferences</h3>
+        <div class="form-group">
+            <label>Current daily habits (good or bad)</label>
+            <textarea id="habits" rows="3" placeholder="e.g., I wake up at 10am, scroll phone for 2 hours, skip gym..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>Preferred coaching style</label>
+            <select id="coachingStyle">
+                <option value="strict">Strict & Structured</option>
+                <option value="flexible">Flexible & Supportive</option>
+                <option value="balanced">Balanced</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Best time for daily check-in</label>
+            <select id="checkInTime">
+                <option value="morning">Morning (6am - 9am)</option>
+                <option value="afternoon">Afternoon (12pm - 3pm)</option>
+                <option value="evening">Evening (6pm - 9pm)</option>
+                <option value="night">Night (9pm - 11pm)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Anything else you want your coach to know?</label>
+            <textarea id="additionalInfo" rows="3" placeholder="Any medical conditions, special requirements, or additional context..."></textarea>
+        </div>
+        <div class="btn-row">
+            <button class="btn btn-back" onclick="prevStep(4)">← Back</button>
+            <button class="btn btn-primary" onclick="submitForm()">Submit & Get Matched 🎯</button>
+        </div>
+    </div>
+
+    <!-- Success Screen -->
+    <div class="success-screen" id="successScreen">
+        <div class="icon">🎉</div>
+        <h2>You're All Set!</h2>
+        <p>Your onboarding form has been submitted successfully. Our team will review your profile and assign you the perfect coach within <strong>24 hours</strong>.<br><br>You'll receive a confirmation email with your coach's details and next steps.</p>
+        <a href="coaching.html" style="display: inline-block; background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 14px 30px; border-radius: 8px; text-decoration: none; font-weight: 600;">← Back to Coaching</a>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAFoXIPtkRJdTxcTcXQkDYDUxmzcoownWA",
+        authDomain: "nextgen-innohub.firebaseapp.com",
+        projectId: "nextgen-innohub",
+        storageBucket: "nextgen-innohub.firebasestorage.app",
+        messagingSenderId: "28087223200",
+        appId: "1:28087223200:web:f4885a48ac45fdccfc1ac5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    window.db = db;
+
+    // Pre-select coach type from URL param
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get('type');
+    if (type) {
+        const opt = document.getElementById('opt-' + type);
+        if (opt) {
+            opt.classList.add('selected');
+            opt.querySelector('input').checked = true;
+        }
+    }
+
+    // Radio option selection
+    document.querySelectorAll('.radio-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+            document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+            opt.querySelector('input').checked = true;
+            const val = opt.querySelector('input').value;
+            document.getElementById('fitnessFields').style.display = val === 'fitness' ? 'block' : 'none';
+        });
+    });
+
+    let currentStep = 1;
+
+    window.nextStep = (step) => {
+        if (step === 1) {
+            const selected = document.querySelector('input[name="coachType"]:checked');
+            if (!selected) { alert('Please select a coaching type'); return; }
+        }
+        if (step === 2) {
+            if (!document.getElementById('fullName').value || !document.getElementById('email').value || !document.getElementById('phone').value) {
+                alert('Please fill all required fields');
+                return;
+            }
+        }
+        if (step === 3) {
+            if (!document.getElementById('mainGoal').value) {
+                alert('Please describe your main goal');
+                return;
+            }
+        }
+
+        document.getElementById('step' + step).classList.remove('active');
+        document.getElementById('step' + (step + 1)).classList.add('active');
+        document.getElementById('dot' + step).classList.remove('active');
+        document.getElementById('dot' + step).classList.add('done');
+        document.getElementById('dot' + (step + 1)).classList.add('active');
+        document.getElementById('progressFill').style.width = ((step + 1) * 25) + '%';
+        currentStep = step + 1;
+    };
+
+    window.prevStep = (step) => {
+        document.getElementById('step' + step).classList.remove('active');
+        document.getElementById('step' + (step - 1)).classList.add('active');
+        document.getElementById('dot' + step).classList.remove('active');
+        document.getElementById('dot' + (step - 1)).classList.remove('done');
+        document.getElementById('dot' + (step - 1)).classList.add('active');
+        document.getElementById('progressFill').style.width = ((step - 1) * 25) + '%';
+        currentStep = step - 1;
+    };
+
+    window.submitForm = async () => {
+        try {
+            await addDoc(collection(db, 'coaching_applications'), {
+                coachType: document.querySelector('input[name="coachType"]:checked')?.value,
+                name: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                age: document.getElementById('age').value,
+                userType: document.getElementById('userType').value,
+                mainGoal: document.getElementById('mainGoal').value,
+                challenges: document.getElementById('challenges').value,
+                currentWeight: document.getElementById('currentWeight').value || null,
+                targetWeight: document.getElementById('targetWeight').value || null,
+                hoursPerDay: document.getElementById('hoursPerDay').value,
+                habits: document.getElementById('habits').value,
+                coachingStyle: document.getElementById('coachingStyle').value,
+                checkInTime: document.getElementById('checkInTime').value,
+                additionalInfo: document.getElementById('additionalInfo').value,
+                status: 'pending',
+                createdAt: serverTimestamp()
+            });
+
+            document.getElementById('step4').classList.remove('active');
+            document.getElementById('successScreen').style.display = 'block';
+        } catch (error) {
+            alert('Error submitting form: ' + error.message);
+        }
+    };
+</script>
+</body>
+</html>

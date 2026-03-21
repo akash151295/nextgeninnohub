@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coach Dashboard - NextGen InnoHub</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f5f7fa; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 1.5em; }
+        .logout-btn { background: rgba(255,255,255,0.2); color: white; padding: 8px 18px; border: none; border-radius: 20px; cursor: pointer; }
+        .container { max-width: 1300px; margin: 30px auto; padding: 0 20px; }
+        .welcome { background: white; padding: 25px 30px; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .welcome h2 { color: #333; }
+        .welcome p { color: #64748b; margin-top: 5px; }
+        .badge { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.9em; font-weight: 600; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); text-align: center; }
+        .stat-card .num { font-size: 2em; font-weight: 700; color: #667eea; }
+        .stat-card .label { color: #64748b; font-size: 0.9em; margin-top: 5px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 25px; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .card h3 { color: #667eea; margin-bottom: 15px; font-size: 1.1em; display: flex; justify-content: space-between; align-items: center; }
+        .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; font-size: 0.9em; }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-sm { padding: 6px 14px; font-size: 0.85em; }
+        .btn-green { background: #10b981; color: white; }
+        .btn-red { background: #ef4444; color: white; }
+        .user-item { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .user-info strong { display: block; color: #333; }
+        .user-info span { color: #64748b; font-size: 0.85em; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8em; font-weight: 600; }
+        .status-active { background: #d1fae5; color: #065f46; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .loading { color: #667eea; font-style: italic; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto; }
+        .modal-content { background: white; margin: 40px auto; padding: 30px; border-radius: 15px; max-width: 500px; }
+        .close { float: right; font-size: 24px; cursor: pointer; color: #64748b; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.95em; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #667eea; }
+        .task-item { background: #f8f9fa; padding: 12px 15px; margin: 8px 0; border-radius: 8px; border-left: 4px solid #667eea; }
+        .task-item strong { display: block; color: #333; }
+        .task-item span { color: #64748b; font-size: 0.85em; }
+        .earnings-box { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 12px; padding: 20px; text-align: center; }
+        .earnings-box .amount { font-size: 2.5em; font-weight: 700; }
+        .earnings-box p { opacity: 0.85; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>🎯 Coach Dashboard</h1>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+</div>
+
+<div class="container">
+    <div class="welcome">
+        <div>
+            <h2>Welcome, <span id="coachName">Coach</span>! 👋</h2>
+            <p>Manage your users, assign tasks, and track progress.</p>
+        </div>
+        <span class="badge" id="coachTypeBadge">Coach</span>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <div class="num" id="totalUsers">0</div>
+            <div class="label">Assigned Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="num" id="activeTasks">0</div>
+            <div class="label">Active Tasks</div>
+        </div>
+        <div class="stat-card">
+            <div class="num" id="completedTasks">0</div>
+            <div class="label">Completed Tasks</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">₹5,000</div>
+            <div class="label">Monthly Earnings</div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h3>👥 My Users <button class="btn btn-primary btn-sm" onclick="loadMyUsers()">🔄 Refresh</button></h3>
+            <div id="myUsersList"><p class="loading">Click refresh to load...</p></div>
+        </div>
+
+        <div class="card">
+            <h3>📋 Tasks <button class="btn btn-primary btn-sm" onclick="openAddTaskModal()">➕ Add Task</button></h3>
+            <button class="btn btn-primary" style="margin-bottom: 15px; width: 100%;" onclick="loadMyTasks()">🔄 Refresh Tasks</button>
+            <div id="myTasksList"><p class="loading">Click refresh to load...</p></div>
+        </div>
+
+        <div class="card">
+            <h3>📝 Pending Applications <button class="btn btn-primary btn-sm" onclick="loadApplications()">🔄 Refresh</button></h3>
+            <div id="applicationsList"><p class="loading">Click refresh to load...</p></div>
+        </div>
+
+        <div class="card">
+            <h3>💰 Earnings</h3>
+            <div class="earnings-box">
+                <div class="amount">₹5,000</div>
+                <p>Fixed monthly salary</p>
+            </div>
+            <div style="margin-top: 15px; color: #64748b; font-size: 0.9em; line-height: 1.7;">
+                <p>✅ Work: 1-3 hours/day</p>
+                <p>✅ Payment: 1st of every month</p>
+                <p>✅ Bonus for top performers</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Task Modal -->
+<div id="addTaskModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('addTask')">&times;</span>
+        <h3 style="color: #667eea; margin-bottom: 20px;">➕ Assign Task to User</h3>
+        <form onsubmit="submitTask(event)">
+            <label>Select User:</label>
+            <select id="taskUserSelect" required>
+                <option value="">Loading users...</option>
+            </select>
+            <label>Task Title:</label>
+            <input type="text" id="taskTitle" placeholder="e.g., Morning workout - 30 mins" required>
+            <label>Description:</label>
+            <textarea id="taskDesc" rows="3" placeholder="Detailed task description..." required></textarea>
+            <label>Due Date:</label>
+            <input type="date" id="taskDue" required>
+            <label>Priority:</label>
+            <select id="taskPriority">
+                <option value="high">High</option>
+                <option value="medium" selected>Medium</option>
+                <option value="low">Low</option>
+            </select>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Assign Task</button>
+        </form>
+    </div>
+</div>
+
+<!-- Remark Modal -->
+<div id="remarkModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('remark')">&times;</span>
+        <h3 style="color: #667eea; margin-bottom: 20px;">📝 Add Remark</h3>
+        <input type="hidden" id="remarkUserId">
+        <label>Performance Remark:</label>
+        <textarea id="remarkText" rows="4" placeholder="Add your performance notes and feedback..."></textarea>
+        <label>Performance Rating:</label>
+        <select id="remarkRating">
+            <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+            <option value="4">⭐⭐⭐⭐ Good</option>
+            <option value="3">⭐⭐⭐ Average</option>
+            <option value="2">⭐⭐ Needs Improvement</option>
+            <option value="1">⭐ Poor</option>
+        </select>
+        <button class="btn btn-primary" style="width: 100%; margin-top: 15px;" onclick="submitRemark()">Save Remark</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getFirestore, doc, getDoc, collection, getDocs, addDoc, query, where, serverTimestamp, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAFoXIPtkRJdTxcTcXQkDYDUxmzcoownWA",
+        authDomain: "nextgen-innohub.firebaseapp.com",
+        projectId: "nextgen-innohub",
+        storageBucket: "nextgen-innohub.firebasestorage.app",
+        messagingSenderId: "28087223200",
+        appId: "1:28087223200:web:f4885a48ac45fdccfc1ac5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    let currentCoachId = '';
+    let authChecked = false;
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            if (authChecked) window.location.href = 'portal-login.html';
+            return;
+        }
+
+        try {
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                const coachRoles = ['motivation_coach', 'discipline_coach', 'fitness_coach'];
+                if (!coachRoles.includes(userData.role)) {
+                    window.location.href = 'portal-login.html';
+                    return;
+                }
+                document.getElementById('coachName').textContent = userData.name;
+                document.getElementById('coachTypeBadge').textContent = userData.role.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                currentCoachId = user.uid;
+                authChecked = true;
+                loadStats();
+            } else {
+                window.location.href = 'portal-login.html';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+
+    async function loadStats() {
+        try {
+            const usersSnap = await getDocs(query(collection(db, 'coaching_users'), where('coachId', '==', currentCoachId)));
+            document.getElementById('totalUsers').textContent = usersSnap.size;
+
+            const tasksSnap = await getDocs(query(collection(db, 'coaching_tasks'), where('assignedBy', '==', currentCoachId)));
+            let active = 0, completed = 0;
+            tasksSnap.forEach(d => {
+                if (d.data().status === 'completed') completed++;
+                else active++;
+            });
+            document.getElementById('activeTasks').textContent = active;
+            document.getElementById('completedTasks').textContent = completed;
+        } catch (e) { console.error(e); }
+    }
+
+    window.loadMyUsers = async () => {
+        const container = document.getElementById('myUsersList');
+        container.innerHTML = '<p class="loading">Loading...</p>';
+        try {
+            const snap = await getDocs(query(collection(db, 'coaching_users'), where('coachId', '==', currentCoachId)));
+            if (snap.empty) { container.innerHTML = '<p>No users assigned yet</p>'; return; }
+            let html = '';
+            snap.forEach(d => {
+                const u = d.data();
+                html += `
+                    <div class="user-item">
+                        <div class="user-info">
+                            <strong>${u.name}</strong>
+                            <span>${u.email} | ${u.coachType} coaching</span>
+                        </div>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <span class="status-badge status-active">Active</span>
+                            <button class="btn btn-sm btn-green" onclick="openRemarkModal('${d.id}')">📝 Remark</button>
+                        </div>
+                    </div>`;
+            });
+            container.innerHTML = html;
+        } catch (e) {
+            container.innerHTML = `<p style="color:red;">Error: ${e.message}</p>`;
+        }
+    };
+
+    window.loadMyTasks = async () => {
+        const container = document.getElementById('myTasksList');
+        container.innerHTML = '<p class="loading">Loading...</p>';
+        try {
+            const snap = await getDocs(query(collection(db, 'coaching_tasks'), where('assignedBy', '==', currentCoachId)));
+            if (snap.empty) { container.innerHTML = '<p>No tasks created yet</p>'; return; }
+            let html = '';
+            snap.forEach(d => {
+                const t = d.data();
+                html += `
+                    <div class="task-item">
+                        <strong>${t.title}</strong>
+                        <span>Due: ${t.dueDate} | Priority: ${t.priority} | Status: ${t.status}</span>
+                    </div>`;
+            });
+            container.innerHTML = html;
+        } catch (e) {
+            container.innerHTML = `<p style="color:red;">Error: ${e.message}</p>`;
+        }
+    };
+
+    window.loadApplications = async () => {
+        const container = document.getElementById('applicationsList');
+        container.innerHTML = '<p class="loading">Loading...</p>';
+        try {
+            const snap = await getDocs(query(collection(db, 'coaching_applications'), where('status', '==', 'pending')));
+            if (snap.empty) { container.innerHTML = '<p>No pending applications</p>'; return; }
+            let html = '';
+            snap.forEach(d => {
+                const a = d.data();
+                html += `
+                    <div class="user-item">
+                        <div class="user-info">
+                            <strong>${a.name}</strong>
+                            <span>${a.coachType} coaching | ${a.userType}</span>
+                        </div>
+                        <span class="status-badge status-pending">Pending</span>
+                    </div>`;
+            });
+            container.innerHTML = html;
+        } catch (e) {
+            container.innerHTML = `<p style="color:red;">Error: ${e.message}</p>`;
+        }
+    };
+
+    window.openAddTaskModal = async () => {
+        const select = document.getElementById('taskUserSelect');
+        select.innerHTML = '<option value="">Loading...</option>';
+        try {
+            const snap = await getDocs(query(collection(db, 'coaching_users'), where('coachId', '==', currentCoachId)));
+            let html = '<option value="">Select a user</option>';
+            snap.forEach(d => {
+                const u = d.data();
+                html += `<option value="${d.id}">${u.name}</option>`;
+            });
+            select.innerHTML = html;
+            document.getElementById('addTaskModal').style.display = 'block';
+        } catch (e) { alert('Error: ' + e.message); }
+    };
+
+    window.submitTask = async (e) => {
+        e.preventDefault();
+        try {
+            await addDoc(collection(db, 'coaching_tasks'), {
+                userId: document.getElementById('taskUserSelect').value,
+                title: document.getElementById('taskTitle').value,
+                description: document.getElementById('taskDesc').value,
+                dueDate: document.getElementById('taskDue').value,
+                priority: document.getElementById('taskPriority').value,
+                assignedBy: currentCoachId,
+                status: 'pending',
+                createdAt: serverTimestamp()
+            });
+            alert('✅ Task assigned successfully!');
+            closeModal('addTask');
+            e.target.reset();
+            loadMyTasks();
+            loadStats();
+        } catch (e) { alert('Error: ' + e.message); }
+    };
+
+    window.openRemarkModal = (userId) => {
+        document.getElementById('remarkUserId').value = userId;
+        document.getElementById('remarkModal').style.display = 'block';
+    };
+
+    window.submitRemark = async () => {
+        const userId = document.getElementById('remarkUserId').value;
+        const text = document.getElementById('remarkText').value;
+        const rating = document.getElementById('remarkRating').value;
+        try {
+            await addDoc(collection(db, 'coaching_remarks'), {
+                userId, coachId: currentCoachId,
+                remark: text, rating: parseInt(rating),
+                createdAt: serverTimestamp()
+            });
+            alert('✅ Remark saved!');
+            closeModal('remark');
+        } catch (e) { alert('Error: ' + e.message); }
+    };
+
+    window.closeModal = (type) => {
+        document.getElementById(type + 'Modal').style.display = 'none';
+    };
+
+    window.logout = async () => {
+        await signOut(auth);
+        window.location.href = 'portal-login.html';
+    };
+</script>
+</body>
+</html>
