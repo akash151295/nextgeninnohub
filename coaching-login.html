@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coaching Portal Login - NextGen InnoHub</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-container { background: white; padding: 45px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); max-width: 420px; width: 100%; }
+        .portal-badge { text-align: center; margin-bottom: 25px; }
+        .portal-badge .icon { font-size: 2.5em; }
+        .portal-badge h1 { color: #ef4444; font-size: 1.6em; margin-top: 8px; }
+        .portal-badge p { color: #64748b; font-size: 0.9em; margin-top: 5px; }
+        .role-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
+        .role-btn { padding: 10px 6px; border: 2px solid #e0e0e0; border-radius: 10px; text-align: center; cursor: pointer; font-weight: 600; font-size: 0.8em; color: #64748b; transition: all 0.3s; background: white; }
+        .role-btn:hover, .role-btn.active { border-color: #ef4444; background: #fef2f2; color: #ef4444; }
+        .role-btn .icon { font-size: 1.3em; display: block; margin-bottom: 3px; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; margin-bottom: 6px; color: #333; font-weight: 600; font-size: 0.95em; }
+        input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; }
+        input:focus { outline: none; border-color: #ef4444; }
+        .btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #ef4444, #f59e0b); color: white; border: none; border-radius: 50px; font-size: 1em; font-weight: 700; cursor: pointer; margin-top: 8px; }
+        .btn:hover { transform: translateY(-2px); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .error-msg { background: #fee; color: #c33; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: none; font-size: 0.9em; }
+        .success-msg { background: #efe; color: #3c3; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: none; font-size: 0.9em; }
+        .back-link { text-align: center; margin-top: 20px; }
+        .back-link a { color: #ef4444; text-decoration: none; font-size: 0.9em; }
+        .new-user { text-align: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid #f0f0f0; }
+        .new-user a { color: #ef4444; text-decoration: none; font-weight: 600; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="portal-badge">
+            <div class="icon">🔥</div>
+            <h1>Coaching Portal</h1>
+            <p>NextGen InnoHub — Select your role</p>
+        </div>
+
+        <div class="role-selector">
+            <div class="role-btn" onclick="selectRole('admin')" id="role-admin"><span class="icon">🔧</span>Admin</div>
+            <div class="role-btn active" onclick="selectRole('coach')" id="role-coach"><span class="icon">🎯</span>Coach</div>
+            <div class="role-btn" onclick="selectRole('client')" id="role-client"><span class="icon">💪</span>Client</div>
+        </div>
+
+        <div class="error-msg" id="errorMsg"></div>
+        <div class="success-msg" id="successMsg"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="email" required placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" required placeholder="Enter password">
+            </div>
+            <button type="submit" class="btn" id="loginBtn">Login</button>
+        </form>
+
+        <div class="new-user">
+            <a href="coaching-onboarding.html">New client? Start here →</a>
+        </div>
+        <div class="back-link">
+            <a href="portal-login.html">← Back to Portal Selection</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAFoXIPtkRJdTxcTcXQkDYDUxmzcoownWA",
+            authDomain: "nextgen-innohub.firebaseapp.com",
+            projectId: "nextgen-innohub",
+            storageBucket: "nextgen-innohub.firebasestorage.app",
+            messagingSenderId: "28087223200",
+            appId: "1:28087223200:web:f4885a48ac45fdccfc1ac5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.selectRole = (role) => {
+            document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('role-' + role).classList.add('active');
+        };
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const selectedRole = document.querySelector('.role-btn.active')?.id.replace('role-', '') || 'coach';
+            const loginBtn = document.getElementById('loginBtn');
+            const errorMsg = document.getElementById('errorMsg');
+            const successMsg = document.getElementById('successMsg');
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Logging in...';
+            errorMsg.style.display = 'none';
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+
+                successMsg.textContent = '✅ Login successful! Redirecting...';
+                successMsg.style.display = 'block';
+
+                const isAdmin = userDoc.exists() && userDoc.data().role === 'admin';
+
+                setTimeout(() => {
+                    // Admin can preview any role
+                    if (isAdmin && selectedRole === 'coach') {
+                        window.location.href = 'coach-dashboard.html?preview=true';
+                    } else if (isAdmin && selectedRole === 'client') {
+                        window.location.href = 'client-dashboard.html?preview=true';
+                    } else if (isAdmin) {
+                        window.location.href = 'admin-dashboard.html';
+                    } else if (userDoc.exists()) {
+                        const role = userDoc.data().role;
+                        if (role === 'coach' || role === 'motivation_coach' || role === 'discipline_coach' || role === 'fitness_coach') {
+                            window.location.href = 'coach-dashboard.html';
+                        } else if (role === 'client') {
+                            window.location.href = 'client-dashboard.html';
+                        } else {
+                            window.location.href = 'admin-dashboard.html';
+                        }
+                    }
+                }, 1000);
+
+            } catch (error) {
+                errorMsg.textContent = '❌ Invalid credentials!';
+                errorMsg.style.display = 'block';
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Login';
+            }
+        });
+    </script>
+</body>
+</html>

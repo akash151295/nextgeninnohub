@@ -13,204 +13,81 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
-        .login-container {
+        .wrapper { width: 100%; max-width: 800px; }
+        .logo { text-align: center; color: white; margin-bottom: 40px; }
+        .logo h1 { font-size: 2em; margin-bottom: 8px; }
+        .logo p { opacity: 0.85; font-size: 1.05em; }
+        .portals { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .portal-card {
             background: white;
-            padding: 50px;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 400px;
-            width: 100%;
-        }
-        h1 {
+            padding: 40px 30px;
             text-align: center;
-            color: #667eea;
-            margin-bottom: 30px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-        }
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        .btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-size: 18px;
-            font-weight: bold;
             cursor: pointer;
-            margin-top: 10px;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        .back-link {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .back-link a {
-            color: #667eea;
+            transition: all 0.3s;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
             text-decoration: none;
+            display: block;
         }
-        .error-msg {
-            background: #fee;
-            color: #c33;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            display: none;
+        .portal-card:hover { transform: translateY(-8px); box-shadow: 0 20px 50px rgba(0,0,0,0.25); }
+        .portal-icon { font-size: 3.5em; margin-bottom: 20px; }
+        .portal-card h2 { font-size: 1.5em; margin-bottom: 12px; }
+        .portal-card p { color: #64748b; line-height: 1.6; margin-bottom: 20px; font-size: 0.95em; }
+        .portal-roles { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 25px; }
+        .role-tag { padding: 4px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 600; }
+        .btn { display: block; padding: 14px; border-radius: 10px; font-weight: 700; font-size: 1em; color: white; text-decoration: none; }
+        .btn-intern { background: linear-gradient(135deg, #2563EB, #22D3EE); }
+        .btn-coaching { background: linear-gradient(135deg, #ef4444, #f59e0b); }
+        .intern-card h2 { color: #2563EB; }
+        .coaching-card h2 { color: #ef4444; }
+        .back { text-align: center; margin-top: 25px; }
+        .back a { color: white; text-decoration: none; opacity: 0.85; }
+        @media (max-width: 600px) {
+            .portals { grid-template-columns: 1fr; }
+            .logo h1 { font-size: 1.5em; }
         }
-        .success-msg {
-            background: #efe;
-            color: #3c3;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            display: none;
-        }
-        .role-selector { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 20px; }
-        .role-btn { padding: 12px 8px; border: 2px solid #e0e0e0; border-radius: 10px; text-align: center; cursor: pointer; font-weight: 600; font-size: 0.85em; color: #64748b; transition: all 0.3s; background: white; }
-        .role-btn:hover, .role-btn.active { border-color: #667eea; background: #f0f4ff; color: #667eea; }
-        .role-btn .icon { font-size: 1.5em; display: block; margin-bottom: 4px; }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <h1>🔐 Portal Login</h1>
-        
-        <div class="role-selector">
-            <div class="role-btn active" onclick="selectRole('admin')" id="role-admin"><span class="icon">🔧</span>Admin</div>
-            <div class="role-btn" onclick="selectRole('TL')" id="role-TL"><span class="icon">👨‍💼</span>Team Lead</div>
-            <div class="role-btn" onclick="selectRole('Intern')" id="role-Intern"><span class="icon">🎓</span>Intern</div>
-            <div class="role-btn" onclick="selectRole('coach')" id="role-coach"><span class="icon">🎯</span>Coach</div>
-            <div class="role-btn" onclick="selectRole('client')" id="role-client"><span class="icon">💪</span>Client</div>
+    <div class="wrapper">
+        <div class="logo">
+            <h1>🚀 NextGen InnoHub</h1>
+            <p>Select your portal to continue</p>
         </div>
 
-        <div class="error-msg" id="errorMsg"></div>
-        <div class="success-msg" id="successMsg"></div>
+        <div class="portals">
+            <!-- Internship Portal -->
+            <a href="intern-login.html" class="portal-card intern-card">
+                <div class="portal-icon">🎓</div>
+                <h2>Internship Portal</h2>
+                <p>For interns, team leads and admins managing the internship program.</p>
+                <div class="portal-roles">
+                    <span class="role-tag" style="background:#eff6ff; color:#2563EB;">🔧 Admin</span>
+                    <span class="role-tag" style="background:#f0fdf4; color:#16a34a;">👨‍💼 Team Lead</span>
+                    <span class="role-tag" style="background:#faf5ff; color:#7c3aed;">🎓 Intern</span>
+                </div>
+                <span class="btn btn-intern">Login to Internship Portal →</span>
+            </a>
 
-        <form id="loginForm">
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="email" required placeholder="Enter your email">
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="password" required placeholder="Enter password">
-            </div>
-            <button type="submit" class="btn" id="loginBtn">Login</button>
-        </form>
-        <div class="back-link">
+            <!-- Coaching Portal -->
+            <a href="coaching-login.html" class="portal-card coaching-card">
+                <div class="portal-icon">🔥</div>
+                <h2>Coaching Portal</h2>
+                <p>For coaches and clients in the Motivation, Discipline & Fitness coaching program.</p>
+                <div class="portal-roles">
+                    <span class="role-tag" style="background:#fef2f2; color:#ef4444;">🎯 Coach</span>
+                    <span class="role-tag" style="background:#fff7ed; color:#ea580c;">💪 Client</span>
+                    <span class="role-tag" style="background:#f0f4ff; color:#667eea;">🔧 Admin</span>
+                </div>
+                <span class="btn btn-coaching">Login to Coaching Portal →</span>
+            </a>
+        </div>
+
+        <div class="back">
             <a href="index.html">← Back to Home</a>
         </div>
     </div>
-
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
-        // Firebase configuration - REPLACE WITH YOUR CONFIG
-        const firebaseConfig = {
-            apiKey: "AIzaSyAFoXIPtkRJdTxcTcXQkDYDUxmzcoownWA",
-            authDomain: "nextgen-innohub.firebaseapp.com",
-            projectId: "nextgen-innohub",
-            storageBucket: "nextgen-innohub.firebasestorage.app",
-            messagingSenderId: "28087223200",
-            appId: "1:28087223200:web:f4885a48ac45fdccfc1ac5"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        const loginForm = document.getElementById('loginForm');
-        const loginBtn = document.getElementById('loginBtn');
-        const errorMsg = document.getElementById('errorMsg');
-        const successMsg = document.getElementById('successMsg');
-
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const selectedRole = document.querySelector('.role-btn.active')?.id.replace('role-', '') || 'admin';
-            
-            loginBtn.disabled = true;
-            loginBtn.textContent = 'Logging in...';
-            errorMsg.style.display = 'none';
-            successMsg.style.display = 'none';
-
-            try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                const userDoc = await getDoc(doc(db, 'users', user.uid));
-                
-                successMsg.textContent = '✅ Login successful! Redirecting...';
-                successMsg.style.display = 'block';
-
-                // Admin can preview any role
-                const isAdmin = userDoc.exists() && userDoc.data().role === 'admin';
-
-                setTimeout(() => {
-                    if (isAdmin && selectedRole === 'coach') {
-                        window.location.href = 'coach-dashboard.html?preview=true';
-                    } else if (isAdmin && selectedRole === 'client') {
-                        window.location.href = 'client-dashboard.html?preview=true';
-                    } else if (isAdmin && selectedRole === 'TL') {
-                        window.location.href = 'lead-intern-dashboard.html';
-                    } else if (isAdmin && selectedRole === 'Intern') {
-                        window.location.href = 'intern-dashboard.html';
-                    } else if (userDoc.exists()) {
-                        const role = userDoc.data().role;
-                        if (role === 'admin') window.location.href = 'admin-dashboard.html';
-                        else if (role === 'TL') window.location.href = 'lead-intern-dashboard.html';
-                        else if (role === 'Intern') window.location.href = 'intern-dashboard.html';
-                        else if (role === 'coach' || role === 'motivation_coach' || role === 'discipline_coach' || role === 'fitness_coach') window.location.href = 'coach-dashboard.html';
-                        else if (role === 'client') window.location.href = 'client-dashboard.html';
-                        else window.location.href = 'admin-dashboard.html';
-                    } else {
-                        window.location.href = 'admin-dashboard.html';
-                    }
-                }, 1000);
-
-            } catch (error) {
-                console.error('Login error:', error);
-                errorMsg.textContent = '❌ Invalid credentials! Please check your email and password.';
-                errorMsg.style.display = 'block';
-                loginBtn.disabled = false;
-                loginBtn.textContent = 'Login';
-            }
-        });
-
-        window.selectRole = (role) => {
-            document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('role-' + role).classList.add('active');
-        };
-    </script>
 </body>
 </html>
