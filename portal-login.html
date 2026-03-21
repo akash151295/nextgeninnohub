@@ -90,7 +90,7 @@
             margin-bottom: 15px;
             display: none;
         }
-        .role-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .role-selector { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 20px; }
         .role-btn { padding: 12px 8px; border: 2px solid #e0e0e0; border-radius: 10px; text-align: center; cursor: pointer; font-weight: 600; font-size: 0.85em; color: #64748b; transition: all 0.3s; background: white; }
         .role-btn:hover, .role-btn.active { border-color: #667eea; background: #f0f4ff; color: #667eea; }
         .role-btn .icon { font-size: 1.5em; display: block; margin-bottom: 4px; }
@@ -102,6 +102,8 @@
         
         <div class="role-selector">
             <div class="role-btn active" onclick="selectRole('admin')" id="role-admin"><span class="icon">🔧</span>Admin</div>
+            <div class="role-btn" onclick="selectRole('TL')" id="role-TL"><span class="icon">👨‍💼</span>Team Lead</div>
+            <div class="role-btn" onclick="selectRole('Intern')" id="role-Intern"><span class="icon">🎓</span>Intern</div>
             <div class="role-btn" onclick="selectRole('coach')" id="role-coach"><span class="icon">🎯</span>Coach</div>
             <div class="role-btn" onclick="selectRole('client')" id="role-client"><span class="icon">💪</span>Client</div>
         </div>
@@ -175,10 +177,14 @@
                 const isAdmin = userDoc.exists() && userDoc.data().role === 'admin';
 
                 setTimeout(() => {
-                    if (selectedRole === 'coach' && isAdmin) {
+                    if (isAdmin && selectedRole === 'coach') {
                         window.location.href = 'coach-dashboard.html?preview=true';
-                    } else if (selectedRole === 'client' && isAdmin) {
+                    } else if (isAdmin && selectedRole === 'client') {
                         window.location.href = 'client-dashboard.html?preview=true';
+                    } else if (isAdmin && selectedRole === 'TL') {
+                        window.location.href = 'lead-intern-dashboard.html';
+                    } else if (isAdmin && selectedRole === 'Intern') {
+                        window.location.href = 'intern-dashboard.html';
                     } else if (userDoc.exists()) {
                         const role = userDoc.data().role;
                         if (role === 'admin') window.location.href = 'admin-dashboard.html';
