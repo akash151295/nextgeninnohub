@@ -90,31 +90,20 @@
             margin-bottom: 15px;
             display: none;
         }
-        .demo-creds {
-            background: #fff3cd;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-        .demo-creds h3 {
-            margin-bottom: 10px;
-            color: #856404;
-        }
-        .demo-creds p {
-            margin: 5px 0;
-            color: #856404;
-        }
+        .role-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .role-btn { padding: 12px 8px; border: 2px solid #e0e0e0; border-radius: 10px; text-align: center; cursor: pointer; font-weight: 600; font-size: 0.85em; color: #64748b; transition: all 0.3s; background: white; }
+        .role-btn:hover, .role-btn.active { border-color: #667eea; background: #f0f4ff; color: #667eea; }
+        .role-btn .icon { font-size: 1.5em; display: block; margin-bottom: 4px; }
     </style>
 </head>
 <body>
     <div class="login-container">
         <h1>🔐 Portal Login</h1>
         
-        <div class="demo-creds">
-            <h3>📝 Demo Access:</h3>
-            <p>Contact admin for login credentials</p>
-            <p><small>For demo access: <a href="mailto:contact@nextgeninnohub.in?cc=akash151295@gmail.com&subject=Demo Access Request&body=Hi,%0A%0AI would like to request demo access to your AI products.%0A%0APlease provide login credentials.%0A%0AThank you!">Request Access</a></small></p>
+        <div class="role-selector">
+            <div class="role-btn active" onclick="selectRole('admin')" id="role-admin"><span class="icon">🔧</span>Admin</div>
+            <div class="role-btn" onclick="selectRole('coach')" id="role-coach"><span class="icon">🎯</span>Coach</div>
+            <div class="role-btn" onclick="selectRole('client')" id="role-client"><span class="icon">💪</span>Client</div>
         </div>
 
         <div class="error-msg" id="errorMsg"></div>
@@ -167,6 +156,7 @@
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const selectedRole = document.querySelector('.role-btn.active')?.id.replace('role-', '') || 'admin';
             
             loginBtn.disabled = true;
             loginBtn.textContent = 'Logging in...';
@@ -174,34 +164,33 @@
             successMsg.style.display = 'none';
 
             try {
-                // Sign in with Firebase
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-
-                // Get user role from Firestore
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
                 
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    
-                    successMsg.textContent = '✅ Login successful! Redirecting...';
-                    successMsg.style.display = 'block';
+                successMsg.textContent = '✅ Login successful! Redirecting...';
+                successMsg.style.display = 'block';
 
-                    // Redirect based on role
-                    setTimeout(() => {
-                        if (userData.role === 'admin') {
-                            window.location.href = 'admin-dashboard.html';
-                        } else if (userData.role === 'TL') {
-                            window.location.href = 'lead-intern-dashboard.html';
-                        } else if (userData.role === 'Intern') {
-                            window.location.href = 'intern-dashboard.html';
-                        } else {
-                            window.location.href = 'admin-dashboard.html';
-                        }
-                    }, 1000);
-                } else {
-                    throw new Error('User data not found');
-                }
+                // Admin can preview any role
+                const isAdmin = userDoc.exists() && userDoc.data().role === 'admin';
+
+                setTimeout(() => {
+                    if (selectedRole === 'coach' && isAdmin) {
+                        window.location.href = 'coach-dashboard.html?preview=true';
+                    } else if (selectedRole === 'client' && isAdmin) {
+                        window.location.href = 'client-dashboard.html?preview=true';
+                    } else if (userDoc.exists()) {
+                        const role = userDoc.data().role;
+                        if (role === 'admin') window.location.href = 'admin-dashboard.html';
+                        else if (role === 'TL') window.location.href = 'lead-intern-dashboard.html';
+                        else if (role === 'Intern') window.location.href = 'intern-dashboard.html';
+                        else if (role === 'coach' || role === 'motivation_coach' || role === 'discipline_coach' || role === 'fitness_coach') window.location.href = 'coach-dashboard.html';
+                        else if (role === 'client') window.location.href = 'client-dashboard.html';
+                        else window.location.href = 'admin-dashboard.html';
+                    } else {
+                        window.location.href = 'admin-dashboard.html';
+                    }
+                }, 1000);
 
             } catch (error) {
                 console.error('Login error:', error);
@@ -211,6 +200,11 @@
                 loginBtn.textContent = 'Login';
             }
         });
+
+        window.selectRole = (role) => {
+            document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('role-' + role).classList.add('active');
+        };
     </script>
 </body>
 </html>

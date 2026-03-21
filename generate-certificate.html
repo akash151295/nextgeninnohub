@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generate Certificate - NextGen InnoHub</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #f5f7fa; padding: 20px; }
@@ -554,36 +553,36 @@
                 appointment: 'appointmentLetter',
                 promotion: 'promotionLetter'
             };
-            const nameMap = {
-                certificate: document.getElementById('certInternName')?.textContent || 'Certificate',
-                offer: document.getElementById('offerNameDisplay')?.textContent || 'Offer',
-                appointment: document.getElementById('apptNameDisplay')?.textContent || 'Appointment',
-                promotion: document.getElementById('promoNameDisplay')?.textContent || 'Promotion'
-            };
-            const element = document.getElementById(elementMap[type]);
-            if (!element) { alert('Please generate a document first'); return; }
+            const el = document.getElementById(elementMap[type]);
+            if (!el) { alert('Please generate a document first'); return; }
             const isLetter = type !== 'certificate';
-            
-            // Temporarily make element visible for capture
-            const prevDisplay = element.style.display;
-            element.style.display = 'block';
-            element.style.margin = '0';
+            const orientation = isLetter ? 'portrait' : 'landscape';
 
-            const opt = {
-                margin: isLetter ? 10 : 0,
-                filename: type.charAt(0).toUpperCase() + type.slice(1) + '_' + nameMap[type].replace(/\s+/g, '_') + '.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { 
-                    scale: 2, 
-                    useCORS: true, 
-                    logging: false,
-                    windowWidth: isLetter ? 794 : 1122
-                },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: isLetter ? 'portrait' : 'landscape' }
-            };
-            html2pdf().set(opt).from(element).save().then(() => {
-                element.style.margin = '';
-            });
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>${type}</title>
+                    <style>
+                        @page { size: A4 ${orientation}; margin: ${isLetter ? '10mm' : '0'}; }
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body { font-family: 'Times New Roman', serif; }
+                        ${document.querySelector('style').innerHTML}
+                        #${elementMap[type]} { display: block !important; margin: 0 auto; border: none; }
+                    </style>
+                </head>
+                <body>
+                    ${el.outerHTML}
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                            setTimeout(() => window.close(), 1000);
+                        }
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
         }
 
         function printDoc() {
@@ -596,16 +595,20 @@
             };
             const el = document.getElementById(elementMap[type]);
             if (!el) { alert('Please generate a document first'); return; }
+            const isLetter = type !== 'certificate';
             const printWindow = window.open('', '_blank');
-            printWindow.document.write('<html><head><title>Print</title>');
-            printWindow.document.write('<style>');
-            printWindow.document.write(document.querySelector('style').innerHTML);
-            printWindow.document.write('</style></head><body>');
-            printWindow.document.write(el.outerHTML);
-            printWindow.document.write('</body></html>');
+            printWindow.document.write(`<!DOCTYPE html><html><head><title>Print</title>
+                <style>
+                    @page { size: A4 ${isLetter ? 'portrait' : 'landscape'}; margin: ${isLetter ? '10mm' : '0'}; }
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body { font-family: 'Times New Roman', serif; }
+                    ${document.querySelector('style').innerHTML}
+                    #${elementMap[type]} { display: block !important; margin: 0; border: none; }
+                </style></head><body>
+                ${el.outerHTML}
+                <script>window.onload=function(){window.print();setTimeout(()=>window.close(),1000);}<\/script>
+                </body></html>`);
             printWindow.document.close();
-            printWindow.focus();
-            setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
         }
 
         function resetForm() {
@@ -621,23 +624,19 @@
     </script>
 
     <style media="print">
-        @page {
-            size: A4 landscape;
-            margin: 0;
-        }
+        @page { size: A4 portrait; margin: 10mm; }
         body * { visibility: hidden; }
+        #offerLetter, #offerLetter *,
+        #appointmentLetter, #appointmentLetter *,
+        #promotionLetter, #promotionLetter * { visibility: visible; }
+        #offerLetter, #appointmentLetter, #promotionLetter {
+            position: absolute; left: 0; top: 0;
+            width: 100%; border: none; margin: 0; padding: 15mm;
+        }
         #certificate, #certificate * { visibility: visible; }
-        #certificate { 
-            position: absolute; 
-            left: 0; 
-            top: 0; 
-            width: 297mm;
-            height: 210mm;
-            margin: 0;
-            box-shadow: none;
-            page-break-after: avoid;
-            page-break-before: avoid;
-            page-break-inside: avoid;
+        #certificate {
+            position: absolute; left: 0; top: 0;
+            width: 297mm; height: 210mm; margin: 0;
         }
         .header, .form-section, #actionButtons { display: none !important; }
     </style>
