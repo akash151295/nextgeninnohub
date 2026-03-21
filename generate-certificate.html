@@ -71,8 +71,8 @@
         .doc-form.active { display: block; }
         /* Offer/Appointment/Promotion Letter */
         #offerLetter, #appointmentLetter, #promotionLetter {
-            width: 210mm; min-height: 297mm; background: white;
-            padding: 20mm 20mm; margin: 30px auto;
+            width: 190mm; background: white;
+            padding: 15mm 15mm;
             display: none; box-sizing: border-box;
             font-family: 'Times New Roman', serif;
             border: 1px solid #ddd;
@@ -563,14 +563,27 @@
             const element = document.getElementById(elementMap[type]);
             if (!element) { alert('Please generate a document first'); return; }
             const isLetter = type !== 'certificate';
+            
+            // Temporarily make element visible for capture
+            const prevDisplay = element.style.display;
+            element.style.display = 'block';
+            element.style.margin = '0';
+
             const opt = {
-                margin: isLetter ? [10, 15, 10, 15] : 0,
+                margin: isLetter ? 10 : 0,
                 filename: type.charAt(0).toUpperCase() + type.slice(1) + '_' + nameMap[type].replace(/\s+/g, '_') + '.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, logging: false },
+                html2canvas: { 
+                    scale: 2, 
+                    useCORS: true, 
+                    logging: false,
+                    windowWidth: isLetter ? 794 : 1122
+                },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: isLetter ? 'portrait' : 'landscape' }
             };
-            html2pdf().set(opt).from(element).save();
+            html2pdf().set(opt).from(element).save().then(() => {
+                element.style.margin = '';
+            });
         }
 
         function printDoc() {
