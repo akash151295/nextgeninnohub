@@ -39,6 +39,7 @@
         .dot.active { background: #667eea; }
         .dot.done { background: #10b981; }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
 <body>
 <div class="container">
@@ -267,9 +268,14 @@
         currentStep = step - 1;
     };
 
+    // EmailJS config - replace with your actual IDs
+    const EMAILJS_SERVICE_ID = 'service_mzl5tdk';
+    const EMAILJS_TEMPLATE_ID = 'template_q26lm6b';
+    const EMAILJS_PUBLIC_KEY = 'sOYGNJFNDDlTTDkO5';
+
     window.submitForm = async () => {
         try {
-            await addDoc(collection(db, 'coaching_applications'), {
+            const formData = {
                 coachType: document.querySelector('input[name="coachType"]:checked')?.value,
                 name: document.getElementById('fullName').value,
                 email: document.getElementById('email').value,
@@ -285,9 +291,34 @@
                 coachingStyle: document.getElementById('coachingStyle').value,
                 checkInTime: document.getElementById('checkInTime').value,
                 additionalInfo: document.getElementById('additionalInfo').value,
+            };
+
+            // Save to Firestore
+            await addDoc(collection(db, 'coaching_applications'), {
+                ...formData,
                 status: 'pending',
                 createdAt: serverTimestamp()
             });
+
+            // Send email notification via EmailJS
+            try {
+                emailjs.init(EMAILJS_PUBLIC_KEY);
+                await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                    to_email: 'akash151295@gmail.com',
+                    from_name: formData.name,
+                    from_email: formData.email,
+                    phone: formData.phone,
+                    coach_type: formData.coachType,
+                    user_type: formData.userType,
+                    main_goal: formData.mainGoal,
+                    challenges: formData.challenges,
+                    coaching_style: formData.coachingStyle,
+                    check_in_time: formData.checkInTime,
+                    message: `New coaching application from ${formData.name}\n\nCoach Type: ${formData.coachType}\nPhone: ${formData.phone}\nGoal: ${formData.mainGoal}\nChallenges: ${formData.challenges}`
+                });
+            } catch (emailError) {
+                console.log('Email notification failed:', emailError);
+            }
 
             document.getElementById('step4').classList.remove('active');
             document.getElementById('successScreen').style.display = 'block';
