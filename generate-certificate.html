@@ -64,18 +64,55 @@
         .cert-signature-title { font-size: 12px; color: #666; }
         .cert-date { position: absolute; bottom: 30px; left: 50px; font-size: 12px; color: #666; }
         .cert-id { position: absolute; bottom: 30px; right: 50px; font-size: 12px; color: #666; }
-        .cert-seal { position: absolute; bottom: 80px; right: 70px; width: 90px; height: 90px; border: 4px solid #2563EB; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #2563EB; transform: rotate(-15deg); font-size: 11px; }
+        /* Doc type tabs */
+        .doc-type-btn { padding: 15px; background: #f0f4ff; border-radius: 10px; text-align: center; cursor: pointer; font-weight: 600; color: #667eea; border: 2px solid transparent; transition: all 0.3s; }
+        .doc-type-btn:hover, .doc-type-btn.active { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-color: #667eea; }
+        .doc-form { display: none; }
+        .doc-form.active { display: block; }
+        /* Offer/Appointment/Promotion Letter */
+        #offerLetter, #appointmentLetter, #promotionLetter {
+            width: 210mm; min-height: 297mm; background: white;
+            padding: 20mm 20mm; margin: 30px auto;
+            display: none; box-sizing: border-box;
+            font-family: 'Times New Roman', serif;
+            border: 1px solid #ddd;
+        }
+        .letter-header { text-align: center; border-bottom: 3px double #2563EB; padding-bottom: 15px; margin-bottom: 25px; }
+        .letter-logo { font-size: 2em; }
+        .letter-company { font-size: 1.4em; font-weight: bold; color: #2563EB; }
+        .letter-tagline { font-size: 0.85em; color: #666; }
+        .letter-title { text-align: center; font-size: 1.3em; font-weight: bold; text-decoration: underline; margin: 20px 0; color: #0F172A; text-transform: uppercase; }
+        .letter-body { font-size: 1em; line-height: 1.9; color: #333; }
+        .letter-body p { margin-bottom: 15px; }
+        .letter-highlight { font-weight: bold; color: #2563EB; }
+        .letter-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .letter-table td { padding: 10px 15px; border: 1px solid #ddd; }
+        .letter-table td:first-child { font-weight: bold; background: #f0f4ff; width: 40%; }
+        .letter-footer { margin-top: 50px; }
+        .letter-sign-line { border-top: 2px solid #333; width: 200px; margin-top: 50px; }
+        .letter-ref { font-size: 0.85em; color: #666; margin-bottom: 20px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>📜 Generate Certificate</h1>
-            <p>Create professional certificates for interns</p>
+            <h1>📜 Document Generator</h1>
+            <p>Generate Certificates, Offer Letters, Appointment Letters & Promotion Letters</p>
         </div>
 
+        <!-- Document Type Selector -->
         <div class="form-section">
-            <h2 style="margin-bottom: 20px;">Certificate Details</h2>
+            <h2 style="margin-bottom: 20px;">Select Document Type</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;">
+                <div class="doc-type-btn active" onclick="switchDoc('certificate')" id="tab-certificate">📜 Certificate</div>
+                <div class="doc-type-btn" onclick="switchDoc('offer')" id="tab-offer">📋 Offer Letter</div>
+                <div class="doc-type-btn" onclick="switchDoc('appointment')" id="tab-appointment">🤝 Appointment Letter</div>
+                <div class="doc-type-btn" onclick="switchDoc('promotion')" id="tab-promotion">⬆️ Promotion Letter</div>
+            </div>
+        </div>
+
+        <div class="form-section doc-form active" id="form-certificate">
+            <h2 style="margin-bottom: 20px;">📜 Certificate Details</h2>
             <form id="certForm">
                 <div class="form-group">
                     <label>Intern Name *</label>
@@ -105,6 +142,108 @@
                 </div>
                 <button type="submit" class="btn">🎨 Generate Certificate</button>
                 <button type="button" class="btn btn-secondary" onclick="window.history.back()">← Back</button>
+            </form>
+        </div>
+
+        <!-- Offer Letter Form -->
+        <div class="form-section doc-form" id="form-offer">
+            <h2 style="margin-bottom: 20px;">📋 Offer Letter - Coach</h2>
+            <form id="offerForm">
+                <div class="form-group">
+                    <label>Coach Name *</label>
+                    <input type="text" id="offerName" required placeholder="Full name">
+                </div>
+                <div class="form-group">
+                    <label>Coach Role *</label>
+                    <select id="offerRole" required>
+                        <option value="Motivation Coach">Motivation Coach</option>
+                        <option value="Discipline Coach">Discipline Coach</option>
+                        <option value="Fitness Coach">Fitness Coach</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Date of Joining *</label>
+                    <input type="date" id="offerJoining" required>
+                </div>
+                <div class="form-group">
+                    <label>Monthly Stipend (₹)</label>
+                    <input type="number" id="offerStipend" value="5000">
+                </div>
+                <div class="form-group">
+                    <label>Work Hours per Day</label>
+                    <input type="text" id="offerHours" value="1-3 hours/day">
+                </div>
+                <div class="form-group">
+                    <label>Number of Clients</label>
+                    <input type="text" id="offerClients" placeholder="e.g., 5-10 clients">
+                </div>
+                <button type="submit" class="btn" onclick="generateOffer(event)">📋 Generate Offer Letter</button>
+            </form>
+        </div>
+
+        <!-- Appointment Letter Form -->
+        <div class="form-section doc-form" id="form-appointment">
+            <h2 style="margin-bottom: 20px;">🤝 Appointment Letter - Coach</h2>
+            <form id="appointmentForm">
+                <div class="form-group">
+                    <label>Coach Name *</label>
+                    <input type="text" id="apptName" required placeholder="Full name">
+                </div>
+                <div class="form-group">
+                    <label>Coach Role *</label>
+                    <select id="apptRole" required>
+                        <option value="Motivation Coach">Motivation Coach</option>
+                        <option value="Discipline Coach">Discipline Coach</option>
+                        <option value="Fitness Coach">Fitness Coach</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Date of Appointment *</label>
+                    <input type="date" id="apptDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Monthly Stipend (₹)</label>
+                    <input type="number" id="apptStipend" value="5000">
+                </div>
+                <div class="form-group">
+                    <label>Work Hours per Day</label>
+                    <input type="text" id="apptHours" value="1-3 hours/day">
+                </div>
+                <button type="submit" class="btn" onclick="generateAppointment(event)">🤝 Generate Appointment Letter</button>
+            </form>
+        </div>
+
+        <!-- Promotion Letter Form -->
+        <div class="form-section doc-form" id="form-promotion">
+            <h2 style="margin-bottom: 20px;">⬆️ Promotion Letter - Coach</h2>
+            <form id="promotionForm">
+                <div class="form-group">
+                    <label>Coach Name *</label>
+                    <input type="text" id="promoName" required placeholder="Full name">
+                </div>
+                <div class="form-group">
+                    <label>Previous Role</label>
+                    <input type="text" id="promoOldRole" placeholder="e.g., Motivation Coach">
+                </div>
+                <div class="form-group">
+                    <label>Promoted To *</label>
+                    <select id="promoNewRole" required>
+                        <option value="Senior Motivation Coach">Senior Motivation Coach</option>
+                        <option value="Senior Discipline Coach">Senior Discipline Coach</option>
+                        <option value="Senior Fitness Coach">Senior Fitness Coach</option>
+                        <option value="Lead Coach">Lead Coach</option>
+                        <option value="Head of Coaching">Head of Coaching</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Effective Date *</label>
+                    <input type="date" id="promoDate" required>
+                </div>
+                <div class="form-group">
+                    <label>New Monthly Stipend (₹)</label>
+                    <input type="number" id="promoStipend" value="7000">
+                </div>
+                <button type="submit" class="btn" onclick="generatePromotion(event)">⬆️ Generate Promotion Letter</button>
             </form>
         </div>
 
@@ -156,7 +295,113 @@
             </div>
         </div>
 
-        <div id="actionButtons" style="text-align: center; margin: 30px 0; display: none;">
+        <!-- Offer Letter Template -->
+        <div id="offerLetter">
+            <div class="letter-header">
+                <div class="letter-logo">🚀</div>
+                <div class="letter-company">NextGen InnoHub</div>
+                <div class="letter-tagline">Empowering Future Innovators | www.nextgeninnohub.in</div>
+            </div>
+            <div class="letter-ref">Ref: NGI/OFFER/<span id="offerRef"></span> &nbsp;&nbsp;&nbsp; Date: <span id="offerDate"></span></div>
+            <div class="letter-title">Offer Letter</div>
+            <div class="letter-body">
+                <p>Dear <span class="letter-highlight" id="offerNameDisplay"></span>,</p>
+                <p>We are pleased to offer you the position of <span class="letter-highlight" id="offerRoleDisplay"></span> at <strong>NextGen InnoHub</strong>. After reviewing your profile and interest, we believe you will be a valuable addition to our coaching team.</p>
+                <p>Please find below the details of your offer:</p>
+                <table class="letter-table">
+                    <tr><td>Position</td><td id="offerRoleTable"></td></tr>
+                    <tr><td>Date of Joining</td><td id="offerJoiningTable"></td></tr>
+                    <tr><td>Monthly Stipend</td><td id="offerStipendTable"></td></tr>
+                    <tr><td>Work Hours</td><td id="offerHoursTable"></td></tr>
+                    <tr><td>Expected Clients</td><td id="offerClientsTable"></td></tr>
+                    <tr><td>Work Mode</td><td>Remote / Online</td></tr>
+                    <tr><td>Payment Date</td><td>1st of every month</td></tr>
+                </table>
+                <p><strong>Terms & Conditions:</strong></p>
+                <p>1. You will be required to dedicate <span id="offerHoursInline"></span> daily for coaching sessions and follow-ups.<br>
+                2. Monthly stipend of ₹<span id="offerStipendInline"></span> will be paid on the 1st of every month.<br>
+                3. Performance bonuses may be awarded based on client results and feedback.<br>
+                4. This offer is valid for 7 days from the date of issue.<br>
+                5. You are expected to maintain professionalism and confidentiality at all times.</p>
+                <p>We look forward to having you on board. Please sign and return a copy of this letter as your acceptance.</p>
+                <p>Congratulations and welcome to the NextGen InnoHub family! 🎉</p>
+            </div>
+            <div class="letter-footer">
+                <p>Yours sincerely,</p>
+                <div class="letter-sign-line"></div>
+                <p><strong>Akash Chaudhary</strong><br>CEO & Founder<br>NextGen InnoHub<br>contact@nextgeninnohub.in | +91 9760327132</p>
+                <div style="margin-top: 40px; border-top: 1px dashed #ccc; padding-top: 20px;">
+                    <p><strong>Acceptance:</strong> I, <span id="offerAcceptName"></span>, accept the above offer.</p>
+                    <div class="letter-sign-line"></div>
+                    <p>Signature &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Date: ___________</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointment Letter Template -->
+        <div id="appointmentLetter">
+            <div class="letter-header">
+                <div class="letter-logo">🚀</div>
+                <div class="letter-company">NextGen InnoHub</div>
+                <div class="letter-tagline">Empowering Future Innovators | www.nextgeninnohub.in</div>
+            </div>
+            <div class="letter-ref">Ref: NGI/APPT/<span id="apptRef"></span> &nbsp;&nbsp;&nbsp; Date: <span id="apptDateDisplay"></span></div>
+            <div class="letter-title">Appointment Letter</div>
+            <div class="letter-body">
+                <p>Dear <span class="letter-highlight" id="apptNameDisplay"></span>,</p>
+                <p>With reference to your application and subsequent discussions, we are pleased to appoint you as <span class="letter-highlight" id="apptRoleDisplay"></span> at <strong>NextGen InnoHub</strong>, effective from <span class="letter-highlight" id="apptEffectiveDate"></span>.</p>
+                <table class="letter-table">
+                    <tr><td>Designation</td><td id="apptRoleTable"></td></tr>
+                    <tr><td>Effective Date</td><td id="apptEffectiveDateTable"></td></tr>
+                    <tr><td>Monthly Stipend</td><td id="apptStipendTable"></td></tr>
+                    <tr><td>Work Hours</td><td id="apptHoursTable"></td></tr>
+                    <tr><td>Work Mode</td><td>Remote / Online</td></tr>
+                    <tr><td>Reporting To</td><td>CEO, NextGen InnoHub</td></tr>
+                </table>
+                <p><strong>Responsibilities:</strong></p>
+                <p>1. Conduct daily coaching sessions with assigned clients.<br>
+                2. Track client progress and submit weekly reports.<br>
+                3. Assign daily tasks and ensure accountability.<br>
+                4. Maintain a professional and supportive coaching environment.<br>
+                5. Participate in team meetings and training sessions as required.</p>
+                <p>This appointment is subject to satisfactory performance and adherence to company policies. We are confident that your contribution will be valuable to our mission.</p>
+                <p>Welcome aboard! 🎉</p>
+            </div>
+            <div class="letter-footer">
+                <p>Yours sincerely,</p>
+                <div class="letter-sign-line"></div>
+                <p><strong>Akash Chaudhary</strong><br>CEO & Founder<br>NextGen InnoHub</p>
+            </div>
+        </div>
+
+        <!-- Promotion Letter Template -->
+        <div id="promotionLetter">
+            <div class="letter-header">
+                <div class="letter-logo">🚀</div>
+                <div class="letter-company">NextGen InnoHub</div>
+                <div class="letter-tagline">Empowering Future Innovators | www.nextgeninnohub.in</div>
+            </div>
+            <div class="letter-ref">Ref: NGI/PROMO/<span id="promoRef"></span> &nbsp;&nbsp;&nbsp; Date: <span id="promoDateDisplay"></span></div>
+            <div class="letter-title">Promotion Letter</div>
+            <div class="letter-body">
+                <p>Dear <span class="letter-highlight" id="promoNameDisplay"></span>,</p>
+                <p>It is with great pleasure that we inform you of your promotion from <span class="letter-highlight" id="promoOldRoleDisplay"></span> to <span class="letter-highlight" id="promoNewRoleDisplay"></span> at <strong>NextGen InnoHub</strong>, effective <span class="letter-highlight" id="promoEffectiveDate"></span>.</p>
+                <p>This promotion is a recognition of your outstanding performance, dedication, and the exceptional results you have delivered to your clients. Your commitment to excellence has made a significant impact on our coaching program.</p>
+                <table class="letter-table">
+                    <tr><td>Previous Role</td><td id="promoOldRoleTable"></td></tr>
+                    <tr><td>New Role</td><td id="promoNewRoleTable"></td></tr>
+                    <tr><td>Effective Date</td><td id="promoEffectiveDateTable"></td></tr>
+                    <tr><td>Revised Stipend</td><td id="promoStipendTable"></td></tr>
+                </table>
+                <p>With this new role comes greater responsibility and opportunity to make an even bigger impact. We are confident in your abilities and look forward to your continued growth with us.</p>
+                <p>Congratulations on this well-deserved promotion! 🎉</p>
+            </div>
+            <div class="letter-footer">
+                <p>Yours sincerely,</p>
+                <div class="letter-sign-line"></div>
+                <p><strong>Akash Chaudhary</strong><br>CEO & Founder<br>NextGen InnoHub</p>
+            </div>
+        </div>
             <button class="btn" onclick="downloadPDF()">📥 Download PDF</button>
             <button class="btn btn-secondary" onclick="printCertificate()">🖨️ Print Certificate</button>
             <button class="btn" onclick="resetForm()" style="background: #ef4444;">🔄 Create New</button>
@@ -166,6 +411,110 @@
     <script>
         const user = JSON.parse(localStorage.getItem('currentUser'));
         if (!user || user.role === 'intern') window.location.href = 'portal-login.html';
+
+        // Tab switching
+        function switchDoc(type) {
+            document.querySelectorAll('.doc-type-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.doc-form').forEach(f => f.classList.remove('active'));
+            document.getElementById('tab-' + type).classList.add('active');
+            document.getElementById('form-' + type).classList.add('active');
+            ['certificate', 'offerLetter', 'appointmentLetter', 'promotionLetter'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+            document.getElementById('actionButtons').style.display = 'none';
+            document.querySelector('.form-section:first-of-type') && (document.querySelector('.form-section:first-of-type').style.display = 'block');
+        }
+
+        function formatDate(dateStr) {
+            return new Date(dateStr).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        // Offer Letter
+        function generateOffer(e) {
+            e.preventDefault();
+            const name = document.getElementById('offerName').value;
+            const role = document.getElementById('offerRole').value;
+            const joining = document.getElementById('offerJoining').value;
+            const stipend = document.getElementById('offerStipend').value;
+            const hours = document.getElementById('offerHours').value;
+            const clients = document.getElementById('offerClients').value || 'As assigned';
+            const ref = 'NGI' + Date.now().toString().slice(-6);
+
+            document.getElementById('offerRef').textContent = ref;
+            document.getElementById('offerDate').textContent = formatDate(new Date().toISOString().split('T')[0]);
+            document.getElementById('offerNameDisplay').textContent = name;
+            document.getElementById('offerRoleDisplay').textContent = role;
+            document.getElementById('offerRoleTable').textContent = role;
+            document.getElementById('offerJoiningTable').textContent = formatDate(joining);
+            document.getElementById('offerStipendTable').textContent = '\u20b9' + stipend + '/month';
+            document.getElementById('offerHoursTable').textContent = hours;
+            document.getElementById('offerClientsTable').textContent = clients;
+            document.getElementById('offerHoursInline').textContent = hours;
+            document.getElementById('offerStipendInline').textContent = stipend;
+            document.getElementById('offerAcceptName').textContent = name;
+
+            document.getElementById('offerLetter').style.display = 'block';
+            document.getElementById('actionButtons').style.display = 'block';
+            document.getElementById('form-offer').style.display = 'none';
+            document.getElementById('actionButtons').setAttribute('data-type', 'offer');
+            window.scrollTo({ top: document.getElementById('offerLetter').offsetTop - 100, behavior: 'smooth' });
+        }
+
+        // Appointment Letter
+        function generateAppointment(e) {
+            e.preventDefault();
+            const name = document.getElementById('apptName').value;
+            const role = document.getElementById('apptRole').value;
+            const date = document.getElementById('apptDate').value;
+            const stipend = document.getElementById('apptStipend').value;
+            const hours = document.getElementById('apptHours').value;
+            const ref = 'NGI' + Date.now().toString().slice(-6);
+
+            document.getElementById('apptRef').textContent = ref;
+            document.getElementById('apptDateDisplay').textContent = formatDate(new Date().toISOString().split('T')[0]);
+            document.getElementById('apptNameDisplay').textContent = name;
+            document.getElementById('apptRoleDisplay').textContent = role;
+            document.getElementById('apptEffectiveDate').textContent = formatDate(date);
+            document.getElementById('apptRoleTable').textContent = role;
+            document.getElementById('apptEffectiveDateTable').textContent = formatDate(date);
+            document.getElementById('apptStipendTable').textContent = '\u20b9' + stipend + '/month';
+            document.getElementById('apptHoursTable').textContent = hours;
+
+            document.getElementById('appointmentLetter').style.display = 'block';
+            document.getElementById('actionButtons').style.display = 'block';
+            document.getElementById('form-appointment').style.display = 'none';
+            document.getElementById('actionButtons').setAttribute('data-type', 'appointment');
+            window.scrollTo({ top: document.getElementById('appointmentLetter').offsetTop - 100, behavior: 'smooth' });
+        }
+
+        // Promotion Letter
+        function generatePromotion(e) {
+            e.preventDefault();
+            const name = document.getElementById('promoName').value;
+            const oldRole = document.getElementById('promoOldRole').value;
+            const newRole = document.getElementById('promoNewRole').value;
+            const date = document.getElementById('promoDate').value;
+            const stipend = document.getElementById('promoStipend').value;
+            const ref = 'NGI' + Date.now().toString().slice(-6);
+
+            document.getElementById('promoRef').textContent = ref;
+            document.getElementById('promoDateDisplay').textContent = formatDate(new Date().toISOString().split('T')[0]);
+            document.getElementById('promoNameDisplay').textContent = name;
+            document.getElementById('promoOldRoleDisplay').textContent = oldRole;
+            document.getElementById('promoNewRoleDisplay').textContent = newRole;
+            document.getElementById('promoEffectiveDate').textContent = formatDate(date);
+            document.getElementById('promoOldRoleTable').textContent = oldRole;
+            document.getElementById('promoNewRoleTable').textContent = newRole;
+            document.getElementById('promoEffectiveDateTable').textContent = formatDate(date);
+            document.getElementById('promoStipendTable').textContent = '\u20b9' + stipend + '/month';
+
+            document.getElementById('promotionLetter').style.display = 'block';
+            document.getElementById('actionButtons').style.display = 'block';
+            document.getElementById('form-promotion').style.display = 'none';
+            document.getElementById('actionButtons').setAttribute('data-type', 'promotion');
+            window.scrollTo({ top: document.getElementById('promotionLetter').offsetTop - 100, behavior: 'smooth' });
+        }
 
         document.getElementById('certForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -196,30 +545,28 @@
         }
 
         function downloadPDF() {
-            const element = document.getElementById('certificate');
+            const type = document.getElementById('actionButtons').getAttribute('data-type') || 'certificate';
+            const elementMap = {
+                certificate: 'certificate',
+                offer: 'offerLetter',
+                appointment: 'appointmentLetter',
+                promotion: 'promotionLetter'
+            };
+            const nameMap = {
+                certificate: document.getElementById('certInternName')?.textContent,
+                offer: document.getElementById('offerNameDisplay')?.textContent,
+                appointment: document.getElementById('apptNameDisplay')?.textContent,
+                promotion: document.getElementById('promoNameDisplay')?.textContent
+            };
+            const element = document.getElementById(elementMap[type]);
+            const isLetter = type !== 'certificate';
             const opt = {
                 margin: 0,
-                filename: 'Certificate_' + document.getElementById('certInternName').textContent.replace(/\s+/g, '_') + '.pdf',
+                filename: type.charAt(0).toUpperCase() + type.slice(1) + '_' + (nameMap[type] || '').replace(/\s+/g, '_') + '.pdf',
                 image: { type: 'jpeg', quality: 1 },
-                html2canvas: { 
-                    scale: 2,
-                    useCORS: true,
-                    letterRendering: true,
-                    logging: false,
-                    width: 1122,
-                    height: 793,
-                    windowWidth: 1122,
-                    windowHeight: 793
-                },
-                jsPDF: { 
-                    unit: 'mm', 
-                    format: 'a4', 
-                    orientation: 'landscape',
-                    compress: true
-                },
-                pagebreak: { mode: 'avoid-all' }
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: isLetter ? 'portrait' : 'landscape' }
             };
-            
             html2pdf().set(opt).from(element).save();
         }
 
@@ -228,10 +575,13 @@
         }
 
         function resetForm() {
-            document.getElementById('certForm').reset();
-            document.getElementById('certificate').style.display = 'none';
+            ['certificate', 'offerLetter', 'appointmentLetter', 'promotionLetter'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+            document.querySelectorAll('.doc-form').forEach(f => f.style.display = 'block');
             document.getElementById('actionButtons').style.display = 'none';
-            document.querySelector('.form-section').style.display = 'block';
+            document.getElementById('certForm').reset();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
