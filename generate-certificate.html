@@ -401,8 +401,10 @@
                 <p><strong>Akash Chaudhary</strong><br>CEO & Founder<br>NextGen InnoHub</p>
             </div>
         </div>
+
+        <div id="actionButtons" style="text-align: center; margin: 30px 0; display: none;">
             <button class="btn" onclick="downloadPDF()">📥 Download PDF</button>
-            <button class="btn btn-secondary" onclick="printCertificate()">🖨️ Print Certificate</button>
+            <button class="btn btn-secondary" onclick="printDoc()">🖨️ Print</button>
             <button class="btn" onclick="resetForm()" style="background: #ef4444;">🔄 Create New</button>
         </div>
     </div>
@@ -538,6 +540,7 @@
 
             document.getElementById('certificate').style.display = 'block';
             document.getElementById('actionButtons').style.display = 'block';
+            document.getElementById('actionButtons').setAttribute('data-type', 'certificate');
             document.querySelector('.form-section').style.display = 'none';
             
             window.scrollTo({ top: document.getElementById('certificate').offsetTop - 100, behavior: 'smooth' });
@@ -552,25 +555,44 @@
                 promotion: 'promotionLetter'
             };
             const nameMap = {
-                certificate: document.getElementById('certInternName')?.textContent,
-                offer: document.getElementById('offerNameDisplay')?.textContent,
-                appointment: document.getElementById('apptNameDisplay')?.textContent,
-                promotion: document.getElementById('promoNameDisplay')?.textContent
+                certificate: document.getElementById('certInternName')?.textContent || 'Certificate',
+                offer: document.getElementById('offerNameDisplay')?.textContent || 'Offer',
+                appointment: document.getElementById('apptNameDisplay')?.textContent || 'Appointment',
+                promotion: document.getElementById('promoNameDisplay')?.textContent || 'Promotion'
             };
             const element = document.getElementById(elementMap[type]);
+            if (!element) { alert('Please generate a document first'); return; }
             const isLetter = type !== 'certificate';
             const opt = {
-                margin: 0,
-                filename: type.charAt(0).toUpperCase() + type.slice(1) + '_' + (nameMap[type] || '').replace(/\s+/g, '_') + '.pdf',
-                image: { type: 'jpeg', quality: 1 },
-                html2canvas: { scale: 2, useCORS: true },
+                margin: isLetter ? [10, 15, 10, 15] : 0,
+                filename: type.charAt(0).toUpperCase() + type.slice(1) + '_' + nameMap[type].replace(/\s+/g, '_') + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, logging: false },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: isLetter ? 'portrait' : 'landscape' }
             };
             html2pdf().set(opt).from(element).save();
         }
 
-        function printCertificate() {
-            window.print();
+        function printDoc() {
+            const type = document.getElementById('actionButtons').getAttribute('data-type') || 'certificate';
+            const elementMap = {
+                certificate: 'certificate',
+                offer: 'offerLetter',
+                appointment: 'appointmentLetter',
+                promotion: 'promotionLetter'
+            };
+            const el = document.getElementById(elementMap[type]);
+            if (!el) { alert('Please generate a document first'); return; }
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write('<html><head><title>Print</title>');
+            printWindow.document.write('<style>');
+            printWindow.document.write(document.querySelector('style').innerHTML);
+            printWindow.document.write('</style></head><body>');
+            printWindow.document.write(el.outerHTML);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
         }
 
         function resetForm() {
